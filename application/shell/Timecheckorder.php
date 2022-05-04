@@ -42,11 +42,11 @@ class Timecheckorder extends Command
             $totalNum = count($orderData);
             if ($totalNum > 0) {
                 foreach ($orderData as $k => $v) {
-                    $getResParam['order_no'] = (string)$v['order_pay'];
-                    $getResParam['order_url'] = $v['check_url'];
-                    $getResParam['ck'] = $v['cookie'];
+                    $getResParam['order_no'] = $v['order_no'];
+                    $getResParam['account'] = $v['account'];
                     $checkStartTime = date("Y-m-d H:i:s", time());
                     $getPhoneAmountRes = $orderHXModel->checkPhoneAmount($getResParam);
+
                     logs(json_encode(['phone' => $v['account'],
                         "order_no" => $v['order_no'],
                         "startTime" => $checkStartTime,
@@ -91,6 +91,7 @@ class Timecheckorder extends Command
                             ->update($orderUpdate);
                         if (!$updateCheck) {
                             logs(json_encode(["time" => date("Y-m-d H:i:s", time()),
+                                'action' => $v['order_no'],
                                 'order_no' => $v['order_no'],
                                 'phone' => $v['account'],
                                 "getPhoneAmountRes" => $getPhoneAmountRes['data']

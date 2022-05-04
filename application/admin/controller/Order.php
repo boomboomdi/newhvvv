@@ -10,6 +10,7 @@ namespace app\admin\controller;
 
 use app\admin\model\OrderModel;
 use app\common\model\OrderdouyinModel;
+use app\common\model\OrderhexiaoModel;
 use think\Db;
 
 class Order extends Base
@@ -85,15 +86,69 @@ class Order extends Base
 
             return json(['code' => 0, 'msg' => 'ok', 'count' => 0, 'data' => []]);
         }
-
         return $this->fetch();
     }
+
 
     /**
      * 手动回调
      * @return void
      */
     public function notify()
+    {
+//        $order_no = input('param.order_no');
+        try {
+            if (request()->isAjax()) {
+                $id = input('param.id');
+//                $param = input('post.');
+
+                if (empty($id)) {
+                    return reMsg(-1, '', "回调错误！");
+                }
+
+                //查询订单
+                $order = Db::table("bsa_order")->where("id", $id)->find();
+
+                if (empty($order)) {
+                    return reMsg(-1, '', "回调订单有误");
+                }
+
+                $orderModel = new \app\common\model\OrderModel();
+                $orderHXModel = new OrderhexiaoModel();
+                logs(json_encode(['notify' => "notify", 'id' => input('param.id')]), 'notify2_log');
+
+                $orderHXWhere['order_me'] = $order['order_me'];
+                $v = $orderHXModel->where($orderHXWhere)->find();
+                logs(json_encode(['order_id' => $id, 'v' => $v, "sql" => Db::table("bsa_order_hexiao")->getLastSql(), "time" => date("Y-m-d H:i:s", time())]), 'order_notify_log2');
+
+
+                $localUpdate = $orderHXModel->orderLocalUpDate($v, 2);
+                if (!isset($localUpdate['code']) || $localUpdate['code'] == 1) {
+                    logs(json_encode(["time" => date("Y-m-d H:i:s", time()),
+                        'order_no' => $v['order_no'],
+                        'phone' => $v['account'],
+                        "localUpdateFail" => json_encode($localUpdate)
+                    ]), 'notify2_log');
+                }
+                return json(['code' => 1000, 'msg' => '回调成功', 'data' => []]);
+            } else {
+                return json('访问错误', 20009);
+            }
+        } catch (\Exception $exception) {
+            logs(json_encode(['id' => $id, 'file' => $exception->getFile(), 'line' => $exception->getLine(), 'errorMessage' => $exception->getMessage()]), 'order_notify_exception');
+            return json('20009', "通道异常" . $exception->getMessage());
+        } catch (\Error $error) {
+            logs(json_encode(['id' => $id, 'file' => $error->getFile(), 'line' => $error->getLine(), 'errorMessage' => $error->getMessage()]), 'order_notify_error');
+            return json('20099', "通道异常" . $error->getMessage());
+        }
+
+    }
+
+    /**
+     * 手动回调
+     * @return void
+     */
+    public function notifyOld()
     {
 //        $order_no = input('param.order_no');
         try {
