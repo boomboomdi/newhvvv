@@ -1,6 +1,6 @@
 <?php
 
-namespace app\shell;
+namespace app\shellOld;
 
 use think\console\Command;
 use think\console\Input;

@@ -1,6 +1,6 @@
 <?php
 
-namespace app\shell;
+namespace app\shellOld;
 
 use app\common\model\OrderdouyinModel;
 use app\common\model\OrderModel;

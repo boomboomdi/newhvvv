@@ -10,10 +10,6 @@
 // +----------------------------------------------------------------------
 
 return [
-//    'app\shell\TimeouttorderNotify',
-    'app\shell\Timedevice',  //定时解锁超时设备
-    'app\shell\Prepareorder',  //预先生成
-    'app\shell\Timecheckdouyinhuadan',  //支付限制话单回调
-    'app\shell\Timecheckdouyin',  //查单回调
-    'app\shell\DestroytorderUrl',  //定时销毁已拉单拉单、超时、未匹配订单
+    'app\shell\Timecheckorder',  //查单更新
+//    'app\shell\Timecheckorder',  //查单更新
 ];

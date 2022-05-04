@@ -104,46 +104,12 @@ class OrderModel extends Model
             //更改订单状态 order
             //1、支付成功（下单成功）！2、支付失败（下单成功）！3、下单失败！4、等待支付（下单成功）！5、已手动回调。6、回调中（还未通知商户）
             $orderWhere['order_me'] = $orderData['order_me'];
-            $orderWhere['order_pay'] = $orderData['order_pay'];
-//            $order = Db::table('bsa_order')->where($orderWhere)->find();
             //4和6是可回调状态
             if ($orderData['order_status'] != 6 || $orderData['order_status'] != 4) {
                 $returnMsg['code'] = 1003;
                 $returnMsg['msg'] = "不可回调状态!";
                 $returnMsg['data'] = $orderData;
             }
-
-            $orderUpdate['order_status'] = 6;
-
-            if ($orderData['order_status'] == 6) { //手动回调 本地更新未通知四方
-                $orderNotifyForMerchantRes = $this->orderNotifyForMerchant($orderData, 2);
-                if ($orderNotifyForMerchantRes['code'] > 0) {
-                    return $orderNotifyForMerchantRes;
-                }
-            }
-            $orderUpdate['order_status'] = 6;
-            $orderUpdate['update_time'] = time();
-            $orderUpdate['pay_time'] = time();
-            $orderUpdate['actual_amount'] = (float)$orderData['amount'];
-            Db::table('bsa_order')->where($orderWhere)->update($orderUpdate);
-            $orderData = Db::table('bsa_order')->where($orderWhere)->find();
-
-            //更改商户余额 merchant
-            $merchantWhere['merchant_sign'] = $orderData['merchant_sign'];
-            $merchant = Db::table('bsa_merchant')->where($merchantWhere)->find();
-            Db::table('bsa_merchant')->where($merchantWhere)
-                ->update([
-                    "amount" => $merchant["amount"] + $orderData['amount']
-                ]);
-            if (!empty($orderData['write_off_sign'])) {
-                $writeOffWhere['studio_sign'] = $orderData['write_off_sign'];
-                $writeOff = Db::table('bsa_write_off')->where($writeOffWhere)->find();
-                Db::table('bsa_write_off')->where($writeOffWhere)
-                    ->update([
-                        "amount" => $writeOff['amount'] + $orderData['amount']
-                    ]);
-            }
-
             $notifyRes = $this->orderNotifyForMerchant($orderData, $status);
 
             if ($notifyRes['code'] != 1000) {
@@ -194,92 +160,54 @@ class OrderModel extends Model
             }
             $merchantWhere['merchant_sign'] = $data['merchant_sign'];
             $token = Db::table("bsa_merchant")->where($merchantWhere)->find()['token'];
-            logs(json_encode(['callbackData' => $data, 'notify_url' => $data['notify_url']]), 'curlPostForMerchant_log1');
 
             $returnMsg = array();
             $doMd5String = $callbackData['merchant_sign'] . $callbackData['order_no'] . $callbackData['amount'] . $callbackData['actual_amount'] . $callbackData['pay_time'] . $token;
             $callbackData['sign'] = md5($doMd5String);
             //回调处理
+            $startTime = date("Y-m-d H:i:s", time());
+
             $notifyResult = curlPostJson($data['notify_url'], $callbackData);
-            logs(json_encode(['callbackData' => $callbackData, 'notify_url' => $data['notify_url'], 'notifyResult' => $notifyResult]), 'curlPostForMerchant_log');
-//            $result = json_decode($notifyResult, true);
-            //通知失败
+            logs(json_encode([
+                "order_no" => $callbackData['order_no'],
+                "startTime" => $startTime,
+                "endTime" => date("Y-m-d H:i:s", time()),
+                'callbackData' => $callbackData,
+                'notify_url' => $data['notify_url'],
+                'notifyResult' => $notifyResult
+            ]), 'curlPostForMerchant_log');
+            $notifyResultLog = "</br>" . $data['notify_result'] . "第" . $data['notify_times'] + 1 . "次回调:" . $notifyResult . "(" . date("Y-m-d H:i:s") . ")";
 
-            if ($data) {
-                $orderWhere['order_no'] = $callbackData['order_no'];  //orderData
-                if ($notifyResult != "success") {
-                    $updateData['order_desc'] = "回调失败|" . json_encode($notifyResult);
-                    $updateRes = Db::table('bsa_order')->where($orderWhere)->update($updateData);
-                    if (!$updateRes) {
-                        $db::rollback();
-                        $returnMsg['code'] = 3000;
-                        $returnMsg['msg'] = "回调失败!请联系管理员";
-                        $returnMsg['data'] = json_encode($notifyResult);
-                        return $returnMsg;
-                    }
-                    $db::commit();
-                    $returnMsg['code'] = 1000;
-                    $returnMsg['msg'] = "回调失败!";
-                    $returnMsg['data'] = json_encode($notifyResult);
+            //通知结果不为success
+            if ($notifyResult != "success") {
+                $db::rollback();
+                $db::table('bsa_order')->where('order_no','=', $callbackData['order_no'])
+                    ->update([
+                        'notify_time' => time(),
+                        'notify_times' => $data['notify_times'] + 1,
+                        'notify_result' => $notifyResultLog,
+                        'order_desc' => "回调失败:" . $notifyResult
+                    ]);
+                return modelReMsg(-3, "", "回调结果失败！");
 
-                    return $returnMsg;
-                }
-                //如果是手动回调
-                $orderWhere['order_no'] = $callbackData['order_no'];
-                if ($status == 2) {
-                    $updateData['order_status'] = 5;
-                    $updateData['status'] = 1;
-                    $updateData['update_time'] = time();
-                    $updateData['order_desc'] = "手动回调成功|" . json_encode($notifyResult);
-                    $updateRes = Db::table('bsa_order')->where($orderWhere)->update($updateData);
-                    if (!$updateRes) {
-                        $returnMsg['code'] = 3000;
-                        $returnMsg['msg'] = "手动回调失败!请联系管理员";
-                        $returnMsg['data'] = json_encode($notifyResult);
-                        $db::rollback();
-                        return $returnMsg;
-                    }
-
-                    $db::commit();
-                    $returnMsg['code'] = 1000;
-                    $returnMsg['msg'] = "手动回调成功!";
-                    $returnMsg['data'] = json_encode($notifyResult);
-                    return $returnMsg;
-                }
-                if ($status == 1) {
-                    $orderUpdate['order_status'] = 1;
-                    $orderUpdate['update_time'] = time();
-                    $orderUpdate['status'] = 1;
-                    $orderUpdate['order_desc'] = "回调成功|" . json_encode($notifyResult);
-                    $updateRes = Db::table('bsa_order')->where($orderWhere)->update($orderUpdate);
-
-                    if (!$updateRes) {
-                        $db::rollback();
-                        $returnMsg['code'] = 4000;
-                        $returnMsg['msg'] = "回调失败!请联系管理员";
-                        $returnMsg['data'] = json_encode($notifyResult);
-                        return $returnMsg;
-                    }
-
-                    $db::commit();
-                    $returnMsg['code'] = 1000;
-                    $returnMsg['msg'] = "回调成功!";
-                    $returnMsg['data'] = json_encode($notifyResult);
-                    return $returnMsg;
-                }
             }
-            $returnMsg['code'] = 4000;
-            $returnMsg['msg'] = "回调失败!";
-            $returnMsg['data'] = json_encode($notifyResult);
-            return $returnMsg;
+            $db::table('bsa_order')->where('order_no','=', $callbackData['order_no'])
+                ->update([
+                    'notify_time' => time(),
+                    'notify_times' => $data['notify_times'] + 1,
+                    'notify_result' => $notifyResultLog,
+                    'order_desc' => "回调成功:" . $notifyResult
+                ]);
+            $db::commit();
+            return modelReMsg(0, "", json_encode($notifyResult));
 
         } catch (\Exception $exception) {
             $db::rollback();
-            logs(json_encode(['data' => $data, 'file' => $exception->getFile(), 'line' => $exception->getLine(), 'errorMessage' => $exception->getMessage()]), 'orderNotifyForMerchant_exception');
+            logs(json_encode(['data' => $data, 'file' => $exception->getFile(), 'line' => $exception->getLine(), 'errorMessage' => $exception->getMessage()]), 'orderNotifyToMerchant_exception');
             return modelReMsg(-2, '', $exception->getMessage());
         } catch (\Error $error) {
             $db::rollback();
-            logs(json_encode(['data' => $data, 'file' => $error->getFile(), 'line' => $error->getLine(), 'errorMessage' => $error->getMessage()]), 'orderNotifyForMerchant_error');
+            logs(json_encode(['data' => $data, 'file' => $error->getFile(), 'line' => $error->getLine(), 'errorMessage' => $error->getMessage()]), 'orderNotifyToMerchant_error');
             return modelReMsg(-3, '', $error->getMessage());
         }
 
