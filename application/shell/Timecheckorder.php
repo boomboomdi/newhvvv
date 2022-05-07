@@ -34,7 +34,7 @@ class Timecheckorder extends Command
             $orderData = $orderModel
                 ->where('order_status', '=', 4)
                 ->where('next_check_time', '<', time())
-                ->where('check_status', '<>', 0)
+                ->where('check_status', '=', 0)
                 ->where('check_times', '<', 5)
                 ->select();
             logs(json_encode(['orderData' => $orderData,
