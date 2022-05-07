@@ -34,7 +34,7 @@ class Timeoutorder extends Command
                 ->where('notify_status', '=', 0)
                 ->where('do_notify', '=', 0)
                 ->where('order_me', '<>', null)
-                ->where('order_limit_time', '>', time())
+                ->where('order_limit_time', '<', time())
                 ->select();
             $totalNum = count($orderData);
             if ($totalNum > 0) {
