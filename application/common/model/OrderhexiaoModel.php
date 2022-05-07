@@ -108,7 +108,7 @@ class OrderhexiaoModel extends Model
             $orderWhere['order_me'] = $orderHxData['order_me'];
 //            $orderWhere['account'] = $orderHxData['account'];
             $payTime = time();
-            $lockHxOrderRes = $this->where('id', '=', $orderHxData['id'])->lock('true')->find();
+            $lockHxOrderRes = $this->where('id', '=', $orderHxData['id'])->lock(true)->find();
             if (!$lockHxOrderRes) {
                 $db::rollback();
                 return modelReMsg(-1, "", "update fail rollback");
@@ -132,7 +132,7 @@ class OrderhexiaoModel extends Model
 
             //更新订单表
             $orderData = $this->where($orderWhere)->find();
-            $lockOrderRes = $this->where('id', '=', $orderData['id'])->lock('lock')->find();
+            $lockOrderRes = $this->where('id', '=', $orderData['id'])->lock(true)->find();
             if (!$lockOrderRes) {
                 $db::rollback();
                 return modelReMsg(-3, "", "update lock order fail rollback");
