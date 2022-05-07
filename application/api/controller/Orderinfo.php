@@ -88,6 +88,7 @@ class Orderinfo extends Controller
                 return apiJsonReturn(10010, $getUseHxOrderRes['msg'], "");
             }
             $updateOrderStatus['order_status'] = 4;   //等待支付状态
+            $updateOrderStatus['check_times'] = 1;   //下单成功就查询一次
             $updateOrderStatus['order_pay'] = $getUseHxOrderRes['data']['order_no'];   //匹配核销单订单号
             $updateOrderStatus['order_limit_time'] = time() + 900;  //订单表 限制使用时间
             $updateOrderStatus['start_check_amount'] = $getUseHxOrderRes['data']['last_check_amount'];  //开单余额
