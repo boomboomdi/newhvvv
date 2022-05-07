@@ -70,6 +70,7 @@ class Orderhexiao extends Base
 //                    $data[$key]['order_status'] = '<button class="layui-btn layui-btn-primary layui-btn-xs">等待支付</button>';
 //                }
                 $data[$key]['add_time'] = date('Y-m-d H:i:s', $data[$key]['add_time']);
+                $data[$key]['limit_time'] = date('Y-m-d H:i:s', $data[$key]['limit_time']);
                 $data[$key]['last_use_time'] = date('Y-m-d H:i:s', $data[$key]['last_use_time']);
                 $data[$key]['notify_time'] = date('Y-m-d H:i:s', $data[$key]['notify_time']);
             }
