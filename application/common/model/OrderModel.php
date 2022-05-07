@@ -181,7 +181,7 @@ class OrderModel extends Model
             //通知结果不为success
             if ($notifyResult != "success") {
                 $db::rollback();
-                $db::table('bsa_order')->where('order_no','=', $callbackData['order_no'])
+                $db::table('bsa_order')->where('order_no', '=', $callbackData['order_no'])
                     ->update([
                         'notify_time' => time(),
                         'notify_times' => $data['notify_times'] + 1,
@@ -191,7 +191,7 @@ class OrderModel extends Model
                 return modelReMsg(-3, "", "回调结果失败！");
 
             }
-            $db::table('bsa_order')->where('order_no','=', $callbackData['order_no'])
+            $db::table('bsa_order')->where('order_no', '=', $callbackData['order_no'])
                 ->update([
                     'notify_time' => time(),
                     'notify_times' => $data['notify_times'] + 1,
@@ -213,5 +213,63 @@ class OrderModel extends Model
 
     }
 
+    /**
+     * 支付超时订单修改
+     * @param $where
+     * @param $updateData
+     * @return array
+     */
+    public function localUpdateOrder($where, $updateData)
+    {
+        $this->startTrans();
+        try {
+            $orderInfo = $this->where($where)->lock(true)->find();
+            if (!$orderInfo) {
+                $this->rollback();
+                logs(json_encode([
+                    'orderWhere' => $where,
+                    'updateData' => $updateData,
+                    'orderInfo' => $orderInfo
+                ]), 'localhostUpdateOrderFail_log');
+                return modelReMsg(-1, "", "更新失败!");
+            }
+            $updateRes = $this->where($where)->update($updateData);
+
+            if (!$updateRes) {
+                $this->rollback();
+                logs(json_encode([
+                    'orderWhere' => $where,
+                    'updateData' => $updateData,
+                    'updateRes' => $updateRes
+                ]), 'localhostUpdateOrderFail_log');
+                return modelReMsg(-2, "", "更新失败");
+            }
+//            logs(json_encode([
+//                'orderWhere' => $where,
+//                'updateData' => $updateData,
+//                'updateRes' => $updateRes
+//            ]), 'localhostUpdateOrder');
+            $this->commit();
+            return modelReMsg(0, "", "更新成功");
+
+        } catch (\Exception $exception) {
+
+            $this->rollback();
+            logs(json_encode(['file' => $exception->getFile(),
+                'line' => $exception->getLine(),
+                'errorMessage' => $exception->getMessage()
+            ]), 'localhostUpdateOrderException');
+            return modelReMsg(-11, "", $exception->getMessage());
+        } catch (\Error $error) {
+
+            $this->rollback();
+            logs(json_encode([
+                'file' => $error->getFile(),
+                'line' => $error->getLine(),
+                'errorMessage' => $error->getMessage()
+            ]), 'localhostUpdateOrderError');
+            return modelReMsg(-22, "", $error->getMessage());
+        }
+    }
 
 }

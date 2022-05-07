@@ -35,7 +35,7 @@ class Timecheckorder extends Command
                 ->where('order_status', '=', 4)
                 ->where('next_check_time', '<', time())
                 ->where('check_status', '>', 0)
-                ->where('check_times', '<', 10)
+                ->where('check_times', '<', 5)
                 ->select();
 //            logs(json_encode(['orderData' => $orderData, "sql" => Db::table("bsa_torder_douyin")->getLastSql(), "time" => date("Y-m-d H:i:s", time())]), 'Timecheckdouyin_log1');
             $db = new Db();
@@ -43,7 +43,7 @@ class Timecheckorder extends Command
             if ($totalNum > 0) {
                 foreach ($orderData as $k => $v) {
                     $getResParam['order_no'] = $v['order_no'];
-                    $getResParam['account'] = $v['account'];
+                    $getResParam['phone'] = $v['account'];
                     $checkStartTime = date("Y-m-d H:i:s", time());
                     $getPhoneAmountRes = $orderHXModel->checkPhoneAmount($getResParam);
 
@@ -53,13 +53,17 @@ class Timecheckorder extends Command
                         "endTime" => date("Y-m-d H:i:s", time()),
                         "getPhoneAmountRes" => $getPhoneAmountRes['data']
                     ]), 'Timecheckdouyin_getOrderStatus_log');
-                    $checkResult = "</br>" . $v['check_result'] . "第" . $v['check_times'] + 1 . "次查询结果" . $getPhoneAmountRes['data'] . "(" . date("Y-m-d H:i:s") . ")";
+                    $checkResult = "第" . $v['check_times'] + 1 . "次查询结果" . $getPhoneAmountRes['data'] . "(" . date("Y-m-d H:i:s") . ")";
+                    $nextCheckTime = time() + 40;
+                    if ($v['check_times'] > 3) {
+                        $nextCheckTime = time() + 50;
+                    }
                     if (!isset($getPhoneAmountRes['code']) && $getPhoneAmountRes['code'] != 0) {
                         $orderWhere['order_no'] = $v['order_no'];
                         $db::table("bsa_order")->where($orderWhere)
                             ->update([
                                 "check_times" => $v['check_times'] + 1,
-                                "next_check_time" => $v['next_check_time'] + 40,
+                                "next_check_time" => $nextCheckTime,
                                 "check_result" => $checkResult,
                             ]);
                     } else {
