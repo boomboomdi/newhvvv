@@ -55,7 +55,7 @@ class Timecheckorder extends Command
                         "endTime" => date("Y-m-d H:i:s", time()),
                         "getPhoneAmountRes" => $getPhoneAmountRes['data']
                     ]), 'TimecheckdouyincheckPhoneAmount_log');
-                    $checkResult = "第" . $v['check_times'] + 1 . "次查询结果" . $getPhoneAmountRes['data'] . "(" . date("Y-m-d H:i:s") . ")";
+                    $checkResult = "第" . ($v['check_times'] + 1) . "次查询结果" . $getPhoneAmountRes['data'] . "(" . date("Y-m-d H:i:s") . ")";
                     $nextCheckTime = time() + 40;
                     if ($v['check_times'] > 3) {
                         $nextCheckTime = time() + 50;
