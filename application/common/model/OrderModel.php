@@ -221,11 +221,12 @@ class OrderModel extends Model
      */
     public function localUpdateOrder($where, $updateData)
     {
-        $this->startTrans();
+        $db = new Db();
+        $db::startTrans();
         try {
             $orderInfo = $this->where($where)->lock(true)->find();
             if (!$orderInfo) {
-                $this->rollback();
+                $db::rollback();
                 logs(json_encode([
                     'orderWhere' => $where,
                     'updateData' => $updateData,
@@ -236,7 +237,7 @@ class OrderModel extends Model
             $updateRes = $this->where($where)->update($updateData);
 
             if (!$updateRes) {
-                $this->rollback();
+                $db::rollback();
                 logs(json_encode([
                     'orderWhere' => $where,
                     'updateData' => $updateData,
@@ -254,7 +255,7 @@ class OrderModel extends Model
 
         } catch (\Exception $exception) {
 
-            $this->rollback();
+            $db::rollback();
             logs(json_encode(['file' => $exception->getFile(),
                 'line' => $exception->getLine(),
                 'errorMessage' => $exception->getMessage()
@@ -262,7 +263,7 @@ class OrderModel extends Model
             return modelReMsg(-11, "", $exception->getMessage());
         } catch (\Error $error) {
 
-            $this->rollback();
+            $db::rollback();
             logs(json_encode([
                 'file' => $error->getFile(),
                 'line' => $error->getLine(),

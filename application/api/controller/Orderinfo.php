@@ -103,6 +103,11 @@ class Orderinfo extends Controller
             $updateOrderStatus['qr_url'] = $url;   //支付订单
             $updateWhere['order_no'] = $message['order_no'];
             $localOrderUpdateRes = $orderModel->localUpdateOrder($updateWhere, $updateOrderStatus);
+            logs(json_encode([
+                'orderWhere' => $updateWhere,
+                'updateOrderStatus' => $updateOrderStatus,
+                'localOrderUpdateRes' => $localOrderUpdateRes
+            ]), 'localhostUpdateOrder');
 //            $orderModel->where('order_no', '=', $insertOrderData['order_no'])->update($updateOrderStatus);
             if (!isset($localOrderUpdateRes['code']) || $localOrderUpdateRes != 0) {
                 return apiJsonReturn(10009, "下单失败！");
