@@ -120,7 +120,7 @@ class OrderhexiaoModel extends Model
             $amount = $orderHxData['order_amount'];
             $updateHXData['pay_amount'] = (float)$amount;
             $updateHXData['pay_time'] = $payTime;
-            $updateHXData['status'] = $payTime;
+            $updateHXData['status'] = 2;
             $updateHXData['pay_status'] = 1;
             $updateHXRes = $db::table("bsa_order_hexiao")->where($orderWhere)
                 ->update($updateHXData);
