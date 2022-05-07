@@ -304,7 +304,7 @@ class OrderhexiaoModel extends Model
                 "paramAddTime" => date("Y-m-d H:i:s", $orderHXData['add_time']),
                 "notifyResult" => $notifyResult
             ]), 'curlPostJsonToWriteOff_log');
-            $notifyResultLog = $orderHXData['notify_result'] . "第" . $orderHXData['notify_times'] + 1 . "次回调:" . $notifyResult . "(" . date("Y-m-d H:i:s") . ")";
+            $notifyResultLog = "第" . ($orderHXData['notify_times'] + 1) . "次回调:" . json_encode($notifyResult) . "(" . date("Y-m-d H:i:s") . ")";
 
             //通知结果不为success
             if ($notifyResult != "success") {
