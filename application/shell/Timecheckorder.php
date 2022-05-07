@@ -1,6 +1,6 @@
 <?php
 
-namespace app\shellOld;
+namespace app\shell;
 
 use app\common\model\OrderhexiaoModel;
 use app\common\model\OrderModel;
