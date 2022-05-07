@@ -114,7 +114,7 @@ class OrderhexiaoModel extends Model
                 $db::rollback();
                 return modelReMsg(-1, "", "update fail rollback");
             }
-            $amount = $orderHxData['amount'];
+            $amount = $orderHxData['order_amount'];
             $updateHXRes = $this->where($orderWhere)
                 ->update([
                     "pay_amount" => $amount,
@@ -137,9 +137,9 @@ class OrderhexiaoModel extends Model
             }
             $updateOrderRes = $db::table('bsa_order')->where($orderWhere)
                 ->update([
-                    "actual_amount" => $amount,
-                    "pay_time" => $payTime,
-                    "order_status" => 1,
+                    "actual_amount" => $amount,  //
+                    "pay_time" => $payTime,  //支付时间
+                    "order_status" => 1,  //已支付
                     "check_status" => 2,
                     "pay_status" => 1,
                 ]);
