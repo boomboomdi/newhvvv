@@ -15,7 +15,7 @@ class OrderhexiaoValidate extends Validate
         'operator' => 'require|max:32',
         'order_amount' => 'require|float',
         'limit_time' => 'require|integer|length:10',
-        'notify_url' => 'require|activeUrl',
+        'notify_url' => 'require',
         'sign' => 'require|length:32',
     ];
 
@@ -30,7 +30,7 @@ class OrderhexiaoValidate extends Validate
         'operator.require' => 'require operator',
         'operator.max' => 'format error operator',
         'notify_url.require' => 'notify_url format error',
-        'notify_url.activeUrl' => 'notify_url format error',
+//        'notify_url.activeUrl' => 'notify_url format error',
         'total_amount.require' => 'require total_amount',
         'total_amount.float' => 'total_amount format float',
         'limit_time.require' => 'require limit_time',
