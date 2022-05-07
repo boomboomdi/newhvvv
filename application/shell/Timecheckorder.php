@@ -84,7 +84,7 @@ class Timecheckorder extends Command
                         $orderUpdate['check_times'] = $v['check_times'] + 1;
                         $orderUpdate['last_check_amount'] = $getPhoneAmountRes['data'];
                         $orderUpdate['next_check_time'] = $nextCheckTime;
-                        $orderUpdate['check_result'] = $getPhoneAmountRes['data'];
+                        $orderUpdate['order_desc'] = $checkResult;
                         $orderUpdate['check_times'] = $checkResult;
                         $updateCheck = $db::table("bsa_order")->where($orderWhere)
                             ->update($orderUpdate);
