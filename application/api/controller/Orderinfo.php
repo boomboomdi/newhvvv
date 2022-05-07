@@ -132,10 +132,10 @@ class Orderinfo extends Controller
             $where['order_no'] = $message['order_no'];
             $orderInfo = $orderModel->where($where)->find();
             if (empty($message['order_no'])) {
-                return json(msg(-2, '', '无次推单！'));
+                return json(msg(-2, '', '无此推单！'));
             }
             if ($message['order_no'] != 4) {
-                return json(msg(-3, '', '请重新下单'));
+                return json(msg(-3, '', '请重新下单！'));
             }
 
             if (($orderInfo['order_limit_time'] - 30) < time()) {
