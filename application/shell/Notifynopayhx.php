@@ -12,11 +12,11 @@ use app\common\model\SystemConfigModel;
 use app\common\model\NotifylogModel;
 use think\Db;
 
-class Timenotifyhxnopay extends Command
+class Notifynopayhx extends Command
 {
     protected function configure()
     {
-        $this->setName('Timenotifyhxnopay')->setDescription('回调核销:支付失败！');
+        $this->setName('Notifynopayhx')->setDescription('回调核销:支付失败！');
     }
 
     /**
@@ -51,13 +51,13 @@ class Timenotifyhxnopay extends Command
                     $db::table('bsa_order_hexiao')->where($orderWhere)->update($notifying);
                 }
             }
-            $output->writeln("Timenotifyhxnopay:订单总数" . $totalNum);
+            $output->writeln("Notifynopayhx:订单总数" . $totalNum);
         } catch (\Exception $exception) {
-            logs(json_encode(['file' => $exception->getFile(), 'line' => $exception->getLine(), 'errorMessage' => $exception->getMessage()]), 'Timenotifyhxiao_exception');
-            $output->writeln("Timenotifyhxnopay:exception");
+            logs(json_encode(['file' => $exception->getFile(), 'line' => $exception->getLine(), 'errorMessage' => $exception->getMessage()]), 'NotifynopayhxException');
+            $output->writeln("Notifynopayhx:exception");
         } catch (\Error $error) {
-            logs(json_encode(['file' => $error->getFile(), 'line' => $error->getLine(), 'errorMessage' => $error->getMessage()]), 'TiTimenotifyhxiao_error');
-            $output->writeln("Timenotifyhxnopay:error");
+            logs(json_encode(['file' => $error->getFile(), 'line' => $error->getLine(), 'errorMessage' => $error->getMessage()]), 'NotifynopayhxError');
+            $output->writeln("Notifynopayhx:error");
         }
 
     }
