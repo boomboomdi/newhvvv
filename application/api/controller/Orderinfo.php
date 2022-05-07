@@ -116,9 +116,9 @@ class Orderinfo extends Controller
     /**
      * 引导页面查询订单状态
      */
-    public function orderInfo(Request $request)
+    public function getOrderInfo(Request $request)
     {
-        header('Access-Control-Allow-Origin:' . $_SERVER['HTTP_ORIGIN']);
+        header('Access-Control-Allow-Origin:*');
         header("Access-Control-Allow-Credentials:true");
         header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept,Authorization");
         header('Access-Control-Allow-Methods:GET,POST,PUT,DELETE,OPTIONS,PATCH');
