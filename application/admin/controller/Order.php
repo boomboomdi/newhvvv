@@ -45,7 +45,7 @@ class Order extends Base
             $Order = new OrderModel();
             $list = $Order->getOrders($limit, $where);
 
-            logs(json_encode(['searchParam' => $searchParam, "where" => $where, "last_sql" => Db::table('bsa_order')->getLastSql()]), 'orderIndex_log');
+//            logs(json_encode(['searchParam' => $searchParam, "where" => $where, "last_sql" => Db::table('bsa_order')->getLastSql()]), 'orderIndex_log');
             $data = $list['data'];
             foreach ($data as $key => $vo) {
                 // 1、支付成功（下单成功）！2、支付失败（下单成功）！3、下单失败！4、等待支付（下单成功）！5、已手动回调。
