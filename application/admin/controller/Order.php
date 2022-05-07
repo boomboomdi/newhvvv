@@ -118,7 +118,7 @@ class Order extends Base
                 logs(json_encode(['order_id' => $id, 'v' => $v, "sql" => Db::table("bsa_order_hexiao")->getLastSql(), "time" => date("Y-m-d H:i:s", time())]), 'order_notify_log2');
 
                 $localUpdate = $orderHXModel->orderLocalUpDate($v, 2);
-                if (!isset($localUpdate['code']) || $localUpdate['code'] == 1) {
+                if (!isset($localUpdate['code']) || $localUpdate['code'] == 0) {
                     logs(json_encode(["time" => date("Y-m-d H:i:s", time()),
                         'order_no' => $v['order_no'],
                         'phone' => $v['account'],
