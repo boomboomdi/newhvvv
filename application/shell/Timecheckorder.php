@@ -62,14 +62,37 @@ class Timecheckorder extends Command
                     }
                     if (!isset($getPhoneAmountRes['code']) && $getPhoneAmountRes['code'] != 0) {
                         $orderWhere['order_no'] = $v['order_no'];
-                        $db::table("bsa_order")->where($orderWhere)
+                        $updateCheckTimesRes = $db::table("bsa_order")->where($orderWhere)
                             ->update([
                                 "check_times" => $v['check_times'] + 1,
                                 "next_check_time" => $nextCheckTime,
                                 "check_result" => $checkResult,
                             ]);
+                        if (!$updateCheckTimesRes) {
+                            logs(json_encode(['phone' => $v['account'],
+                                "order_no" => $v['order_no'],
+                                "startTime" => $checkStartTime,
+                                "endTime" => date("Y-m-d H:i:s", time()),
+                                "getPhoneAmountRes" => $getPhoneAmountRes['data']
+                            ]), 'updateCheckPhoneAmountFail');
+                        }
                     } else {
                         //查询成功
+                        $orderWhere['order_no'] = $v['order_no'];
+                        $orderUpdate['check_times'] = $v['check_times'] + 1;
+                        $orderUpdate['last_check_amount'] = $getPhoneAmountRes['data'];
+                        $orderUpdate['check_result'] = $getPhoneAmountRes['data'];
+                        $orderUpdate['check_times'] = $checkResult;
+                        $updateCheck = $db::table("bsa_order")->where($orderWhere)
+                            ->update($orderUpdate);
+                        if (!$updateCheck) {
+                            logs(json_encode(["time" => date("Y-m-d H:i:s", time()),
+                                'action' => "paySuccess",
+                                'order_no' => $v['order_no'],
+                                'phone' => $v['account'],
+                                "getPhoneAmountRes" => $checkResult
+                            ]), 'Timecheckorder_log');
+                        }
                         //1、支付到账
                         if ($getPhoneAmountRes['data'] == $v['end_check_amount']) {
                             //1、回调核销商
@@ -89,20 +112,7 @@ class Timecheckorder extends Command
                             //3、余额小于等于初始查询余额
 
                         }
-                        $orderWhere['order_no'] = $v['order_no'];
-                        $orderUpdate['check_times'] = $v['check_times'] + 1;
-                        $orderUpdate['last_check_amount'] = $getPhoneAmountRes['data'];
-                        $orderUpdate['check_times'] = $checkResult;
-                        $updateCheck = $db::table("bsa_order")->where($orderWhere)
-                            ->update($orderUpdate);
-                        if (!$updateCheck) {
-                            logs(json_encode(["time" => date("Y-m-d H:i:s", time()),
-                                'action' => $v['order_no'],
-                                'order_no' => $v['order_no'],
-                                'phone' => $v['account'],
-                                "getPhoneAmountRes" => $getPhoneAmountRes['data']
-                            ]), 'Timecheckorder_log');
-                        }
+
                     }
                 }
 
