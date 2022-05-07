@@ -71,6 +71,7 @@ class Orderhexiao extends Base
 //                }
                 $data[$key]['add_time'] = date('Y-m-d H:i:s', $data[$key]['add_time']);
                 $data[$key]['use_time'] = date('Y-m-d H:i:s', $data[$key]['use_time']);
+                $data[$key]['pay_time'] = date('Y-m-d H:i:s', $data[$key]['pay_time']);
                 $data[$key]['limit_time'] = date('Y-m-d H:i:s', $data[$key]['limit_time']);
                 $data[$key]['last_use_time'] = date('Y-m-d H:i:s', $data[$key]['last_use_time']);
                 $data[$key]['notify_time'] = date('Y-m-d H:i:s', $data[$key]['notify_time']);
