@@ -33,7 +33,7 @@ class Notifynopayhx extends Command
                 ->where('notify_status', '=', 0)
                 ->where('do_notify', '=', 0)
                 ->where('notify_times', '<', 5)
-                ->where('order_limit_time', '<', time())
+                ->where('limit_time', '<', time())
                 ->select();
             $db = new Db();
 
