@@ -82,8 +82,8 @@ class Orderhexiao extends Controller
 //                logs(json_encode(['addParam' => $addParam, 'addRes' => $res, "time" => date("Y-m-d H:i:s", time())]), 'uploadOrder_log');
                 return json(msg('-4', '', $res['msg']));
             }
-            $returnData['code'] = 1;
-            $returnData['order_no'] = $param['order_no'];
+////            $returnData['code'] = 1;
+//            $returnData['order_no'] = $param['order_no'];
 
             return json(msg(1, '', "success"));
 

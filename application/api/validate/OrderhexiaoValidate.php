@@ -30,12 +30,12 @@ class OrderhexiaoValidate extends Validate
         'operator.require' => 'require operator',
         'operator.max' => 'format error operator',
         'notify_url.require' => 'notify_url format error',
+        'notify_url.activeUrl' => 'notify_url format error',
         'total_amount.require' => 'require total_amount',
         'total_amount.float' => 'total_amount format float',
         'limit_time.require' => 'require limit_time',
         'limit_time.integer' => 'limit_time format error',
         'limit_time.length' => 'limit_time format length error',
-        'notify_url.length' => 'notify_url format error',
         'sign.require' => 'require sign',
         'sign.length' => 'sign format error',
     ];
