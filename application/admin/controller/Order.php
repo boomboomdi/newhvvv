@@ -96,16 +96,12 @@ class Order extends Base
      */
     public function notify()
     {
-//        $order_no = input('param.order_no');
         try {
             if (request()->isAjax()) {
                 $id = input('param.id');
-//                $param = input('post.');
-
                 if (empty($id)) {
                     return reMsg(-1, '', "回调错误！");
                 }
-
                 //查询订单
                 $order = Db::table("bsa_order")->where("id", $id)->find();
 
@@ -120,7 +116,6 @@ class Order extends Base
                 $orderHXWhere['order_me'] = $order['order_me'];
                 $v = $orderHXModel->where($orderHXWhere)->find();
                 logs(json_encode(['order_id' => $id, 'v' => $v, "sql" => Db::table("bsa_order_hexiao")->getLastSql(), "time" => date("Y-m-d H:i:s", time())]), 'order_notify_log2');
-
 
                 $localUpdate = $orderHXModel->orderLocalUpDate($v, 2);
                 if (!isset($localUpdate['code']) || $localUpdate['code'] == 1) {

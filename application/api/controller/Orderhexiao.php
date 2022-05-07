@@ -64,6 +64,19 @@ class Orderhexiao extends Controller
             }
             $orderHeXModel = new OrderhexiaoModel();
 
+            //查询是否已经有有相同手机号
+            $isHasWhere['account'] = $param['account'];
+            $isHasWhere['notify_status'] = 0;
+            $isHas = $orderHeXModel->where($isHasWhere)->find();
+            if ($isHas) {
+                $exception['order_no'] = $param['order_no'];
+                $exception['action_result'] = 'check sign fail!';
+                $exception['content'] = json_encode(['param' => $param]);
+                $exception['desc'] = "有未回调订单" . $isHas['order_no'];
+                $orderExceptionModel->addLog($param['write_off_sign'], 'uploadOrder', $exception);
+                return json(msg(-4, '', '该账号有未回调订单!'));
+            }
+
             $addParam = $param;
             unset($addParam['sign']);
             $addParam['add_time'] = time();
@@ -80,7 +93,7 @@ class Orderhexiao extends Controller
                 $exception['desc'] = "上传签名有误！";
                 $orderExceptionModel->addLog($param['write_off_sign'], 'uploadOrder', $exception);
 //                logs(json_encode(['addParam' => $addParam, 'addRes' => $res, "time" => date("Y-m-d H:i:s", time())]), 'uploadOrder_log');
-                return json(msg('-4', '', $res['msg']));
+                return json(msg(-5, '', $res['msg']));
             }
 ////            $returnData['code'] = 1;
 //            $returnData['order_no'] = $param['order_no'];
