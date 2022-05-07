@@ -64,19 +64,13 @@ class OrderhexiaoModel extends Model
             ]), 'curlCheckPhoneAmount_log');
             //查询成功
 
-
-            $notifyResultData = json_decode($notifyResult['data'], true);
+//            $notifyResultData = json_decode($notifyResult['data'], true);
             //{"code":0,"msg":"SUCCESS","data":{"phone":"13333338889","amount":469.19},"sign":"488864C0AB51AEA0AF551074446FBCEC"}
-            logs(json_encode([
-                'orderNo' => $orderNo,
-                "endTime" => date("Y-m-d H:i:s", time()),
-                "notifyResult" => $notifyResultData['amount']
-            ]), 'curlCheckPhoneAmount_logaaa');
             if (!isset($notifyResult['code']) || $notifyResult['code'] != 0) {
                 return modelReMsg(-1, "", $notifyResult['msg']);
             }
 
-            return modelReMsg(0, $notifyResultData['amount'], '查询成功！');
+            return modelReMsg(0, $notifyResult['data']['amount'], '查询成功！');
         } catch (\Exception $exception) {
             logs(json_encode(['file' => $exception->getFile(), 'line' => $exception->getLine(), 'errorMessage' => $exception->getMessage()]),
                 'checkPhoneAmountException');
