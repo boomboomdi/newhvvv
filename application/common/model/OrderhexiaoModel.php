@@ -173,6 +173,7 @@ class OrderhexiaoModel extends Model
             $hxOrderInfo = $this
                 ->where('order_amount', '=', $order['amount'])
                 ->where('order_me', '=', null)
+                ->where('status', '=', 0)
                 ->where('order_status', '=', 0)
                 ->where('order_limit_time', '<', time())
                 ->where('do_check_status', '=', 0)  //是否查单使用中
@@ -303,7 +304,7 @@ class OrderhexiaoModel extends Model
                 "paramAddTime" => date("Y-m-d H:i:s", $orderHXData['add_time']),
                 "notifyResult" => $notifyResult
             ]), 'curlPostJsonToWriteOff_log');
-            $notifyResultLog = "</br>" . $orderHXData['notify_result'] . "第" . $orderHXData['notify_times'] + 1 . "次回调:" . $notifyResult . "(" . date("Y-m-d H:i:s") . ")";
+            $notifyResultLog = $orderHXData['notify_result'] . "第" . $orderHXData['notify_times'] + 1 . "次回调:" . $notifyResult . "(" . date("Y-m-d H:i:s") . ")";
 
             //通知结果不为success
             if ($notifyResult != "success") {

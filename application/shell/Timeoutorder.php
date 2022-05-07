@@ -19,7 +19,7 @@ class Timeoutorder extends Command
     }
 
     /**
-     * 超时订单修改订单状态
+     * 超时订单冻结
      * @param Input $input
      * @param Output $output
      * @return int|null|void
