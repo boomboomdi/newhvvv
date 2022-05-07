@@ -106,12 +106,14 @@ class Order extends Base
                 $order = Db::table("bsa_order")->where("id", $id)->find();
 
                 if (empty($order)) {
-                    return reMsg(-1, '', "回调订单有误");
+                    logs(json_encode([
+                        'notify' => "notify",
+                        'id' => input('param.id')
+                    ]), 'notifyEmptyOrder_log');
+                    return reMsg(-2, '', "回调订单有误!");
                 }
 
-                $orderModel = new \app\common\model\OrderModel();
                 $orderHXModel = new OrderhexiaoModel();
-                logs(json_encode(['notify' => "notify", 'id' => input('param.id')]), 'notify2_log');
 
                 $orderHXWhere['order_me'] = $order['order_me'];
                 $v = $orderHXModel->where($orderHXWhere)->find();
@@ -124,6 +126,7 @@ class Order extends Base
                         'phone' => $v['account'],
                         "localUpdateFail" => json_encode($localUpdate)
                     ]), 'notify2_log');
+                    return reMsg(-3, '', "回调订单,有误!");
                 }
                 return json(['code' => 1000, 'msg' => '回调成功', 'data' => []]);
             } else {
