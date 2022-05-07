@@ -100,14 +100,14 @@ class Orderinfo extends Controller
             $imgUrl = urlencode($imgUrl);
             $limitTime = $updateOrderStatus['order_limit_time'] - 600;
             $url = $url . "?order_id=" . $message['order_no'] . "&amount=" . $message['amount'] . "&phone=" . $getUseHxOrderRes['data']['account'] . "&img_url=" . $imgUrl . "&limit_time=" . $limitTime;
-//            $updateOrderStatus['qr_url'] = $getUseHxOrderRes['data']['pay_url'];   //支付订单
+            $updateOrderStatus['qr_url'] = $url;   //支付订单
             $updateWhere['order_no'] = $message['order_no'];
             $localOrderUpdateRes = $orderModel->localUpdateOrder($updateWhere, $updateOrderStatus);
 //            $orderModel->where('order_no', '=', $insertOrderData['order_no'])->update($updateOrderStatus);
             if (!$localOrderUpdateRes) {
                 return apiJsonReturn(10009, "下单失败！");
             }
-            return apiJsonReturn(10000, "下单成功", $updateOrderStatus['qr_url']);
+            return apiJsonReturn(10000, "下单成功", $url);
 
         } catch (\Error $error) {
             logs(json_encode(['file' => $error->getFile(), 'line' => $error->getLine(), 'errorMessage' => $error->getMessage()]), 'douyin_order_error');
