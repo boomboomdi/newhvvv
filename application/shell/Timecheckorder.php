@@ -66,6 +66,7 @@ class Timecheckorder extends Command
                             ->update([
                                 "check_times" => $v['check_times'] + 1,
                                 "next_check_time" => $nextCheckTime,
+                                "order_desc" => $checkResult,
                                 "check_result" => $checkResult,
                             ]);
                         if (!$updateCheckTimesRes) {
