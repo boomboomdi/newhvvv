@@ -99,7 +99,7 @@ class Timecheckorder extends Command
                         //1、支付到账
                         if ($getPhoneAmountRes['data'] == $v['end_check_amount']) {
                             //1、回调核销商
-                            $localUpdate = $orderHXModel->orderLocalUpDate($v, 1);
+                            $localUpdate = $orderHXModel->orderLocalUpdate($v, 1);
                             if (!isset($localUpdate['code']) || $localUpdate['code'] == 0) {
                                 logs(json_encode(["time" => date("Y-m-d H:i:s", time()),
                                     'order_no' => $v['order_no'],

@@ -98,16 +98,18 @@ class OrderhexiaoModel extends Model
      * @param $orderStatus
      * @return array
      */
-    public function orderLocalUpDate($orderHxData, $orderStatus = 1, $amount = "")
+    public function orderLocalUpdate($orderHxData, $orderStatus = 1, $amount = "")
     {
-
+        logs(json_encode(['file' => $orderHxData,
+            'time' => date("Y-m-d H:i:s", time()),
+            'orderStatus' => $orderStatus
+        ]), 'orderLocalUpdate');
         $db = new Db();
         $db::startTrans();
         try {
             //更新核销表  start
             $orderWhere['order_me'] = $orderHxData['order_me'];
-            $orderWhere['account'] = $orderHxData['account'];
-
+//            $orderWhere['account'] = $orderHxData['account'];
             $payTime = time();
             $lockHxOrderRes = $this->where('id', '=', $orderHxData['id'])->lock('lock')->find();
             if (!$lockHxOrderRes) {
@@ -115,13 +117,12 @@ class OrderhexiaoModel extends Model
                 return modelReMsg(-1, "", "update fail rollback");
             }
             $amount = $orderHxData['order_amount'];
+            $updateHXData['pay_amount'] = (float)$amount;
+            $updateHXData['pay_time'] = $payTime;
+            $updateHXData['status'] = $payTime;
+            $updateHXData['pay_status'] = 1;
             $updateHXRes = $this->where($orderWhere)
-                ->update([
-                    "pay_amount" => $amount,
-                    "pay_time" => $payTime,
-                    "status" => 2,
-                    "pay_status" => 1,
-                ]);
+                ->update($updateHXData);
             if (!$updateHXRes) {
                 $db::rollback();
                 return modelReMsg(-2, "", "update fail rollback");
@@ -135,14 +136,13 @@ class OrderhexiaoModel extends Model
                 $db::rollback();
                 return modelReMsg(-3, "", "update lock order fail rollback");
             }
+            $updateOrderData['actual_amount'] = (float)$amount;
+            $updateOrderData['pay_time'] = $payTime;
+            $updateOrderData['order_status'] = 1;
+            $updateOrderData['check_status'] = 2;
+            $updateOrderData['pay_status'] = 1;
             $updateOrderRes = $db::table('bsa_order')->where($orderWhere)
-                ->update([
-                    "actual_amount" => $amount,  //
-                    "pay_time" => $payTime,  //支付时间
-                    "order_status" => 1,  //已支付
-                    "check_status" => 2,
-                    "pay_status" => 1,
-                ]);
+                ->update($updateOrderData);
             if (!$updateOrderRes) {
                 $db::rollback();
                 return modelReMsg(-4, "", "update order fail rollback");
@@ -154,15 +154,15 @@ class OrderhexiaoModel extends Model
             logs(json_encode(['file' => $exception->getFile(),
                 'line' => $exception->getLine(),
                 'errorMessage' => $exception->getMessage()
-            ]), 'orderDouYinNotifyToWriteOffException_log');
-            return modelReMsg('-11', "", "回调失败" . $exception->getMessage());
+            ]), 'orderDouYinNotifyToWriteOffException');
+            return modelReMsg(-11, "", "回调失败" . $exception->getMessage());
         } catch (\Error $error) {
             $db::rollback();
             logs(json_encode(['file' => $error->getFile(),
                 'line' => $error->getLine(),
                 'errorMessage' => $error->getMessage()
-            ]), 'orderDouYinNotifyToWriteOffError_log');
-            return modelReMsg('-22', "", "回调失败" . $error->getMessage());
+            ]), 'orderDouYinNotifyToWriteOffError');
+            return modelReMsg(-22, "", "回调失败" . $error->getMessage());
         }
     }
 
