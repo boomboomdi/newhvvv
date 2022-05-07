@@ -100,10 +100,7 @@ class OrderhexiaoModel extends Model
      */
     public function orderLocalUpdate($orderHxData, $orderStatus = 1, $amount = "")
     {
-        logs(json_encode(['file' => $orderHxData,
-            'time' => date("Y-m-d H:i:s", time()),
-            'orderStatus' => $orderStatus
-        ]), 'orderLocalUpdate');
+
         $db = new Db();
         $db::startTrans();
         try {
@@ -116,6 +113,7 @@ class OrderhexiaoModel extends Model
                 $db::rollback();
                 return modelReMsg(-1, "", "update fail rollback");
             }
+
             $amount = $orderHxData['order_amount'];
             $updateHXData['pay_amount'] = (float)$amount;
             $updateHXData['pay_time'] = $payTime;
@@ -128,7 +126,10 @@ class OrderhexiaoModel extends Model
                 return modelReMsg(-2, "", "update fail rollback");
             }
             //更新核销表  end
-
+            logs(json_encode(['file' => $orderHxData,
+                'time' => date("Y-m-d H:i:s", time()),
+                'orderStatus' => $orderStatus
+            ]), 'orderLocalUpdate');
             //更新订单表
             $orderData = $this->where($orderWhere)->find();
             $lockOrderRes = $this->where('id', '=', $orderData['id'])->lock('lock')->find();
