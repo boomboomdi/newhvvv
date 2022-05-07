@@ -47,7 +47,7 @@ class Timecheckorder extends Command
                     $getResParam['order_no'] = $v['order_no'];
                     $getResParam['phone'] = $v['account'];
                     $checkStartTime = date("Y-m-d H:i:s", time());
-                    $getPhoneAmountRes = $orderHXModel->checkPhoneAmount($getResParam);
+                    $getPhoneAmountRes = $orderHXModel->checkPhoneAmount($getResParam, $v['order_no']);
 
                     logs(json_encode(['phone' => $v['account'],
                         "order_no" => $v['order_no'],
