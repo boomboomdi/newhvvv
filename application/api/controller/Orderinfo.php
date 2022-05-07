@@ -104,7 +104,7 @@ class Orderinfo extends Controller
             $updateWhere['order_no'] = $message['order_no'];
             $localOrderUpdateRes = $orderModel->localUpdateOrder($updateWhere, $updateOrderStatus);
 //            $orderModel->where('order_no', '=', $insertOrderData['order_no'])->update($updateOrderStatus);
-            if (!$localOrderUpdateRes) {
+            if (!isset($localOrderUpdateRes['code']) || $localOrderUpdateRes != 0) {
                 return apiJsonReturn(10009, "下单失败！");
             }
             return apiJsonReturn(10000, "下单成功", $url);
@@ -112,13 +112,13 @@ class Orderinfo extends Controller
             logs(json_encode(['file' => $error->getFile(),
                 'line' => $error->getLine(), 'errorMessage' => $error->getMessage()
             ]), 'orderError');
-            return json(msg(-22, '',  $error->getMessage() . $error->getLine()));
+            return json(msg(-22, '', $error->getMessage() . $error->getLine()));
         } catch (\Exception $exception) {
             logs(json_encode(['file' => $exception->getFile(),
                 'line' => $exception->getLine(),
                 'errorMessage' => $exception->getMessage()
             ]), 'orderException');
-            return json(msg(-11, '',  $exception->getMessage() . $exception->getFile() . $exception->getLine()));
+            return json(msg(-11, '', $exception->getMessage() . $exception->getFile() . $exception->getLine()));
         }
     }
 
