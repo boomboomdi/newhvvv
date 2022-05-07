@@ -63,7 +63,7 @@ class OrderhexiaoModel extends Model
                 "notifyResult" => $notifyResult
             ]), 'curlCheckPhoneAmount_log');
             //查询成功
-            if ($notifyResult['code'] != 0) {
+            if (!isset($notifyResult['code']) || $notifyResult['code'] != 0) {
                 return modelReMsg(-1, "", $notifyResult['msg']);
             }
 

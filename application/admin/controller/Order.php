@@ -52,9 +52,9 @@ class Order extends Base
                 if (!empty($data[$key]['pay_time']) && $data[$key]['pay_time'] != 0) {
                     $data[$key]['pay_time'] = date('Y-m-d H:i:s', $vo['pay_time']);
                 }
-                if (!empty($data[$key]['update_time']) && $data[$key]['update_time'] != 0) {
-                    $data[$key]['update_time'] = date('Y-m-d H:i:s', $vo['update_time']);
-                }
+
+                $data[$key]['order_limit_time'] = date('Y-m-d H:i:s', $data[$key]['order_limit_time']);
+                $data[$key]['notify_time'] = date('Y-m-d H:i:s', $data[$key]['notify_time']);
                 if (!empty($data[$key]['add_time']) && $data[$key]['add_time'] != 0) {
                     $data[$key]['add_time'] = date('Y-m-d h:i:s', $vo['add_time']);
                 }
