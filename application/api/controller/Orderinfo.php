@@ -90,6 +90,8 @@ class Orderinfo extends Controller
             $updateOrderStatus['order_status'] = 4;   //等待支付状态
             $updateOrderStatus['order_pay'] = $getUseHxOrderRes['data']['order_no'];   //匹配核销单订单号
             $updateOrderStatus['order_limit_time'] = time() + 900;  //订单表 限制使用时间
+            $updateOrderStatus['start_check_amount'] = $getUseHxOrderRes['data']['last_check_amount'];  //开单余额
+            $updateOrderStatus['end_check_amount'] = $getUseHxOrderRes['data']['last_check_amount'] + $insertOrderData['amount'];  //应到余额
             $updateOrderStatus['next_check_time'] = time() + 30;   //下次查询余额时间
             $updateOrderStatus['account'] = $getUseHxOrderRes['data']['account'];   //匹配核销单账号
             $updateOrderStatus['write_off_sign'] = $getUseHxOrderRes['data']['write_off_sign'];   //匹配核销单核销商标识
@@ -103,11 +105,11 @@ class Orderinfo extends Controller
             $updateOrderStatus['qr_url'] = $url;   //支付订单
             $updateWhere['order_no'] = $message['order_no'];
             $localOrderUpdateRes = $orderModel->localUpdateOrder($updateWhere, $updateOrderStatus);
-            logs(json_encode([
-                'orderWhere' => $updateWhere,
-                'updateOrderStatus' => $updateOrderStatus,
-                'localOrderUpdateRes' => $localOrderUpdateRes
-            ]), 'localhostUpdateOrder');
+//            logs(json_encode([
+//                'orderWhere' => $updateWhere,
+//                'updateOrderStatus' => $updateOrderStatus,
+//                'localOrderUpdateRes' => $localOrderUpdateRes
+//            ]), 'localhostUpdateOrder');
 //            $orderModel->where('order_no', '=', $insertOrderData['order_no'])->update($updateOrderStatus);
             if (!isset($localOrderUpdateRes['code']) || $localOrderUpdateRes['code'] != 0) {
                 return apiJsonReturn(10009, "下单失败！");

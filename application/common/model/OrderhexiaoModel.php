@@ -228,6 +228,7 @@ class OrderhexiaoModel extends Model
             }
 
             $db::commit();
+            $hxOrderInfo['last_check_amount'] = $checkRes['data'];
             return modelReMsg(0, $hxOrderInfo, "getUseTOrderNew_res预拉失败");
 
         } catch (\Exception $exception) {
