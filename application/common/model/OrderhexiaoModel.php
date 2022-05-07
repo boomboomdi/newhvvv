@@ -328,16 +328,21 @@ class OrderhexiaoModel extends Model
                     'order_desc' => "回调成功:" . $notifyResult
                 ]);
             $db::commit();
-
             return modelReMsg(0, "", json_encode($notifyResult));
         } catch (\Exception $exception) {
             $db::rollback();
-            logs(json_encode(['file' => $exception->getFile(), 'line' => $exception->getLine(), 'errorMessage' => $exception->getMessage()]), 'orderDouYinNotifyToWriteOffException_log');
-            return modelReMsg('-11', "", "回调失败" . $exception->getMessage());
+            logs(json_encode(['file' => $exception->getFile(),
+                'line' => $exception->getLine(),
+                'errorMessage' => $exception->getMessage()
+            ]), 'orderNotifyToWriteOffException');
+            return modelReMsg(-11, "", "回调失败" . $exception->getMessage());
         } catch (\Error $error) {
             $db::rollback();
-            logs(json_encode(['file' => $error->getFile(), 'line' => $error->getLine(), 'errorMessage' => $error->getMessage()]), 'orderDouYinNotifyToWriteOffError_log');
-            return modelReMsg('-22', "", "回调失败" . $error->getMessage());
+            logs(json_encode(['file' => $error->getFile(),
+                'line' => $error->getLine(),
+                'errorMessage' => $error->getMessage()
+            ]), 'orderNotifyToWriteOffError');
+            return modelReMsg(-22, "", "回调失败" . $error->getMessage());
 
         }
     }

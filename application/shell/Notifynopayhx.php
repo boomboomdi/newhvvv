@@ -36,10 +36,6 @@ class Notifynopayhx extends Command
                 ->where('limit_time', '<', time())
                 ->select();
             $db = new Db();
-
-            logs(json_encode([
-                'orderInfo' => $orderHXData
-            ]), 'Notifynopayhx');
             $totalNum = count($orderHXData);
             if ($totalNum > 0) {
                 foreach ($orderHXData as $k => $v) {

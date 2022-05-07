@@ -47,12 +47,12 @@ class Timecheckorder extends Command
                     $checkStartTime = date("Y-m-d H:i:s", time());
                     $getPhoneAmountRes = $orderHXModel->checkPhoneAmount($getResParam);
 
-                    logs(json_encode(['phone' => $v['account'],
-                        "order_no" => $v['order_no'],
-                        "startTime" => $checkStartTime,
-                        "endTime" => date("Y-m-d H:i:s", time()),
-                        "getPhoneAmountRes" => $getPhoneAmountRes['data']
-                    ]), 'Timecheckdouyin_getOrderStatus_log');
+//                    logs(json_encode(['phone' => $v['account'],
+//                        "order_no" => $v['order_no'],
+//                        "startTime" => $checkStartTime,
+//                        "endTime" => date("Y-m-d H:i:s", time()),
+//                        "getPhoneAmountRes" => $getPhoneAmountRes['data']
+//                    ]), 'TimecheckdouyincheckPhoneAmount_log');
                     $checkResult = "第" . $v['check_times'] + 1 . "次查询结果" . $getPhoneAmountRes['data'] . "(" . date("Y-m-d H:i:s") . ")";
                     $nextCheckTime = time() + 40;
                     if ($v['check_times'] > 3) {

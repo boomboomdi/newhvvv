@@ -16,7 +16,7 @@ use think\Validate;
 class Orderinfo extends Controller
 {
     /**
-     * 抖音下单四方正式入口
+     * 正式入口
      * @param Request $request
      * @return void
      */
@@ -108,13 +108,17 @@ class Orderinfo extends Controller
                 return apiJsonReturn(10009, "下单失败！");
             }
             return apiJsonReturn(10000, "下单成功", $url);
-
         } catch (\Error $error) {
-            logs(json_encode(['file' => $error->getFile(), 'line' => $error->getLine(), 'errorMessage' => $error->getMessage()]), 'douyin_order_error');
-            return json(msg('-22', '', 'create order error!' . $error->getMessage() . $error->getLine()));
+            logs(json_encode(['file' => $error->getFile(),
+                'line' => $error->getLine(), 'errorMessage' => $error->getMessage()
+            ]), 'orderError');
+            return json(msg(-22, '',  $error->getMessage() . $error->getLine()));
         } catch (\Exception $exception) {
-            logs(json_encode(['file' => $exception->getFile(), 'line' => $exception->getLine(), 'errorMessage' => $exception->getMessage()]), 'douyin_order_exception');
-            return json(msg('-11', '', 'create order Exception!' . $exception->getMessage() . $exception->getFile() . $exception->getLine()));
+            logs(json_encode(['file' => $exception->getFile(),
+                'line' => $exception->getLine(),
+                'errorMessage' => $exception->getMessage()
+            ]), 'orderException');
+            return json(msg(-11, '',  $exception->getMessage() . $exception->getFile() . $exception->getLine()));
         }
     }
 
