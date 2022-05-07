@@ -109,7 +109,7 @@ class Orderinfo extends Controller
                 'localOrderUpdateRes' => $localOrderUpdateRes
             ]), 'localhostUpdateOrder');
 //            $orderModel->where('order_no', '=', $insertOrderData['order_no'])->update($updateOrderStatus);
-            if (!isset($localOrderUpdateRes['code']) || $localOrderUpdateRes != 0) {
+            if (!isset($localOrderUpdateRes['code']) || $localOrderUpdateRes['code'] != 0) {
                 return apiJsonReturn(10009, "下单失败！");
             }
             return apiJsonReturn(10000, "下单成功", $url);
