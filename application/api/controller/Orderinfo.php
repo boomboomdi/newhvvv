@@ -92,6 +92,7 @@ class Orderinfo extends Controller
             $updateOrderStatus['order_pay'] = $getUseHxOrderRes['data']['order_no'];   //匹配核销单订单号
             $updateOrderStatus['order_limit_time'] = time() + 900;  //订单表 限制使用时间
             $updateOrderStatus['start_check_amount'] = $getUseHxOrderRes['data']['last_check_amount'];  //开单余额
+            $updateOrderStatus['last_check_amount'] = $getUseHxOrderRes['data']['last_check_amount'];  //开单余额
             $updateOrderStatus['end_check_amount'] = $getUseHxOrderRes['data']['last_check_amount'] + $insertOrderData['amount'];  //应到余额
             $updateOrderStatus['next_check_time'] = time() + 30;   //下次查询余额时间
             $updateOrderStatus['account'] = $getUseHxOrderRes['data']['account'];   //匹配核销单账号
