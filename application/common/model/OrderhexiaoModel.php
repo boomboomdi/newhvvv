@@ -318,18 +318,16 @@ class OrderhexiaoModel extends Model
                     ]);
                 return modelReMsg(-3, "", "回调结果失败！");
 
-            }else{
-                $db::table('bsa_order_hexiao')->where('id', $orderHXData['id'])
-                    ->update([
-                        'notify_time' => time(),
-                        'notify_status' => 1,
-                        'notify_times' => $orderHXData['notify_times'] + 1,
-                        'notify_result' => $notifyResultLog,
-                        'order_desc' => "回调成功:" . $notifyResult
-                    ]);
-                $db::commit();
             }
-
+            $db::table('bsa_order_hexiao')->where('id', $orderHXData['id'])
+                ->update([
+                    'notify_time' => time(),
+                    'notify_status' => 1,
+                    'notify_times' => $orderHXData['notify_times'] + 1,
+                    'notify_result' => $notifyResultLog,
+                    'order_desc' => "回调成功:" . $notifyResult
+                ]);
+            $db::commit();
 
             return modelReMsg(0, "", json_encode($notifyResult));
         } catch (\Exception $exception) {
