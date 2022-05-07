@@ -95,6 +95,10 @@ class Torder extends Controller
      */
     public function orderInfo(Request $request)
     {
+        header('Access-Control-Allow-Origin:'.$_SERVER['HTTP_ORIGIN']);
+        header("Access-Control-Allow-Credentials:true");
+        header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept,Authorization");
+        header('Access-Control-Allow-Methods:GET,POST,PUT,DELETE,OPTIONS,PATCH');
         $param = $request->param();
         $data = @file_get_contents('php://input');
         $param = json_decode($data, true);

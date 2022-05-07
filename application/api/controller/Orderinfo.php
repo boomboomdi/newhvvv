@@ -112,6 +112,54 @@ class Orderinfo extends Controller
         }
     }
 
+
+    /**
+     * 引导页面查询订单状态
+     */
+    public function orderInfo(Request $request)
+    {
+        header('Access-Control-Allow-Origin:' . $_SERVER['HTTP_ORIGIN']);
+        header("Access-Control-Allow-Credentials:true");
+        header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept,Authorization");
+        header('Access-Control-Allow-Methods:GET,POST,PUT,DELETE,OPTIONS,PATCH');
+        $data = @file_get_contents('php://input');
+        $message = json_decode($data, true);
+        if (!isset($message['order_no']) || empty($message['order_no'])) {
+            return json(msg(-1, '', '单号有误！'));
+        }
+        try {
+            $orderModel = new OrderModel();
+            $where['order_no'] = $message['order_no'];
+            $orderInfo = $orderModel->where($where)->find();
+            if (empty($message['order_no'])) {
+                return json(msg(-2, '', '无次推单！'));
+            }
+            if ($message['order_no'] != 4) {
+                return json(msg(-3, '', '请重新下单'));
+            }
+
+            if (($orderInfo['order_limit_time'] - 30) < time()) {
+                return json(msg(-4, '', '订单超时，请重新下单'));
+            }
+
+            return json(msg(0, $orderInfo['order_limit_time'] - 30, "success"));
+
+        } catch (\Exception $exception) {
+            logs(json_encode(['param' => $message,
+                'file' => $exception->getFile(),
+                'line' => $exception->getLine(),
+                'errorMessage' => $exception->getMessage()
+            ]), 'orderInfoException');
+            return apiJsonReturn(-11, "orderInfo exception!" . $exception->getMessage());
+        } catch (\Error $error) {
+            logs(json_encode(['param' => $message,
+                'file' => $error->getFile(),
+                'line' => $error->getLine(),
+                'errorMessage' => $error->getMessage()]), 'orderInfoError');
+            return json(msg(-22, '', 'orderInfo error!' . $error->getMessage()));
+        }
+    }
+
     //
     public function callbackformerchant()
     {
