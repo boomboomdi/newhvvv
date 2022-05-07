@@ -15,11 +15,11 @@ class Timerestarthxorder extends Command
 {
     protected function configure()
     {
-        $this->setName('Timerestarthxorder')->setDescription('Timerestarthxorder');
+        $this->setName('Timerestarthxorder')->setDescription('解冻未支付核销单');
     }
 
     /**
-     * 解冻核销单，以重新使用
+     * 解冻未支付核销单。以重新使用
      * @param Input $input
      * @param Output $output
      * @return int|null|void

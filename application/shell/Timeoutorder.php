@@ -15,11 +15,11 @@ class Timeoutorder extends Command
 {
     protected function configure()
     {
-        $this->setName('Timeoutorder')->setDescription('Timeoutorder');
+        $this->setName('Timeoutorder')->setDescription('冻结超时未支付订单');
     }
 
     /**
-     * 超时订单冻结
+     * 冻结超时未支付订单
      * @param Input $input
      * @param Output $output
      * @return int|null|void

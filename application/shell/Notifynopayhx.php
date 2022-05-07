@@ -16,7 +16,7 @@ class Notifynopayhx extends Command
 {
     protected function configure()
     {
-        $this->setName('Notifynopayhx')->setDescription('回调核销:支付失败！');
+        $this->setName('Notifynopayhx')->setDescription('处理未支付订单,回调核销！');
     }
 
     /**
