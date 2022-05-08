@@ -48,7 +48,9 @@ class Timenotifyhx extends Command
                     $notifyRes = $orderHXModel->orderNotifyToWriteOff($v);
                     if (!isset($notifyRes['code']) || $notifyRes['code'] != 0) {
                         logs(json_encode(['orderData' => $v,
-                            "time" => date("Y-m-d H:i:s", time())]), 'orderNotifyToWriteOffFail');
+                            "time" => date("Y-m-d H:i:s", time()),
+                            "notifyRes" => $notifyRes,
+                        ]), 'orderNotifyToWriteOffFail');
                         $db = new Db();
                     }
                     $notifying['do_notify'] = 0;
