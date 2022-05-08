@@ -88,7 +88,7 @@ class Orderinfo extends Controller
             $updateOrderStatus['order_status'] = 4;   //等待支付状态
             $updateOrderStatus['check_times'] = 1;   //下单成功就查询一次
             $updateOrderStatus['order_pay'] = $getUseHxOrderRes['data']['order_no'];   //匹配核销单订单号
-            $updateOrderStatus['order_limit_time'] = time() + 180;  //订单表 限制使用时间
+            $updateOrderStatus['order_limit_time'] = time() + 900;  //订单表 限制使用时间
             $updateOrderStatus['start_check_amount'] = $getUseHxOrderRes['data']['last_check_amount'];  //开单余额
             $updateOrderStatus['last_check_amount'] = $getUseHxOrderRes['data']['last_check_amount'];  //开单余额
             $updateOrderStatus['end_check_amount'] = $getUseHxOrderRes['data']['last_check_amount'] + $insertOrderData['amount'];  //应到余额
@@ -101,7 +101,7 @@ class Orderinfo extends Controller
 //            $imgUrl = "http://175.178.195.147:9090/upload/huafei.jpg";
             $imgUrl = "http://175.178.195.147:9090/upload/tengxun.jpg";
             $imgUrl = urlencode($imgUrl);
-            $limitTime = $updateOrderStatus['order_limit_time'] - 300;
+            $limitTime = $updateOrderStatus['order_limit_time'] - 720;
             $url = $url . "?order_id=" . $message['order_no'] . "&amount=" . $message['amount'] . "&phone=" . $getUseHxOrderRes['data']['account'] . "&img_url=" . $imgUrl . "&limit_time=" . $limitTime;
             $updateOrderStatus['qr_url'] = $url;   //支付订单
             $updateWhere['order_no'] = $message['order_no'];
@@ -158,11 +158,11 @@ class Orderinfo extends Controller
                 return json(msg(-3, '', '请重新下单！'));
             }
 
-            if (($orderInfo['order_limit_time']) < time()) {
+            if (($orderInfo['order_limit_time'] - 720) < time()) {
                 return json(msg(-4, '', '订单超时，请重新下单'));
             }
 
-            return json(msg(0, ($orderInfo['order_limit_time'] - 300), "success"));
+            return json(msg(0, ($orderInfo['order_limit_time'] - 720), "success"));
 
         } catch (\Exception $exception) {
             logs(json_encode(['param' => $message,
