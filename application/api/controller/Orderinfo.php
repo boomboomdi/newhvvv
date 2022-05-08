@@ -258,7 +258,6 @@ class Orderinfo extends Controller
                         "localUpdateFail" => json_encode($localUpdate)
                     ]), 'checkPhoneAmountNotify0076Fail');
                 }
-
             }
 
             return json(msg(1, '', '接收成功,匹配失败！'));
