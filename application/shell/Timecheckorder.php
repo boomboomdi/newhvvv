@@ -36,7 +36,7 @@ class Timecheckorder extends Command
                 ->where('next_check_time', '<', time())
                 ->where('order_limit_time', '>', time())
                 ->where('check_status', '=', 0)
-                ->where('check_times', '<', 5)
+                ->where('check_times', '<', 6)
                 ->select();
             logs(json_encode(['orderData' => $orderData,
                 "sql" => Db::table("bsa_order")->getLastSql(),
@@ -68,6 +68,9 @@ class Timecheckorder extends Command
                     $nextCheckTime = time() + 90;
                     if ($v['check_times'] > 1) {
                         $nextCheckTime = time() + 90;
+                    }
+                    if ($v['check_times'] > 4) {
+                        $nextCheckTime = time() + 420;
                     }
                     if (!isset($getPhoneAmountRes['code']) && $getPhoneAmountRes['code'] != 0) {
                         $orderWhere['order_no'] = $v['order_no'];
