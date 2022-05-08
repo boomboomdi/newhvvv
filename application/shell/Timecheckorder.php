@@ -27,6 +27,8 @@ class Timecheckorder extends Command
      */
     protected function execute(Input $input, Output $output)
     {
+
+        $db = new Db();
         try {
             $orderHXModel = new OrderhexiaoModel();
             $orderModel = new OrderModel();
@@ -41,9 +43,8 @@ class Timecheckorder extends Command
 
             $totalNum = count($orderData);
             if ($totalNum > 0) {
-                $db = new Db();
                 foreach ($orderData as $k => $v) {
-
+                    $db::startTrans();
                     $updateCheckWhere['order_no'] = $v['order_no'];
                     $updateCheckWhere['check_status'] = 0;
                     $lock = $db::table("bsa_order")->where($updateCheckWhere)->lock(true)->find();
@@ -71,17 +72,29 @@ class Timecheckorder extends Command
                                 "startTime" => $checkStartTime,
                                 "endTime" => date("Y-m-d H:i:s", time()),
                                 "getPhoneAmountRes" => $getPhoneAmountRes
-                            ]), 'TimecheckdouyincheckPhoneAmount_log');
+                            ]), 'TimecheckordercheckPhoneAmount');
+
+                            $db::commit();
+                        }else{
+                            $db::rollback();
                         }
+                    }else{
+                        $db::rollback();
                     }
                 }
 
+            }else{
+                $db::rollback();
             }
             $output->writeln("Timecheckorder:订单总数" . $totalNum);
         } catch (\Exception $exception) {
+
+            $db::rollback();
             logs(json_encode(['file' => $exception->getFile(), 'line' => $exception->getLine(), 'errorMessage' => $exception->getMessage()]), 'Timecheckorder_exception');
             $output->writeln("Timecheckorder:exception");
         } catch (\Error $error) {
+
+            $db::rollback();
             logs(json_encode(['file' => $error->getFile(), 'line' => $error->getLine(), 'errorMessage' => $error->getMessage()]), 'Timecheckorder_error');
             $output->writeln("Timecheckorder:error");
         }

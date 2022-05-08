@@ -52,7 +52,6 @@ class Timerestarthxorder extends Command
                         "time" => date("Y-m-d H:i:s", time()),
                         "updateHXOrderRes" => $updateHXOrderRes,
                     ]), 'Timerestarthxorder');
-
                 }
             }
             $output->writeln("Timerestarthxorder:订单总数" . $totalNum);
