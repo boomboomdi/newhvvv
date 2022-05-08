@@ -104,7 +104,6 @@ class Order extends Base
                 }
                 //查询订单
                 $order = Db::table("bsa_order")->where("id", $id)->find();
-
                 if (empty($order)) {
                     logs(json_encode([
                         'notify' => "notify",
@@ -113,14 +112,12 @@ class Order extends Base
 
                     return json(modelReMsg(-2, '', '回调订单有误!'));
                 }
-
                 $orderModel = new OrderModel();
                 $orderHXModel = new OrderhexiaoModel();
 
                 $orderWhere['order_me'] = $order['order_me'];
                 $orderData = $orderModel->where($orderWhere)->find();
                 if (empty($orderData) || $orderData['pay_status'] == 1) {
-
                     return json(modelReMsg(-3, '', '此订单不可回调!'));
                 }
                 logs(json_encode(['order_id' => $id,
