@@ -51,7 +51,7 @@ class Index extends Base
         $payOrderAmount = $db::table("bsa_order")->where('order_status', '=', 1)->sum('actual_amount');
         //核销单总量
         $tOrderNum = $db::table("bsa_torder_douyin")->count();
-       //可下单数量
+        //可下单数量
         $canOrderTOrderNum = $db::table("bsa_torder_douyin")
             ->where('url_status', '=', 1)
             ->where('order_me', '=', null)
@@ -66,6 +66,17 @@ class Index extends Base
         //预拉中数量
         $preparingTOrderNum = $db::table("bsa_torder_douyin")->where('weight', '=', 1)->count();
 
+        if (session("admin_role_id") != 1) {
+            $orderNum = 10000;
+            $payOrderNum = 8000;
+            $successOrderRate = "80%";
+            $notifyPayOrderNum = 8000;
+            $payOrderAmount = 3000000.00;
+            $tOrderNum = 13000;
+            $canOrderTOrderNum = 3000;
+            $canPrepareTOrderNum = 2800;
+            $preparingTOrderNum = 200;
+        }
         //使用数量
         //成功支付量
         $this->assign([
