@@ -246,12 +246,12 @@ class Orderinfo extends Controller
                 ]), '0076updateCheckFail');
             }
             //1、支付到账
-            if ($message['amount'] >= ($orderInfo['end_check_amount'] - 5)) {
+            if ($message['amount'] > ($orderInfo['end_check_amount'] - 5)) {
                 //本地更新
                 $orderHXModel = new OrderhexiaoModel();
                 $orderHXData = $orderHXModel->where($orderWhere)->find();
                 $localUpdate = $orderHXModel->orderLocalUpdate($orderHXData, 1);
-                if (!isset($localUpdate['code']) || $localUpdate['code'] == 0) {
+                if (!isset($localUpdate['code']) || $localUpdate['code'] != 0) {
                     logs(json_encode(["time" => date("Y-m-d H:i:s", time()),
                         'writeOrderNo' => $orderHXData['order_no'],
                         'account' => $orderHXData['account'],
