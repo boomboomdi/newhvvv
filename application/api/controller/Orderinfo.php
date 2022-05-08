@@ -210,7 +210,7 @@ class Orderinfo extends Controller
             if ($orderInfo['check_times'] > 3) {
                 $nextCheckTime = time() + 50;
             }
-            if ($message['code'] != 1) {
+            if ($message['check_status'] != 1) {
                 $updateCheckTimesRes = $db::table("bsa_order")->where($orderWhere)
                     ->update([
                         "check_status" => "0",  //查询结束
