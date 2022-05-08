@@ -43,7 +43,12 @@ class Timenotifyhx extends Command
                     $orderWhere['account'] = $v['account'];
                     $notifying['do_notify'] = 1;
                     $db::table('bsa_order_hexiao')->where($orderWhere)->update($notifying);
-                    $orderHXModel->orderNotifyToWriteOff($v);
+                    $notifyRes = $orderHXModel->orderNotifyToWriteOff($v);
+                    if (!isset($notifyRes['code']) || $notifyRes['code'] != 0) {
+                        logs(json_encode(['orderData' => $v,
+                            "time" => date("Y-m-d H:i:s", time())]), 'orderNotifyToWriteOffFail');
+                        $db = new Db();
+                    }
                     $notifying['do_notify'] = 0;
                     $db::table('bsa_order_hexiao')->where($orderWhere)->update($notifying);
                 }

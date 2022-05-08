@@ -38,10 +38,7 @@ class Timecheckorder extends Command
                 ->where('check_status', '=', 0)
                 ->where('check_times', '<', 5)
                 ->select();
-            logs(json_encode(['orderData' => $orderData,
-                "sql" => Db::table("bsa_order")->getLastSql(),
-                "time" => date("Y-m-d H:i:s", time())]), 'Timecheckorder');
-            $db = new Db();
+
             $totalNum = count($orderData);
             if ($totalNum > 0) {
                 foreach ($orderData as $k => $v) {
