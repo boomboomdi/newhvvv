@@ -204,7 +204,7 @@ class OrderhexiaoModel extends Model
                 ->where('status', '=', 0)
                 ->where('order_status', '=', 0)
                 ->where('order_limit_time', '<', time())
-                ->where('check_status', '=', 0)  //是否查单使用中
+//                ->where('check_status', '=', 0)  //是否查单使用中
                 ->order("add_time asc")
                 ->lock(true)
                 ->find();

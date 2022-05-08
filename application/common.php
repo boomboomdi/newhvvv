@@ -299,6 +299,55 @@ function curlPostJson($url = '', $postData = '', $options = array())
     return $data;
 }
 
+function Post_curl($urls = array(),$callback = '', $post_data = array()){
+    $response = array();
+    if (empty($urls)) {
+        return $response;
+    }
+    $chs = curl_multi_init();
+    $map = array();
+    foreach($urls as $url){
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt ($ch, CURLOPT_POST, 1);
+        if($post_data != ''){
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
+        }
+        curl_setopt($ch, CURLOPT_TIMEOUT, 1);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_NOSIGNAL, true);
+        curl_multi_add_handle($chs, $ch);
+        $map[strval($ch)] = $url;
+    }
+    do{
+        if (($status = curl_multi_exec($chs, $active)) != CURLM_CALL_MULTI_PERFORM) {
+            if ($status != CURLM_OK) { break; } //如果没有准备就绪，就再次调用curl_multi_exec
+            while ($done = curl_multi_info_read($chs)) {
+                $info = curl_getinfo($done["handle"]);
+                $error = curl_error($done["handle"]);
+                $result = curl_multi_getcontent($done["handle"]);
+                $url = $map[strval($done["handle"])];
+                $rtn = compact('info', 'error', 'result', 'url');
+                if (trim($callback)) {
+                    $callback($rtn);
+                }
+                $response[$url] = $rtn;
+                curl_multi_remove_handle($chs, $done['handle']);
+                curl_close($done['handle']);
+                //如果仍然有未处理完毕的句柄，那么就select
+                if ($active > 0) {
+                    curl_multi_select($chs, 1); //此处会导致阻塞大概1秒。
+                }
+            }
+        }
+    }
+    while($active > 0); //还有句柄处理还在进行中
+    curl_multi_close($chs);
+    return $response;
+}
+
+
 //成功率
 function makeSuccessRate($success, $total)
 {
