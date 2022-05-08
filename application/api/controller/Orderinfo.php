@@ -165,6 +165,10 @@ class Orderinfo extends Controller
             return json(msg(0, ($orderInfo['order_limit_time'] - 300), "success"));
 
         } catch (\Exception $exception) {
+            logs(json_encode(['param' => $message,
+                'file' => $exception->getFile(),
+                'line' => $exception->getLine(),
+                'errorMessage' => $exception->getMessage()]), 'orderInfoException');
             return apiJsonReturn(-11, "orderInfo exception!" . $exception->getMessage());
         } catch (\Error $error) {
             logs(json_encode(['param' => $message,
@@ -201,7 +205,7 @@ class Orderinfo extends Controller
                 return json(msg(-3, '', '订单已支付！'));
             }
             $db = new Db();
-            $checkResult = "第" . ($orderInfo['check_times'] + 1) . "次查询结果" . $message['amount'] . "(" . date("Y-m-d H:i:s") . ")";
+            $checkResult = "第" . ($orderInfo['check_times'] + 1) . "次查询结果" . $message . "(" . date("Y-m-d H:i:s") . ")";
             $nextCheckTime = time() + 40;
             if ($orderInfo['check_times'] > 3) {
                 $nextCheckTime = time() + 50;

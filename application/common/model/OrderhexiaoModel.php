@@ -185,7 +185,7 @@ class OrderhexiaoModel extends Model
                 ->where('status', '=', 0)
                 ->where('order_status', '=', 0)
                 ->where('order_limit_time', '<', time())
-                ->where('do_check_status', '=', 0)  //是否查单使用中
+                ->where('check_status', '=', 0)  //是否查单使用中
                 ->order("add_time asc")
                 ->lock(true)
                 ->find();
@@ -197,7 +197,7 @@ class OrderhexiaoModel extends Model
             }
             $orderWhere['id'] = $hxOrderInfo['id'];
             $checking['order_status'] = 1;  //使用中
-            $checking['do_check_status'] = 1;   //查询余额中
+            $checking['check_status'] = 1;   //查询余额中
             $this->where($orderWhere)->update($checking);
 
 
@@ -212,7 +212,7 @@ class OrderhexiaoModel extends Model
             //查询成功更新余额order_hexiao $order order_hexiao
             $orderWhere['id'] = $hxOrderInfo['id'];
             $updateMatch['last_check_amount'] = (float)$checkRes['data'];
-            $updateMatch['do_check_status'] = 0;
+            $updateMatch['check_status'] = 0;
             $updateMatch['status'] = 1;   //使用中
             $updateMatch['last_check_time'] = time();  //上次查询余额时间
             $updateMatch['use_time'] = time();   //使用时间

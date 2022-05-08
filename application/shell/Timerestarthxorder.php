@@ -33,7 +33,7 @@ class Timerestarthxorder extends Command
                 ->where('notify_status', '=', 0)
                 ->where('order_me', '<>', null)
                 ->where('do_notify', '=', 0)
-                ->where('do_check_status', '=', 0)
+                ->where('check_status', '=', 0)
                 ->where('order_limit_time', '<', time())
                 ->select();
             $totalNum = count($orderHXData);
