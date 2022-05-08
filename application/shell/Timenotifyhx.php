@@ -35,6 +35,8 @@ class Timenotifyhx extends Command
                 ->where('do_notify', '=', 0)
                 ->where('notify_times', '<', 3)
                 ->select();
+            logs(json_encode(['$orderHXData' => $orderHXData,
+                "time" => date("Y-m-d H:i:s", time())]), 'Timenotifyhxiao');
             $db = new Db();
             $totalNum = count($orderHXData);
             if ($totalNum > 0) {
