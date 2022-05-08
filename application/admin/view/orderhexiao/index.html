@@ -75,12 +75,12 @@
                 {{#  } }}
             </script>
             <script type="text/html" id="payStatusTpl">
-                {{#  if(d.pay_status == 1){ }}
-                <span class="layui-badge-dot green"></span>支付成功
-                {{#  } else if(d.pay_status == 2){ }}
-                <span class="layui-badge-dot gray"></span>支付失败
-                {{#  } else if(d.pay_status == 0){ }}
-                <span class="layui-badge-dot gray"></span>等待支付
+                {{#  if(d.pay_status == 0){ }}
+                <button class="layui-btn layui-btn-primary layui-btn-xs">等待支付</button>
+                {{#  } else if(d.pay_status == 1) { }}
+                <button class="layui-btn layui-btn-success layui-btn-xs">支付成功</button>
+                {{#  } else if(d.pay_status == 2) { }}
+                <button class="layui-btn layui-btn-danger layui-btn-xs">支付失败</button>
                 {{#  } }}
             </script>
             <script type="text/html" id="notifyStatusTpl">
@@ -203,10 +203,10 @@
                 field: "notify_result",
                 title: "回调结果"
             }
-            // , {
-            //     field: "order_desc",
-            //     title: "描述"
-            // }
+                // , {
+                //     field: "order_desc",
+                //     title: "描述"
+                // }
                 // , {
                 //     title: "操作",
                 //     align: "center",
