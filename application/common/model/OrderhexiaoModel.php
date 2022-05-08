@@ -54,10 +54,7 @@ class OrderhexiaoModel extends Model
         try {
             $checkStartTime = date('Y-m-d H:i:s', time());
             $notifyResult = curlPostJson("http://127.0.0.1:23943/queryBlance", $checkParam);
-            if (isset($checkParam['action']) && $checkParam['action'] == "other") {
-                return $notifyResult;
-            }
-            $notifyResult = json_decode($notifyResult, true);
+
             logs(json_encode([
                 'writeOrderNo' => $orderNo,  //核销order_no
                 'param' => $checkParam,
@@ -65,6 +62,10 @@ class OrderhexiaoModel extends Model
                 "endTime" => date("Y-m-d H:i:s", time()),
                 "checkAmountResult" => $notifyResult
             ]), 'curlCheckPhoneAmount_log');
+            if (isset($checkParam['action']) && $checkParam['action'] == "other") {
+                return $notifyResult;
+            }
+            $notifyResult = json_decode($notifyResult, true);
             //查询成功
 
 //            $notifyResultData = json_decode($notifyResult['data'], true);
