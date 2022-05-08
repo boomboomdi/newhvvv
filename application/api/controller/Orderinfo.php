@@ -180,14 +180,13 @@ class Orderinfo extends Controller
         }
     }
 
-    //查询成功
+    //结果回调
     public function checkPhoneAmountNotify0076()
     {
         $data = @file_get_contents('php://input');
         $message = json_decode($data, true);
 
         try {
-
             logs(json_encode([
                 'param' => $message,
                 'startTime' => date("Y-m-d H:i:s", time())
