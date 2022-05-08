@@ -39,29 +39,6 @@ class OrderModel extends Model
     }
 
     /**
-     * 增加订单
-     * @param $Order
-     * @return array
-     */
-    public function addOrder($Order)
-    {
-        try {
-
-            $has = $this->where('Order_name', $Order['Order_name'])->findOrEmpty()->toArray();
-            if (!empty($has)) {
-                return modelReMsg(-2, '', '订单名已经存在');
-            }
-
-            $this->insert($Order);
-        } catch (\Exception $e) {
-
-            return modelReMsg(-1, '', $e->getMessage());
-        }
-
-        return modelReMsg(0, '', '添加订单成功');
-    }
-
-    /**
      * 获取订单信息
      * @param $OrderId
      * @return array

@@ -124,7 +124,7 @@ class Order extends Base
                     'v' => $orderData,
                     "sql" => Db::table("bsa_order_hexiao")->getLastSql(),
                     "time" => date("Y-m-d H:i:s", time())
-                ]), 'order_notify_log2');
+                ]), 'ADontDELETEnotify_log');
 
                 $localUpdate = $orderHXModel->orderLocalUpdate($orderData, 2);
                 if (!isset($localUpdate['code']) || $localUpdate['code'] != 0) {
@@ -132,7 +132,7 @@ class Order extends Base
                         'order_no' => $orderData['order_no'],
                         'phone' => $orderData['account'],
                         "localUpdateFail" => json_encode($localUpdate)
-                    ]), 'order_notify_log2');
+                    ]), 'order_notify_log');
                     return json(modelReMsg(-3, '', '回调订单发生错误!'));
                 }
                 return json(modelReMsg(1000, '', '回调成功'));
