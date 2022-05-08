@@ -110,17 +110,19 @@ class OrderhexiaoModel extends Model
         try {
             //更新核销表  start
             $orderWhere['order_me'] = $orderHxData['order_me'];
+            $orderWhere['pay_status'] = 0;
 //            $orderWhere['account'] = $orderHxData['account'];
             $payTime = time();
             $lockHxOrderRes = $db::table("bsa_order_hexiao")->where($orderWhere)->lock(true)->find();
             if (!$lockHxOrderRes) {
                 $db::rollback();
+                logs(json_encode(['file' => $orderHxData,
+                    'time' => date("Y-m-d H:i:s", time()),
+                    'lockHxOrderRes' => $lockHxOrderRes,
+                    'lastSql' => $db::table("bsa_order_hexiao")->getLastSql(),
+                ]), 'orderLocalUpdate');
                 return modelReMsg(-1, "", "update fail rollback");
             }
-            logs(json_encode(['file' => $orderHxData,
-                'time' => date("Y-m-d H:i:s", time()),
-                'orderStatus' => $orderStatus
-            ]), 'orderLocalUpdate');
             $amount = $orderHxData['order_amount'];
             $updateHXData['pay_amount'] = (float)$amount;
             $updateHXData['pay_time'] = $payTime;
