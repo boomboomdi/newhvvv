@@ -41,6 +41,7 @@ class Timecheckorder extends Command
 
             $totalNum = count($orderData);
             if ($totalNum > 0) {
+                $db = new Db();
                 foreach ($orderData as $k => $v) {
                     //修改订单查询状态为查询中
                     $updateCheckWhere['order_no'] = $v['order_no'];
