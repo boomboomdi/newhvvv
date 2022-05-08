@@ -257,6 +257,8 @@ class Orderinfo extends Controller
                         'account' => $orderHXData['account'],
                         "localUpdateFail" => json_encode($localUpdate)
                     ]), 'checkPhoneAmountNotify0076Fail');
+
+                    return json(msg(1, '', '接收成功,更新失败！'));
                 }
                 return json(msg(1, '', '接收成功,更新成功！'));
             }
