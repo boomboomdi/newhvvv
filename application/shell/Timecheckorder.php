@@ -46,28 +46,32 @@ class Timecheckorder extends Command
                     //修改订单查询状态为查询中
                     $updateCheckWhere['order_no'] = $v['order_no'];
                     $updateCheckData['check_status'] = 1;
-                    $db::table("bsa_order")->where($updateCheckWhere)
-                        ->update($updateCheckData);
-                    //修改订单查询状态为查询中 end
+                    $lock = $db::table("bsa_order")->where($updateCheckWhere)->lock(true)->find();
+                    if ($lock) {
+                        if ($lock['check_status'] != 1) {
+                            $db::table("bsa_order")->where($updateCheckWhere)
+                                ->update($updateCheckData);
+                            //修改订单查询状态为查询中 end
 
-                    $getResParam['order_no'] = $v['order_no'];
-                    $getResParam['phone'] = $v['account'];
-                    $getResParam['action'] = "other";
-                    $checkStartTime = date("Y-m-d H:i:s", time());
-                    $getPhoneAmountRes = $orderHXModel->checkPhoneAmount($getResParam, $v['order_no']);
-                    if ($getPhoneAmountRes != "success") {
-                        $updateCheckWhere['order_no'] = $v['order_no'];
-                        $updateCheckData['check_status'] = 0;
-                        $db::table("bsa_order")->where($updateCheckWhere)
-                            ->update($updateCheckData);
+                            $getResParam['order_no'] = $v['order_no'];
+                            $getResParam['phone'] = $v['account'];
+                            $getResParam['action'] = "other";
+                            $checkStartTime = date("Y-m-d H:i:s", time());
+                            $getPhoneAmountRes = $orderHXModel->checkPhoneAmount($getResParam, $v['order_no']);
+                            if ($getPhoneAmountRes != "success") {
+                                $updateCheckWhere['order_no'] = $v['order_no'];
+                                $updateCheckData['check_status'] = 0;
+                                $db::table("bsa_order")->where($updateCheckWhere)
+                                    ->update($updateCheckData);
+                            }
+                            logs(json_encode(['phone' => $v['account'],
+                                "order_no" => $v['order_no'],
+                                "startTime" => $checkStartTime,
+                                "endTime" => date("Y-m-d H:i:s", time()),
+                                "getPhoneAmountRes" => $getPhoneAmountRes
+                            ]), 'TimecheckdouyincheckPhoneAmount_log');
+                        }
                     }
-                    logs(json_encode(['phone' => $v['account'],
-                        "order_no" => $v['order_no'],
-                        "startTime" => $checkStartTime,
-                        "endTime" => date("Y-m-d H:i:s", time()),
-                        "getPhoneAmountRes" => $getPhoneAmountRes
-                    ]), 'TimecheckdouyincheckPhoneAmount_log');
-
                 }
 
             }
