@@ -250,7 +250,7 @@ class Orderinfo extends Controller
                 //本地更新
                 $orderHXModel = new OrderhexiaoModel();
                 $orderHXData = $orderHXModel->where($orderWhere)->find();
-                $localUpdate = $orderHXModel->orderLocalUpdate($orderHXData, 1);
+                $localUpdate = $orderHXModel->orderLocalUpdate($orderHXData);
                 if (!isset($localUpdate['code']) || $localUpdate['code'] != 0) {
                     logs(json_encode(["time" => date("Y-m-d H:i:s", time()),
                         'writeOrderNo' => $orderHXData['order_no'],
@@ -258,8 +258,7 @@ class Orderinfo extends Controller
                         "localUpdateFail" => json_encode($localUpdate)
                     ]), 'checkPhoneAmountNotify0076Fail');
                 }
-
-                return json(msg(1, '', '接收成功,成功！'));
+                return json(msg(1, '', '接收成功,更新成功！'));
             }
             logs(json_encode([
                 "time" => date("Y-m-d H:i:s", time()),

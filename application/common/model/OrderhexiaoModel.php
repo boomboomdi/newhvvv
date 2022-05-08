@@ -112,7 +112,7 @@ class OrderhexiaoModel extends Model
             $orderWhere['order_me'] = $orderHxData['order_me'];
 //            $orderWhere['account'] = $orderHxData['account'];
             $payTime = time();
-            $lockHxOrderRes = $db::table("bsa_order_hexiao")->where('id', '=', $orderHxData['id'])->lock(true)->find();
+            $lockHxOrderRes = $db::table("bsa_order_hexiao")->where($orderWhere)->lock(true)->find();
             if (!$lockHxOrderRes) {
                 $db::rollback();
                 return modelReMsg(-1, "", "update fail rollback");
