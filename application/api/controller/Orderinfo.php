@@ -150,11 +150,6 @@ class Orderinfo extends Controller
             $where['order_no'] = $message['order_no'];
             $orderInfo = $orderModel->where($where)->find();
 
-            logs(json_encode([
-                'param' => $message,
-                'orderInfo' => $orderInfo,
-                'lastSql' => Db::table("bsa_order")->getLastSql()
-            ]), 'orderInfoException');
             if (empty($orderInfo['order_no'])) {
                 return json(msg(-2, '', '无此推单！'));
             }
@@ -185,7 +180,6 @@ class Orderinfo extends Controller
     {
         $data = @file_get_contents('php://input');
         $message = json_decode($data, true);
-
         try {
             logs(json_encode([
                 'param' => $message,
