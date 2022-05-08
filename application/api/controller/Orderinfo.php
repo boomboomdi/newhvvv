@@ -153,7 +153,7 @@ class Orderinfo extends Controller
             if (empty($message['order_no'])) {
                 return json(msg(-2, '', '无此推单！'));
             }
-            if ($message['order_no'] != 4) {
+            if ($message['order_status'] != 4) {
                 return json(msg(-3, '', '请重新下单！'));
             }
 
