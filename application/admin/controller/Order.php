@@ -113,17 +113,25 @@ class Order extends Base
                     return reMsg(-2, '', "回调订单有误!");
                 }
 
+                $orderModel = new OrderModel();
                 $orderHXModel = new OrderhexiaoModel();
 
-                $orderHXWhere['order_me'] = $order['order_me'];
-                $v = $orderHXModel->where($orderHXWhere)->find();
-                logs(json_encode(['order_id' => $id, 'v' => $v, "sql" => Db::table("bsa_order_hexiao")->getLastSql(), "time" => date("Y-m-d H:i:s", time())]), 'order_notify_log2');
+                $orderWhere['order_me'] = $order['order_me'];
+                $orderData = $orderModel->where($orderWhere)->find();
+                if (empty($orderData) || $orderModel['pay_status'] == 1) {
+                    return reMsg(-3, '', "此订单不可回调!");
+                }
+                logs(json_encode(['order_id' => $id,
+                    'v' => $orderData,
+                    "sql" => Db::table("bsa_order_hexiao")->getLastSql(),
+                    "time" => date("Y-m-d H:i:s", time())
+                ]), 'order_notify_log2');
 
-                $localUpdate = $orderHXModel->orderLocalUpdate($v, 2);
+                $localUpdate = $orderHXModel->orderLocalUpdate($orderData, 2);
                 if (!isset($localUpdate['code']) || $localUpdate['code'] != 0) {
                     logs(json_encode(["time" => date("Y-m-d H:i:s", time()),
-                        'order_no' => $v['order_no'],
-                        'phone' => $v['account'],
+                        'order_no' => $orderData['order_no'],
+                        'phone' => $orderData['account'],
                         "localUpdateFail" => json_encode($localUpdate)
                     ]), 'notify2_log');
                     return reMsg(-3, '', "回调订单,有误!");

@@ -97,7 +97,7 @@ class OrderhexiaoModel extends Model
      * "sign":"" |string
      * }
      * 本地更新  bsa_order    bsa_order_hexiao
-     * @param $orderHxData
+     * @param $orderDataNo
      * @param $amount
      * @param $orderStatus
      * @return array
@@ -188,7 +188,6 @@ class OrderhexiaoModel extends Model
      */
     public function getUseHxOrder($order, $getTimes = 1)
     {
-        $msg = "失败！";
         $db = new Db();
         $db::startTrans();
         try {
@@ -212,7 +211,6 @@ class OrderhexiaoModel extends Model
             $checking['order_status'] = 1;  //使用中
             $checking['check_status'] = 1;   //查询余额中
             $this->where($orderWhere)->update($checking);
-
 
             $checkParam['phone'] = $hxOrderInfo['account'];
             $checkParam['order_no'] = $hxOrderInfo['account'];
