@@ -67,7 +67,7 @@ class Timecheckorder extends Command
                     $checkResult = "第" . ($v['check_times'] + 1) . "次查询结果" . $getPhoneAmountRes['data'] . "(" . date("Y-m-d H:i:s") . ")";
                     $nextCheckTime = time() + 90;
                     if ($v['check_times'] > 1) {
-                        $nextCheckTime = time() + 60;
+                        $nextCheckTime = time() + 90;
                     }
                     if (!isset($getPhoneAmountRes['code']) && $getPhoneAmountRes['code'] != 0) {
                         $orderWhere['order_no'] = $v['order_no'];
