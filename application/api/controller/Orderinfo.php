@@ -48,11 +48,11 @@ class Orderinfo extends Controller
             //$user_id = $message['user_id'];  //用户标识
             // 根据user_id  未付款次数 限制下单 end
 
-            $orderMe = guidForSelf();
+            $orderMe = uuidA();
 
             $orderFind = $db::table('bsa_order')->where('order_me', '=', $orderMe)->find();
             if (!empty($orderFind)) {
-                $orderMe = guidForSelf();
+                $orderMe = uuidA();
             }
             $orderNoFind = $db::table('bsa_order')->where('order_no', '=', $message['order_no'])->find();
             if (!empty($orderNoFind)) {

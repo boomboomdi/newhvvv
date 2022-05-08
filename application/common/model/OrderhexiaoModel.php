@@ -140,8 +140,12 @@ class OrderhexiaoModel extends Model
             //更新核销表  end
 
             //更新订单表
-            $orderData = $db::table('bsa_order')->where($orderWhere)->find();   //订单
-            $lockOrderRes = $db::table('bsa_order')->where('id', '=', $orderData['id'])->lock(true)->find();
+            $updateOrderWhere['order_no'] = $orderDataNo['order_no'];
+            $updateOrderWhere['order_me'] = $orderDataNo['order_me'];
+            $orderData = $db::table('bsa_order')->where($updateOrderWhere)->find();   //订单
+            $lockOrderRes = $db::table('bsa_order')
+                ->where('id', '=', $orderData['id'])
+                ->lock(true)->find();
             if (!$lockOrderRes) {
                 $db::rollback();
                 return modelReMsg(-3, "", "update lock order fail rollback");

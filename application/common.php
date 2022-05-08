@@ -213,6 +213,17 @@ function guidForSelf()
 //    return $yCode[intval(date('Y')) - 2011] . $yCode[intval(date('Y')) - rand(2011, 2019)] . strtoupper(dechex(date('m'))) . date('YmdHi') . substr(implode(NULL, array_map('ord', str_split(substr(uniqid(), 7, 13), 1))), 0, 8);
 }
 
+function uuidA()
+{
+    $chars = md5(uniqid(mt_rand(), true));
+    $uuid = substr($chars, 0, 8)
+        . substr($chars, 8, 4)
+        . substr($chars, 12, 4)
+        . substr($chars, 16, 4)
+        . substr($chars, 20, 12);
+    return $uuid;
+}
+
 /**
  * 生成操作按钮
  * @param array $operate 操作按钮数组

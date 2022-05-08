@@ -213,7 +213,7 @@ class OrderModel extends Model
     }
 
     /**
-     * 支付超时订单修改
+     * 下单更新
      * @param $where
      * @param $updateData
      * @return array
