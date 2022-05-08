@@ -66,10 +66,8 @@ class Timecheckorder extends Command
                     ]), 'TimecheckdouyincheckPhoneAmount_log');
                     $checkResult = "第" . ($v['check_times'] + 1) . "次查询结果" . $getPhoneAmountRes['data'] . "(" . date("Y-m-d H:i:s") . ")";
                     $nextCheckTime = time() + 90;
-                    if ($v['check_times'] > 1) {
-                        $nextCheckTime = time() + 90;
-                    }
-                    if ($v['check_times'] > 3) {
+
+                    if (($v['check_times'] + 1) > 4) {   //就是第五次查询是420s之后
                         $nextCheckTime = time() + 420;
                     }
                     if (!isset($getPhoneAmountRes['code']) && $getPhoneAmountRes['code'] != 0) {
