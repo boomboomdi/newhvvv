@@ -150,10 +150,17 @@ class Orderinfo extends Controller
             $orderModel = new OrderModel();
             $where['order_no'] = $message['order_no'];
             $orderInfo = $orderModel->where($where)->find();
+
+            logs(json_encode([
+                'param' => $message,
+                'orderInfo' => $orderInfo,
+                'lastSql' => Db::table("bsa_order")->getLastSql()
+            ]), 'orderInfoException');
             if (empty($message['order_no'])) {
                 return json(msg(-2, '', '无此推单！'));
             }
             if ($orderInfo['order_status'] != 4) {
+
                 return json(msg(-3, '', '请重新下单！'));
             }
 
@@ -164,11 +171,6 @@ class Orderinfo extends Controller
             return json(msg(0, ($orderInfo['order_limit_time'] - 300), "success"));
 
         } catch (\Exception $exception) {
-            logs(json_encode(['param' => $message,
-                'file' => $exception->getFile(),
-                'line' => $exception->getLine(),
-                'errorMessage' => $exception->getMessage()
-            ]), 'orderInfoException');
             return apiJsonReturn(-11, "orderInfo exception!" . $exception->getMessage());
         } catch (\Error $error) {
             logs(json_encode(['param' => $message,
