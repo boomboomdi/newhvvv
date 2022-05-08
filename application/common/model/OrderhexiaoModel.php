@@ -45,8 +45,8 @@ class OrderhexiaoModel extends Model
      * //失败返回：
      * //{"code":9999,"msg":"余额获取失败","data":null,"sign":null}
      * 查询手机余额
-     * @param $checkParam   --订单id  查询单号（四方）
-     * @param $orderNo  --核销order_no
+     * @param $checkParam --订单id  查询单号（四方）
+     * @param $orderNo --核销order_no
      * @return array
      */
     public function checkPhoneAmount($checkParam, $orderNo)
@@ -137,6 +137,7 @@ class OrderhexiaoModel extends Model
                 $db::rollback();
                 return modelReMsg(-3, "", "update lock order fail rollback");
             }
+
             $updateOrderData['actual_amount'] = (float)$amount;
             $updateOrderData['pay_status'] = 1;
             $updateOrderData['pay_time'] = $payTime;
@@ -144,6 +145,12 @@ class OrderhexiaoModel extends Model
             $updateOrderData['check_status'] = 2;
             $updateOrderRes = $db::table('bsa_order')->where($orderWhere)
                 ->update($updateOrderData);
+            logs(json_encode([
+                'orderWhere' => $orderWhere,
+                'updateOrderData' => $updateOrderData,
+                'updateOrderRes' => $updateOrderRes,
+                'sql' => $db::table('bsa_order')->getLastSql()
+            ]), 'updateOrderRes');
             if (!$updateOrderRes) {
                 $db::rollback();
                 return modelReMsg(-4, "", "update order fail rollback");
@@ -155,14 +162,14 @@ class OrderhexiaoModel extends Model
             logs(json_encode(['file' => $exception->getFile(),
                 'line' => $exception->getLine(),
                 'errorMessage' => $exception->getMessage()
-            ]), 'orderDouYinNotifyToWriteOffException');
+            ]), 'orderLocalUpdateException');
             return modelReMsg(-11, "", "回调失败" . $exception->getMessage());
         } catch (\Error $error) {
             $db::rollback();
             logs(json_encode(['file' => $error->getFile(),
                 'line' => $error->getLine(),
                 'errorMessage' => $error->getMessage()
-            ]), 'orderDouYinNotifyToWriteOffError');
+            ]), 'orderLocalUpdateError');
             return modelReMsg(-22, "", "回调失败" . $error->getMessage());
         }
     }
