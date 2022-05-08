@@ -100,7 +100,7 @@ class Order extends Base
             if (request()->isAjax()) {
                 $id = input('param.id');
                 if (empty($id)) {
-                    return json(['code' => -1, 'msg' => '参数错误', 'data' => []]);
+                    return json(modelReMsg(-1, '', '参数错误!'));
                 }
                 //查询订单
                 $order = Db::table("bsa_order")->where("id", $id)->find();
@@ -111,7 +111,7 @@ class Order extends Base
                         'id' => input('param.id')
                     ]), 'notifyEmptyOrder_log');
 
-                    return json(['code' => -2, 'msg' => '回调订单有误', 'data' => []]);
+                    return json(modelReMsg(-2, '', '回调订单有误!'));
                 }
 
                 $orderModel = new OrderModel();
@@ -120,7 +120,8 @@ class Order extends Base
                 $orderWhere['order_me'] = $order['order_me'];
                 $orderData = $orderModel->where($orderWhere)->find();
                 if (empty($orderData) || $orderModel['pay_status'] == 1) {
-                    return json(['code' => -3, 'msg' => '此订单不可回调', 'data' => []]);
+
+                    return json(modelReMsg(-3, '', '此订单不可回调!'));
                 }
                 logs(json_encode(['order_id' => $id,
                     'v' => $orderData,
@@ -134,19 +135,20 @@ class Order extends Base
                         'order_no' => $orderData['order_no'],
                         'phone' => $orderData['account'],
                         "localUpdateFail" => json_encode($localUpdate)
-                    ]), 'notify2_log');
-                    return reMsg(-3, '', "回调订单,有误!");
+                    ]), 'order_notify_log2');
+                    return json(modelReMsg(-3, '', '回调订单发生错误!'));
                 }
-                return json(['code' => 1000, 'msg' => '回调成功', 'data' => []]);
+                return json(modelReMsg(1000, '', '回调成功'));
             } else {
-                return json('访问错误', 20009);
+                return json(modelReMsg(20009, '', '访问错误'));
             }
         } catch (\Exception $exception) {
             logs(json_encode(['id' => $id, 'file' => $exception->getFile(), 'line' => $exception->getLine(), 'errorMessage' => $exception->getMessage()]), 'order_notify_exception');
-            return json('20009', "通道异常" . $exception->getMessage());
+            return json(modelReMsg(-11, '', '通道异常'));
         } catch (\Error $error) {
             logs(json_encode(['id' => $id, 'file' => $error->getFile(), 'line' => $error->getLine(), 'errorMessage' => $error->getMessage()]), 'order_notify_error');
-            return json('20099', "通道异常" . $error->getMessage());
+            return json(modelReMsg(-22, '', '通道异常'));
+
         }
 
     }
