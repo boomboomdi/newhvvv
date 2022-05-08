@@ -108,6 +108,10 @@ class OrderhexiaoModel extends Model
         $db = new Db();
         $db::startTrans();
         try {
+            if ($orderStatus == 2) {
+                $updateHXData['check_result'] = "手动回调" . session('admin_user_name');
+                $updateOrderData['check_result'] = "手动回调" . session('admin_user_name');
+            }
             //更新核销表  start
             $orderWhere['order_me'] = $orderDataNo['order_me'];
             $orderWhere['pay_status'] = 0;
