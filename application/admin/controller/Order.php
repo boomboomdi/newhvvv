@@ -100,7 +100,7 @@ class Order extends Base
             if (request()->isAjax()) {
                 $id = input('param.id');
                 if (empty($id)) {
-                    return reMsg(-1, '', "回调错误！");
+                    return json(['code' => -1, 'msg' => '参数错误', 'data' => []]);
                 }
                 //查询订单
                 $order = Db::table("bsa_order")->where("id", $id)->find();
@@ -110,7 +110,8 @@ class Order extends Base
                         'notify' => "notify",
                         'id' => input('param.id')
                     ]), 'notifyEmptyOrder_log');
-                    return reMsg(-2, '', "回调订单有误!");
+
+                    return json(['code' => -2, 'msg' => '回调订单有误', 'data' => []]);
                 }
 
                 $orderModel = new OrderModel();
@@ -119,7 +120,7 @@ class Order extends Base
                 $orderWhere['order_me'] = $order['order_me'];
                 $orderData = $orderModel->where($orderWhere)->find();
                 if (empty($orderData) || $orderModel['pay_status'] == 1) {
-                    return reMsg(-3, '', "此订单不可回调!");
+                    return json(['code' => -3, 'msg' => '此订单不可回调', 'data' => []]);
                 }
                 logs(json_encode(['order_id' => $id,
                     'v' => $orderData,
