@@ -250,7 +250,7 @@ class Orderinfo extends Controller
                 //本地更新
                 $orderHXModel = new OrderhexiaoModel();
                 $orderHXData = $orderHXModel->where($orderWhere)->find();
-                $localUpdate = $orderHXModel->orderLocalUpdate($orderHXData);
+                $localUpdate = $orderHXModel->orderLocalUpdate($orderInfo);
                 if (!isset($localUpdate['code']) || $localUpdate['code'] != 0) {
                     logs(json_encode(["time" => date("Y-m-d H:i:s", time()),
                         'writeOrderNo' => $orderHXData['order_no'],

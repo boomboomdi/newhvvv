@@ -102,28 +102,28 @@ class OrderhexiaoModel extends Model
      * @param $orderStatus
      * @return array
      */
-    public function orderLocalUpdate($orderHxData, $orderStatus = 1, $amount = "")
+    public function orderLocalUpdate($orderDataNo, $orderStatus = 1, $amount = "")
     {
 
         $db = new Db();
         $db::startTrans();
         try {
             //更新核销表  start
-            $orderWhere['order_me'] = $orderHxData['order_me'];
+            $orderWhere['order_me'] = $orderDataNo['order_me'];
             $orderWhere['pay_status'] = 0;
 //            $orderWhere['account'] = $orderHxData['account'];
             $payTime = time();
             $lockHxOrderRes = $db::table("bsa_order_hexiao")->where($orderWhere)->lock(true)->find();
             if (!$lockHxOrderRes) {
                 $db::rollback();
-                logs(json_encode(['file' => $orderHxData,
+                logs(json_encode(['file' => $orderDataNo,
                     'time' => date("Y-m-d H:i:s", time()),
                     'lockHxOrderRes' => $lockHxOrderRes,
                     'lastSql' => $db::table("bsa_order_hexiao")->getLastSql(),
                 ]), 'orderLocalUpdate');
                 return modelReMsg(-1, "", "update fail rollback");
             }
-            $amount = $orderHxData['order_amount'];
+            $amount = $orderDataNo['amount'];
             $updateHXData['pay_amount'] = (float)$amount;
             $updateHXData['pay_time'] = $payTime;
             $updateHXData['status'] = 2;
