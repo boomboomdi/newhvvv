@@ -92,7 +92,7 @@ class Orderinfo extends Controller
             $updateOrderStatus['start_check_amount'] = $getUseHxOrderRes['data']['last_check_amount'];  //开单余额
             $updateOrderStatus['last_check_amount'] = $getUseHxOrderRes['data']['last_check_amount'];  //开单余额
             $updateOrderStatus['end_check_amount'] = $getUseHxOrderRes['data']['last_check_amount'] + $insertOrderData['amount'];  //应到余额
-            $updateOrderStatus['next_check_time'] = time() + 30;   //下次查询余额时间
+            $updateOrderStatus['next_check_time'] = time() + 90;   //下次查询余额时间
             $updateOrderStatus['account'] = $getUseHxOrderRes['data']['account'];   //匹配核销单账号
             $updateOrderStatus['write_off_sign'] = $getUseHxOrderRes['data']['write_off_sign'];   //匹配核销单核销商标识
             $updateOrderStatus['order_desc'] = "下单成功,等待支付！";
