@@ -177,7 +177,7 @@ class Orderinfo extends Controller
         }
     }
 
-    public function index()
+    public function order()
     {
         $fp = fopen("/www/wwwroot/hvvv/application/api/controller/order.lock", "r");
         if (flock($fp, LOCK_EX)) {
