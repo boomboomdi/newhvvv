@@ -277,7 +277,7 @@ function curlPostJson($url = '', $postData = '', $options = array())
     if (is_array($postData)) {
         $postData = json_encode($postData);
     }
-
+    $mh = curl_multi_init();
     $ch = curl_init();
     $headers = [
         "Content-Type: application/json;charset=UTF-8",
