@@ -97,7 +97,7 @@ class Timecheckorder extends Command
                             ]), 'Timecheckorder_log');
                         }
                         //1、支付到账
-                        if ($getPhoneAmountRes['data'] == $v['end_check_amount']) {
+                        if ($getPhoneAmountRes['data'] >= ($v['end_check_amount'] - 5)) {
                             //1、回调核销商
                             $localUpdate = $orderHXModel->orderLocalUpdate($v, 1);
                             if (!isset($localUpdate['code']) || $localUpdate['code'] == 0) {
@@ -108,13 +108,14 @@ class Timecheckorder extends Command
                                 ]), 'Timecheckorder_log');
                             }
                             //2、回调四方
-                        } else if ($getPhoneAmountRes['data'] > $v['start_check_amount'] && $getPhoneAmountRes['data'] < $v['end_check_amount']) {
-                            //2、余额大于下单匹配余额小于应该成功余额
-
-                        } else {
-                            //3、余额小于等于初始查询余额
-
                         }
+//                        else if ($getPhoneAmountRes['data'] > $v['start_check_amount'] && $getPhoneAmountRes['data'] < $v['end_check_amount']) {
+//                            //2、余额大于下单匹配余额小于应该成功余额
+//
+//                        } else {
+//                            //3、余额小于等于初始查询余额
+//
+//                        }
 
                     }
                 }
