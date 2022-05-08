@@ -2,14 +2,12 @@
 
 namespace app\api\controller;
 
-use app\common\model\OrderhexiaoModel;
-use app\common\model\OrderModel;
 use think\Controller;
 use think\Db;
-use app\api\model\OrderLog;
+use app\common\model\OrderhexiaoModel;
+use app\common\model\OrderModel;
 use app\api\validate\OrderinfoValidate;
-use think\exception\ErrorException;
-use think\facade\Log;
+use app\api\validate\CheckPhoneAmountNotifyValidate;
 use think\Request;
 use think\Validate;
 
@@ -157,7 +155,7 @@ class Orderinfo extends Controller
                 'orderInfo' => $orderInfo,
                 'lastSql' => Db::table("bsa_order")->getLastSql()
             ]), 'orderInfoException');
-            if (empty($message['order_no'])) {
+            if (empty($orderInfo['order_no'])) {
                 return json(msg(-2, '', '无此推单！'));
             }
             if ($orderInfo['order_status'] != 4) {
@@ -182,74 +180,101 @@ class Orderinfo extends Controller
         }
     }
 
-    //
-    public function callbackformerchant()
-    {
-
-    }
-
-    //订单回调 @todo  //通道触发->四方
-    public function callback()
+    //查询成功
+    public function checkPhoneAmountNotify0076()
     {
         $data = @file_get_contents('php://input');
         $message = json_decode($data, true);
-        //验证协议参数 -> 检查商户状态 -> 通知商户付款成功
+
         try {
-            $validate = new OrderinfoValidate();
-            //请求参数不完整
+
+            logs(json_encode([
+                'param' => $message,
+                'startTime' => date("Y-m-d H:i:s", time())
+            ]), 'checkPhoneAmountNotify0076');
+            $validate = new CheckPhoneAmountNotifyValidate();
             if (!$validate->check($message)) {
-                $returnMsg['code'] = 1002;
-                $returnMsg['msg'] = "参数错误!";
-                $returnMsg['data'] = $validate->getError();
-                return json_encode($returnMsg);
+                return apiJsonReturn(-1, '', $validate->getError());
+            }
+            $orderModel = new OrderModel();
+            $orderWhere['order_no'] = $message['order_no'];  //四方单号
+            $orderWhere['account'] = $message['phone'];   //订单匹配手机号
+            $orderInfo = $orderModel->where($orderWhere)->find();
+
+            if (empty($orderInfo)) {
+                return json(msg(-2, '', '无此订单！'));
+            }
+            if ($orderInfo['order_status'] == 1) {
+                return json(msg(-3, '', '订单已支付！'));
             }
             $db = new Db();
-            //验签
-            $merchantWhere['merchant_sign'] = $message['merchant_sign'];
-            $merchant = $db::table('bsa_merchant')->where($merchantWhere)->find();
-            if (empty($merchant) && $merchant['status']) {
-
+            $checkResult = "第" . ($orderInfo['check_times'] + 1) . "次查询结果" . $message['amount'] . "(" . date("Y-m-d H:i:s") . ")";
+            $nextCheckTime = time() + 40;
+            if ($orderInfo['check_times'] > 3) {
+                $nextCheckTime = time() + 50;
             }
-            //    {
-//        "merchant_sign":"cest",
-//        "client_ip":"192.168.1.1"
-//        "order_no":"cest",
-//        "order_pay":"cest",
-//        "payment":"cest",
-//        "amount":"cest",
-//        "actual_amount":"cest",
-//        "pay_time":"cest",
-//        "sign":"cest"
-//    }
-            //
-            $sign = md5("merchant_sign=" . $message['merchant_sign'] .
-                "&client_ip=" . $merchant['client_ip'] .
-                "&order_no=" . $message['order_no'] .
-                "&order_pay=" . $message['order_pay'] .
-                "&payment=" . $message['payment'] .
-                "&amount=" . $message['amount'] .
-                "&actual_amount=" . $message['actual_amount'] .
-                "&pay_time=" . $message['pay_time'] .
-                "&returnUrl=" . $message['returnUrl'] .
-                "&key=" . $merchant['token']
-            );
-            $sign = strtoupper($sign);
-            $orderLogModel = new OrderLog();
-            if ($sign != $message['sign']) {
-                $orderData['merchant_sign'] = $message['merchant_sign'];
-                $orderData['order_desc'] = "验签失败！";
-                $orderLogModel->writeNotifyOrderLog($orderData, 2);
-                return apiJsonReturn('10006', "验签失败！");
+            if ($message['code'] != 1) {
+                $updateCheckTimesRes = $db::table("bsa_order")->where($orderWhere)
+                    ->update([
+                        "check_times" => $orderInfo['check_times'] + 1,
+                        "next_check_time" => $nextCheckTime,
+                        "order_desc" => $checkResult,
+                        "check_result" => $checkResult,
+                    ]);
+                if (!$updateCheckTimesRes) {
+                    logs(json_encode(['phone' => $orderInfo['account'],
+                        "order_no" => $orderInfo['order_no'],
+                        "notifyTime" => date("Y-m-d H:i:s", time()),
+                        "getPhoneAmountRes" => $message
+                    ]), '0076updateCheckPhoneAmountFail');
+                }
+                return json(msg(1, '', '接收成功'));
             }
-            //处理通知
+            //查询成功
+            $orderWhere['order_no'] = $orderInfo['order_no'];
+            $orderUpdate['check_times'] = $orderInfo['check_times'] + 1;
+            $orderUpdate['last_check_amount'] = $message['amount'];
+            $orderUpdate['next_check_time'] = $nextCheckTime;
+            $orderUpdate['check_result'] = $checkResult;
+            $updateCheck = $db::table("bsa_order")->where($orderWhere)
+                ->update($orderUpdate);
+            if (!$updateCheck) {
+                logs(json_encode(["time" => date("Y-m-d H:i:s", time()),
+                    'action' => "paySuccess",
+                    'order_no' => $message['order_no'],
+                    'phone' => $message['account'],
+                    "getPhoneAmountRes" => $checkResult
+                ]), '0076updateCheckFail');
+            }
+            //1、支付到账
+            if ($message['amount'] >= ($orderInfo['end_check_amount'] - 5)) {
+                //1、回调核销商
+                $orderHXModel = new OrderhexiaoModel();
+                $orderHXData = $orderHXModel->where($orderWhere)->find();
+                $localUpdate = $orderHXModel->orderLocalUpdate($orderHXData, 1);
+                if (!isset($localUpdate['code']) || $localUpdate['code'] == 0) {
+                    logs(json_encode(["time" => date("Y-m-d H:i:s", time()),
+                        'writeOrderNo' => $orderHXData['order_no'],
+                        'account' => $orderHXData['account'],
+                        "localUpdateFail" => json_encode($localUpdate)
+                    ]), 'checkPhoneAmountNotify0076Fail');
+                }
+            }
+            return json(msg(1, '', '接收成功,更新成功！'));
 
         } catch (\Exception $exception) {
-            Log::write("/n/t Orderinfo/callback: /n/t" . json_encode($data) . "/n/t" . $exception->getMessage(), "exception");
-            return apiJsonReturn('20009', "通道异常" . $exception->getMessage());
+            logs(json_encode(['param' => $message,
+                'file' => $exception->getFile(),
+                'line' => $exception->getLine(),
+                'errorMessage' => $exception->getMessage()]), 'checkPhoneAmountNotify0076Exception');
+            return json(msg(-11, '', '接收异常！'));
         } catch (\Error $error) {
-            Log::write("/n/t Orderinfo/callback: /n/t" . json_encode($data) . "/n/t" . $error->getMessage(), "error");
-            return apiJsonReturn('20099', "通道异常" . $error->getMessage());
-
+            logs(json_encode(['param' => $message,
+                'file' => $error->getFile(),
+                'line' => $error->getLine(),
+                'errorMessage' => $error->getMessage()]), 'checkPhoneAmountNotify0076Error');
+            return json(msg(-22, '', "接收错误！"));
         }
     }
+
 }

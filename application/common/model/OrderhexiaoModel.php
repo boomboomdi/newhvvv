@@ -45,8 +45,8 @@ class OrderhexiaoModel extends Model
      * //失败返回：
      * //{"code":9999,"msg":"余额获取失败","data":null,"sign":null}
      * 查询手机余额
-     * @param $checkParam
-     * @param $orderNo
+     * @param $checkParam   --订单id  查询单号（四方）
+     * @param $orderNo  --核销order_no
      * @return array
      */
     public function checkPhoneAmount($checkParam, $orderNo)
@@ -56,11 +56,11 @@ class OrderhexiaoModel extends Model
             $notifyResult = curlPostJson("http://127.0.0.1:23943/queryBlance", $checkParam);
             $notifyResult = json_decode($notifyResult, true);
             logs(json_encode([
-                'orderNo' => $orderNo,
+                'writeOrderNo' => $orderNo,  //核销order_no
                 'param' => $checkParam,
                 "startTime" => $checkStartTime,
                 "endTime" => date("Y-m-d H:i:s", time()),
-                "notifyResult" => $notifyResult
+                "checkAmountResult" => $notifyResult
             ]), 'curlCheckPhoneAmount_log');
             //查询成功
 
@@ -203,6 +203,7 @@ class OrderhexiaoModel extends Model
 
             $checkParam['phone'] = $hxOrderInfo['account'];
             $checkParam['order_no'] = $hxOrderInfo['account'];
+            $checkParam['action'] = 'first';
             $checkRes = $this->checkPhoneAmount($checkParam, $hxOrderInfo['order_no']);
             if ($checkRes['code'] != 0) {
                 $db::rollback();

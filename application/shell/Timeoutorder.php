@@ -44,13 +44,13 @@ class Timeoutorder extends Command
                     $orderWhere['order_me'] = $v['order_me'];
                     $updateOrderData['order_status'] = 2;
                     $updateOrderData['last_use_time'] = time();
-                    $updateOrderData['order_desc'] = "支付超时订单冻结";
+                    $updateOrderData['order_desc'] = "支付超时订单冻结!";
                     $updateOrderRes = $orderModel->localUpdateOrder($orderWhere, $updateOrderData);
                     //处理对应order_hexiao表
                     $updateHXOrderData['order_status'] = 2;
                     $updateHXOrderData['last_use_time'] = time();
                     $updateHXOrderData['order_limit_time'] = time() + 2700;
-                    $updateHXOrderData['order_desc'] = "核销单冻结中！";
+                    $updateHXOrderData['order_desc'] = "核销单冻结中!";
                     $updateHXOrderRes = $orderHXModel->localUpdateHXOrder($orderWhere, $updateHXOrderData);
                     logs(json_encode(['order_no' => $v['order_no'],
                         "time" => date("Y-m-d H:i:s", time()),
