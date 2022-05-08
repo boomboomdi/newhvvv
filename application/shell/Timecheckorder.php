@@ -37,7 +37,7 @@ class Timecheckorder extends Command
                 ->where('order_status', '=', 4)
                 ->where('next_check_time', '<', time())
 //                ->where('order_limit_time', '>', time())
-                ->where('check_status', '=', 0)
+//                ->where('check_status', '=', 0)
                 ->where('check_times', '<', 5)
                 ->select();
 
@@ -46,7 +46,7 @@ class Timecheckorder extends Command
                 foreach ($orderData as $k => $v) {
                     $db::startTrans();
                     $updateCheckWhere['order_no'] = $v['order_no'];
-                    $updateCheckWhere['check_status'] = 0;
+//                    $updateCheckWhere['check_status'] = 0;
                     $lock = $db::table("bsa_order")->where($updateCheckWhere)->lock(true)->find();
                     if ($lock) {
                         if ($lock['check_status'] == 0) {
