@@ -67,7 +67,7 @@ class Timecheckorder extends Command
                         "order_no" => $v['order_no'],
                         "startTime" => $checkStartTime,
                         "endTime" => date("Y-m-d H:i:s", time()),
-                        "getPhoneAmountRes" => $getPhoneAmountRes['data']
+                        "getPhoneAmountRes" => $getPhoneAmountRes
                     ]), 'TimecheckdouyincheckPhoneAmount_log');
 
                 }
