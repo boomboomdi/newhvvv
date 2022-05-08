@@ -36,7 +36,7 @@ class Timecheckorder extends Command
                 ->where('next_check_time', '<', time())
                 ->where('order_limit_time', '>', time())
                 ->where('check_status', '=', 0)
-                ->where('check_times', '<', 6)
+                ->where('check_times', '<', 5)
                 ->select();
             logs(json_encode(['orderData' => $orderData,
                 "sql" => Db::table("bsa_order")->getLastSql(),
@@ -58,18 +58,18 @@ class Timecheckorder extends Command
                     $checkStartTime = date("Y-m-d H:i:s", time());
                     $getPhoneAmountRes = $orderHXModel->checkPhoneAmount($getResParam, $v['order_no']);
 
-//                    logs(json_encode(['phone' => $v['account'],
-//                        "order_no" => $v['order_no'],
-//                        "startTime" => $checkStartTime,
-//                        "endTime" => date("Y-m-d H:i:s", time()),
-//                        "getPhoneAmountRes" => $getPhoneAmountRes['data']
-//                    ]), 'TimecheckdouyincheckPhoneAmount_log');
+                    logs(json_encode(['phone' => $v['account'],
+                        "order_no" => $v['order_no'],
+                        "startTime" => $checkStartTime,
+                        "endTime" => date("Y-m-d H:i:s", time()),
+                        "getPhoneAmountRes" => $getPhoneAmountRes['data']
+                    ]), 'TimecheckdouyincheckPhoneAmount_log');
                     $checkResult = "第" . ($v['check_times'] + 1) . "次查询结果" . $getPhoneAmountRes['data'] . "(" . date("Y-m-d H:i:s") . ")";
                     $nextCheckTime = time() + 90;
                     if ($v['check_times'] > 1) {
                         $nextCheckTime = time() + 90;
                     }
-                    if ($v['check_times'] > 4) {
+                    if ($v['check_times'] > 3) {
                         $nextCheckTime = time() + 420;
                     }
                     if (!isset($getPhoneAmountRes['code']) && $getPhoneAmountRes['code'] != 0) {
