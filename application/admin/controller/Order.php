@@ -119,7 +119,7 @@ class Order extends Base
 
                 $orderWhere['order_me'] = $order['order_me'];
                 $orderData = $orderModel->where($orderWhere)->find();
-                if (empty($orderData) || $orderModel['pay_status'] == 1) {
+                if (empty($orderData) || $orderData['pay_status'] == 1) {
 
                     return json(modelReMsg(-3, '', '此订单不可回调!'));
                 }
