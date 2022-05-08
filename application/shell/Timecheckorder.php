@@ -73,7 +73,6 @@ class Timecheckorder extends Command
                                 "endTime" => date("Y-m-d H:i:s", time()),
                                 "getPhoneAmountRes" => $getPhoneAmountRes
                             ]), 'TimecheckordercheckPhoneAmount');
-
                             $db::commit();
                         }else{
                             $db::rollback();
@@ -83,18 +82,12 @@ class Timecheckorder extends Command
                     }
                 }
 
-            }else{
-                $db::rollback();
             }
             $output->writeln("Timecheckorder:订单总数" . $totalNum);
         } catch (\Exception $exception) {
-
-            $db::rollback();
             logs(json_encode(['file' => $exception->getFile(), 'line' => $exception->getLine(), 'errorMessage' => $exception->getMessage()]), 'Timecheckorder_exception');
             $output->writeln("Timecheckorder:exception");
         } catch (\Error $error) {
-
-            $db::rollback();
             logs(json_encode(['file' => $error->getFile(), 'line' => $error->getLine(), 'errorMessage' => $error->getMessage()]), 'Timecheckorder_error');
             $output->writeln("Timecheckorder:error");
         }
