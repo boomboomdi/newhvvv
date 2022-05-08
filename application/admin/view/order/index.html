@@ -58,6 +58,15 @@
 
         <div class="layui-card-body">
             <table id="LAY-user-table" lay-filter="LAY-user-table"></table>
+            <script type="text/html" id="notifyStatusTpl">
+                {{#  if(d.notify_status == 1){ }}
+                <span class="layui-badge-dot green"></span>回调成功
+                {{#  } else if(d.notify_status == 2){ }}
+                <span class="layui-badge-dot gray"></span>回调失败
+                {{#  } else if(d.notify_status == 0){ }}
+                <span class="layui-badge-dot gray"></span>未回调
+                {{#  } }}
+            </script>
             <script type="text/html" id="table-seller-admin">
                 {if (buttonAuth('order/notify'))}
                 {{#  if(d.admin_id == '1'){ }}
@@ -137,7 +146,11 @@
                 title: "查单次数",
             }, {
                 field: "order_status",
-                title: "支付状态",
+                title: "订单状态",
+            }, {
+                field: "notify_status",
+                title: "回调状态",
+                templet: '#notifyStatusTpl'
             }, {
                 field: "add_time",
                 title: "下单时间"
