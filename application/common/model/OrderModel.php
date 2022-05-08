@@ -161,7 +161,6 @@ class OrderModel extends Model
             $merchantWhere['merchant_sign'] = $data['merchant_sign'];
             $token = Db::table("bsa_merchant")->where($merchantWhere)->find()['token'];
 
-            $returnMsg = array();
             $doMd5String = $callbackData['merchant_sign'] . $callbackData['order_no'] . $callbackData['amount'] . $callbackData['actual_amount'] . $callbackData['pay_time'] . $token;
             $callbackData['sign'] = md5($doMd5String);
             //回调处理

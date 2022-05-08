@@ -31,6 +31,7 @@ class Timenotifyorder extends Command
             $orderModel = new OrderModel();
             $orderData = $orderModel
                 ->where('order_status', '=', 1)
+                ->where('pay_status', '=', 1)
                 ->where('notify_status', '=', 0)
                 ->where('do_notify', '=', 0)
                 ->where('notify_times', '<', 3)

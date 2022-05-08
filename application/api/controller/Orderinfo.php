@@ -204,6 +204,10 @@ class Orderinfo extends Controller
             $orderWhere['account'] = $message['phone'];   //订单匹配手机号
             $orderInfo = $orderModel->where($orderWhere)->find();
 
+            logs(json_encode([
+                "time" => date("Y-m-d H:i:s", time()),
+                'param' => $message
+            ]), 'MatchOrderFailCheckPhoneAmountNotify0076');
             if (empty($orderInfo)) {
                 return json(msg(-2, '', '无此订单！'));
             }
@@ -219,7 +223,7 @@ class Orderinfo extends Controller
             if ($message['check_status'] != 1) {
                 $updateCheckTimesRes = $db::table("bsa_order")->where($orderWhere)
                     ->update([
-                        "check_status" => "0",  //查询结束
+                        "check_status" => 0,  //查询结束
                         "check_times" => $orderInfo['check_times'] + 1,
                         "next_check_time" => $nextCheckTime,
                         "order_desc" => $checkResult,
@@ -268,10 +272,6 @@ class Orderinfo extends Controller
                 }
                 return json(msg(1, '', '接收成功,更新成功！'));
             }
-            logs(json_encode([
-                "time" => date("Y-m-d H:i:s", time()),
-                'noMatchOrder' => $message
-            ]), 'MatchOrderFailCheckPhoneAmountNotify0076');
             return json(msg(1, '', '接收成功,匹配失败！'));
         } catch (\Exception $exception) {
             logs(json_encode(['param' => $message,
