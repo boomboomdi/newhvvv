@@ -113,6 +113,11 @@ class OrderModel extends Model
             $notifyRes = $this->orderNotifyForMerchant($orderData, $status);
 
             if ($notifyRes['code'] != 1000) {
+                logs(json_encode([
+                    'orderData' => $orderData,
+                    'status' => $status,
+                    'notifyRes' => $notifyRes,
+                ]), 'AorderNotifyForMerchantFail');
                 return modelReMsg(-2, '', $notifyRes['msg']);
             }
             return modelReMsg(1000, '', $notifyRes['msg']);
@@ -152,7 +157,10 @@ class OrderModel extends Model
 
             //请求参数不完整
             if (!$validate->scene('notify')->check($callbackData)) {
-                logs(json_encode(['callbackData' => $callbackData, 'status' => $status, 'errorMessage' => $validate->getError()]), 'orderNotifyForMerchant_checkfail');
+                logs(json_encode(['callbackData' => $callbackData,
+                    'status' => $status,
+                    'errorMessage' => $validate->getError()
+                ]), 'orderNotifyForMerchant_checkfail');
                 $returnMsg['code'] = 1002;
                 $returnMsg['msg'] = "回调参数有误!";
                 $returnMsg['data'] = $validate->getError();
