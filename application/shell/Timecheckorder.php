@@ -48,7 +48,7 @@ class Timecheckorder extends Command
                     $updateCheckData['check_status'] = 1;
                     $lock = $db::table("bsa_order")->where($updateCheckWhere)->lock(true)->find();
                     if ($lock) {
-                        if ($lock['check_status'] != 1) {
+                        if ($lock['check_status'] == 0) {
                             $db::table("bsa_order")->where($updateCheckWhere)
                                 ->update($updateCheckData);
                             //修改订单查询状态为查询中 end
