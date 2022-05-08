@@ -82,8 +82,8 @@ class Orderinfo extends Controller
 
                 logs(json_encode(['action' => 'getUseHxOrderRes',
                     'insertOrderData' => $insertOrderData,
-                    '$getUseHxOrderRes' => $getUseHxOrderRes]
-                ), 'getUseHxOrder_log');
+                    'getUseHxOrderRes' => $getUseHxOrderRes
+                ]), 'getUseHxOrder_log');
 
                 //修改订单为下单失败状态。
                 $updateOrderStatus['last_use_time'] = time();

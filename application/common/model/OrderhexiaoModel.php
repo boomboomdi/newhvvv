@@ -73,7 +73,6 @@ class OrderhexiaoModel extends Model
             if (!isset($notifyResult['code']) || $notifyResult['code'] != 0) {
                 return modelReMsg(-1, "", $notifyResult['msg']);
             }
-
             return modelReMsg(0, $notifyResult['data']['amount'], '查询成功！');
         } catch (\Exception $exception) {
             logs(json_encode(['file' => $exception->getFile(), 'line' => $exception->getLine(), 'errorMessage' => $exception->getMessage()]),
@@ -221,7 +220,25 @@ class OrderhexiaoModel extends Model
             $checkParam['action'] = 'first';
             $checkRes = $this->checkPhoneAmount($checkParam, $hxOrderInfo['order_no']);
             if ($checkRes['code'] != 0) {
-                $db::rollback();
+                //停用该核销单
+                $updateHxWhereForStop['id'] = $hxOrderInfo['id'];
+                $updateHxDataForStop['status'] = 2;
+                $updateHxDataForStop['limit_time'] = time();
+                $updateHxDataForStop['last_use_time'] = time();
+                $updateHxDataForStop['order_status'] = 2;
+                $updateHxDataForStop['check_status'] = 0;
+                $updateHxDataForStop['order_desc'] = "不可查单，立即回调" . json_encode($checkRes);
+                $updateHxDataForStopRes = $db::table("bsa_order_hexiao")->where($updateHxWhereForStop)->update($updateHxDataForStop);
+
+                if(!$updateHxDataForStopRes){
+                    logs(json_encode([
+                        'action' => 'updateHxWhereForStop',
+                        'orderWhere' => $updateHxWhereForStop,
+                        'updateHxDataForStop' => $updateHxDataForStop,
+                        'updateMatchRes' => $updateHxDataForStopRes,
+                    ]), 'ADONTDELETEupdateHxWhereForStopFAIL');
+                }
+                $db::commit();
                 return modelReMsg(-2, '', '下单频繁，请稍后再下-2！');
             }
             //查询成功更新余额order_hexiao $order order_hexiao
