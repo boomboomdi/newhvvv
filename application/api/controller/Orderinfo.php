@@ -102,7 +102,7 @@ class Orderinfo extends Controller
 //            订单号order_id   金额 amount   手机号 phone  二维码链接 img_url    有效时间 limit_time 秒
             $imgUrl = "http://175.178.195.147:9090/upload/huafei.jpg";
             $imgUrl = urlencode($imgUrl);
-            $limitTime = $updateOrderStatus['order_limit_time'] - 600;
+            $limitTime = $updateOrderStatus['order_limit_time'] - 300;
             $url = $url . "?order_id=" . $message['order_no'] . "&amount=" . $message['amount'] . "&phone=" . $getUseHxOrderRes['data']['account'] . "&img_url=" . $imgUrl . "&limit_time=" . $limitTime;
             $updateOrderStatus['qr_url'] = $url;   //支付订单
             $updateWhere['order_no'] = $message['order_no'];
