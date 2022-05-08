@@ -325,6 +325,7 @@ class OrderhexiaoModel extends Model
                 "startTime" => $startTime,
                 "endTime" => date("Y-m-d H:i:s", time()),
                 'notifyParam' => $notifyParam,
+                'notifyUrl' => $orderHXData['notify_url'],
                 "paramAddTime" => date("Y-m-d H:i:s", $orderHXData['add_time']),
                 "notifyResult" => $notifyResult
             ]), 'curlPostJsonToWriteOff_log');
