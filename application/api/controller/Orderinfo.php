@@ -48,17 +48,16 @@ class Orderinfo extends Controller
             //$user_id = $message['user_id'];  //用户标识
             // 根据user_id  未付款次数 限制下单 end
 
-            $orderMe = guid12();
-            for ($x = 0; $x <= 3; $x++) {
-                $orderFind = $db::table('bsa_order')->where('order_me', '=', $orderMe)->find();
-                if (empty($orderFind)) {
-                    $orderMe = guid12();
-                    break;
-                } else {
-                    continue;
-                }
-            }
+            $orderMe = guidForSelf();
 
+            $orderFind = $db::table('bsa_order')->where('order_me', '=', $orderMe)->find();
+            if (!empty($orderFind)) {
+                $orderMe = guidForSelf();
+            }
+            $orderNoFind = $db::table('bsa_order')->where('order_no', '=', $message['order_no'])->find();
+            if (!empty($orderNoFind)) {
+                return apiJsonReturn(10066, "该订单号已存在！");
+            }
             //1、入库
             $insertOrderData['merchant_sign'] = $message['merchant_sign'];  //商户
             $insertOrderData['order_no'] = $message['order_no'];  //商户订单号
@@ -229,14 +228,12 @@ class Orderinfo extends Controller
                         "order_desc" => $checkResult,
                         "check_result" => $checkResult,
                     ]);
-                if (!$updateCheckTimesRes) {
-                    logs(json_encode(['phone' => $orderInfo['account'],
-                        "order_no" => $orderInfo['order_no'],
-                        "notifyTime" => date("Y-m-d H:i:s", time()),
-                        "getPhoneAmountRes" => $message
-                    ]), '0076updateCheckPhoneAmountFail');
-                }
-                return json(msg(1, '', '接收成功'));
+                logs(json_encode(['phone' => $orderInfo['account'],
+                    "order_no" => $orderInfo['order_no'],
+                    "notifyTime" => date("Y-m-d H:i:s", time()),
+                    "updateCheckTimesRes" => $updateCheckTimesRes
+                ]), '0076updateCheckPhoneAmountFail');
+                return json(msg(1, '', '接收成功,更新成功1'));
             }
             //查询成功
             $orderWhere['order_no'] = $orderInfo['order_no'];
@@ -250,24 +247,24 @@ class Orderinfo extends Controller
             if (!$updateCheck) {
                 logs(json_encode(["time" => date("Y-m-d H:i:s", time()),
                     'action' => "checkNotifySuccess",
-                    'order_no' => $message['order_no'],
-                    'phone' => $message['account'],
-                    "getPhoneAmountRes" => $checkResult
-                ]), '0076updateCheckFail');
+                    'message' => json_encode($message),
+                    "updateCheck" => $updateCheck
+                ]), '0076updateCheckPhoneAmountFail');
             }
             //1、支付到账
             if ($message['amount'] > ($orderInfo['end_check_amount'] - 5)) {
                 //本地更新
                 $orderHXModel = new OrderhexiaoModel();
+                $updateOrderWhere['order_no'] = $orderInfo['order_no'];
+                $updateOrderWhere['account'] = $orderInfo['account'];
                 $orderHXData = $orderHXModel->where($orderWhere)->find();
-                $localUpdate = $orderHXModel->orderLocalUpdate($orderInfo);
+                $localUpdateRes = $orderHXModel->orderLocalUpdate($orderInfo);
+                logs(json_encode(["time" => date("Y-m-d H:i:s", time()),
+                    'updateOrderWhere' => $updateOrderWhere,
+                    'account' => $orderHXData['account'],
+                    'localUpdateRes' => $localUpdateRes
+                ]), '0076updateCheckPhoneAmountLocalUpdate');
                 if (!isset($localUpdate['code']) || $localUpdate['code'] != 0) {
-                    logs(json_encode(["time" => date("Y-m-d H:i:s", time()),
-                        'writeOrderNo' => $orderHXData['order_no'],
-                        'account' => $orderHXData['account'],
-                        "localUpdateFail" => json_encode($localUpdate)
-                    ]), 'checkPhoneAmountNotify0076Fail');
-
                     return json(msg(1, '', '接收成功,更新失败！'));
                 }
                 return json(msg(1, '', '接收成功,更新成功！'));

@@ -230,7 +230,7 @@ class OrderhexiaoModel extends Model
                 $updateHxDataForStop['order_desc'] = "不可查单，立即回调" . json_encode($checkRes);
                 $updateHxDataForStopRes = $db::table("bsa_order_hexiao")->where($updateHxWhereForStop)->update($updateHxDataForStop);
 
-                if(!$updateHxDataForStopRes){
+                if (!$updateHxDataForStopRes) {
                     logs(json_encode([
                         'action' => 'updateHxWhereForStop',
                         'orderWhere' => $updateHxWhereForStop,
