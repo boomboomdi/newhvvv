@@ -205,7 +205,7 @@ class OrderhexiaoModel extends Model
                 ->where('order_status', '=', 0)
                 ->where('order_limit_time', '<', time())
                 ->where('check_status', '=', 0)  //是否查单使用中
-                ->order("add_time asc")
+//                ->order("add_time asc")
                 ->lock(true)
                 ->find();
 //            logs(json_encode(['action' => 'getUseHxOrder', 'orderNo' => $order['order_no'], 'hxOrderInfo' => $hxOrderInfo]), 'getUseHxOrder_log');
@@ -217,7 +217,7 @@ class OrderhexiaoModel extends Model
             $orderWhere['id'] = $hxOrderInfo['id'];
             $checking['order_status'] = 1;  //使用中
             $checking['check_status'] = 1;   //查询余额中
-            $this->where($orderWhere)->update($checking);
+            $db::table("bsa_order_hexiao")->where($orderWhere)->update($checking);
 
             $checkParam['phone'] = $hxOrderInfo['account'];
             $checkParam['order_no'] = $hxOrderInfo['account'];
