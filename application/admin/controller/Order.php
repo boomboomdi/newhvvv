@@ -140,7 +140,7 @@ class Order extends Base
                 }
                 return json(modelReMsg(1000, '', '回调成功'));
             } else {
-                return json(modelReMsg(20009, '', '访问错误'));
+                return json(modelReMsg(-99, '', '访问错误'));
             }
         } catch (\Exception $exception) {
             logs(json_encode(['id' => $id, 'file' => $exception->getFile(), 'line' => $exception->getLine(), 'errorMessage' => $exception->getMessage()]), 'order_notify_exception');
