@@ -153,7 +153,7 @@ class Orderinfo extends Controller
             if (empty($message['order_no'])) {
                 return json(msg(-2, '', '无此推单！'));
             }
-            if ($message['order_status'] != 4) {
+            if ($orderInfo['order_status'] != 4) {
                 return json(msg(-3, '', '请重新下单！'));
             }
 
@@ -161,7 +161,7 @@ class Orderinfo extends Controller
                 return json(msg(-4, '', '订单超时，请重新下单'));
             }
 
-            return json(msg(0, $orderInfo['order_limit_time'] - 30, "success"));
+            return json(msg(0, ($orderInfo['order_limit_time'] - 30), "success"));
 
         } catch (\Exception $exception) {
             logs(json_encode(['param' => $message,
