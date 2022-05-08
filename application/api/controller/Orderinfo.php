@@ -216,6 +216,7 @@ class Orderinfo extends Controller
             if ($message['code'] != 1) {
                 $updateCheckTimesRes = $db::table("bsa_order")->where($orderWhere)
                     ->update([
+                        "check_status" => "0",  //查询结束
                         "check_times" => $orderInfo['check_times'] + 1,
                         "next_check_time" => $nextCheckTime,
                         "order_desc" => $checkResult,
@@ -233,6 +234,7 @@ class Orderinfo extends Controller
             //查询成功
             $orderWhere['order_no'] = $orderInfo['order_no'];
             $orderUpdate['check_times'] = $orderInfo['check_times'] + 1;
+            $orderUpdate['check_status'] = 0;   //可在查询状态
             $orderUpdate['last_check_amount'] = $message['amount'];
             $orderUpdate['next_check_time'] = $nextCheckTime;
             $orderUpdate['check_result'] = $checkResult;
@@ -240,7 +242,7 @@ class Orderinfo extends Controller
                 ->update($orderUpdate);
             if (!$updateCheck) {
                 logs(json_encode(["time" => date("Y-m-d H:i:s", time()),
-                    'action' => "paySuccess",
+                    'action' => "checkNotifySuccess",
                     'order_no' => $message['order_no'],
                     'phone' => $message['account'],
                     "getPhoneAmountRes" => $checkResult
@@ -248,7 +250,7 @@ class Orderinfo extends Controller
             }
             //1、支付到账
             if ($message['amount'] >= ($orderInfo['end_check_amount'] - 5)) {
-                //1、回调核销商
+                //本地更新
                 $orderHXModel = new OrderhexiaoModel();
                 $orderHXData = $orderHXModel->where($orderWhere)->find();
                 $localUpdate = $orderHXModel->orderLocalUpdate($orderHXData, 1);

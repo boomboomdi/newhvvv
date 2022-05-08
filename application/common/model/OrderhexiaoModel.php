@@ -131,17 +131,17 @@ class OrderhexiaoModel extends Model
             //更新核销表  end
 
             //更新订单表
-            $orderData = $this->where($orderWhere)->find();
+            $orderData = $this->where($orderWhere)->find();   //订单
             $lockOrderRes = $this->where('id', '=', $orderData['id'])->lock(true)->find();
             if (!$lockOrderRes) {
                 $db::rollback();
                 return modelReMsg(-3, "", "update lock order fail rollback");
             }
             $updateOrderData['actual_amount'] = (float)$amount;
+            $updateOrderData['pay_status'] = 1;
             $updateOrderData['pay_time'] = $payTime;
             $updateOrderData['order_status'] = 1;
             $updateOrderData['check_status'] = 2;
-            $updateOrderData['pay_status'] = 1;
             $updateOrderRes = $db::table('bsa_order')->where($orderWhere)
                 ->update($updateOrderData);
             if (!$updateOrderRes) {

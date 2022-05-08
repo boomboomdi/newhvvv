@@ -45,6 +45,13 @@ class Timecheckorder extends Command
             $totalNum = count($orderData);
             if ($totalNum > 0) {
                 foreach ($orderData as $k => $v) {
+                    //修改订单查询状态为查询中
+                    $updateCheckWhere['order_no'] = $v['order_no'];
+                    $updateCheckData['check_status'] = 1;
+                    $db::table("bsa_order")->where($updateCheckWhere)
+                        ->update($updateCheckData);
+                    //修改订单查询状态为查询中 end
+
                     $getResParam['order_no'] = $v['order_no'];
                     $getResParam['phone'] = $v['account'];
                     $getResParam['action'] = "other";
@@ -81,7 +88,7 @@ class Timecheckorder extends Command
                         }
                     } else {
                         //查询成功
-                        $orderWhere['order_no'] = $v['order_no'];
+                        $orderWhere['order_no'] = $v['order_no'];  //四方订单
                         $orderUpdate['check_times'] = $v['check_times'] + 1;
                         $orderUpdate['last_check_amount'] = $getPhoneAmountRes['data'];
                         $orderUpdate['next_check_time'] = $nextCheckTime;
