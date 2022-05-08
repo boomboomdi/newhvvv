@@ -24,7 +24,7 @@ class Orderinfo extends Controller
         $message = json_decode($data, true);
         $updateParam = [];
         try {
-            logs(json_encode(['message' => $message, 'line' => $message]), 'douyin_order_fist');
+            logs(json_encode(['message' => $message, 'line' => $message]), 'order_fist');
             $validate = new OrderinfoValidate();
             if (!$validate->check($message)) {
                 return apiJsonReturn(-1, '', $validate->getError());
