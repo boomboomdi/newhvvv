@@ -157,11 +157,11 @@ class Orderinfo extends Controller
                 return json(msg(-3, '', '请重新下单！'));
             }
 
-            if (($orderInfo['order_limit_time'] - 600) < time()) {
+            if (($orderInfo['order_limit_time'] - c) < time()) {
                 return json(msg(-4, '', '订单超时，请重新下单'));
             }
 
-            return json(msg(0, ($orderInfo['order_limit_time'] - 30), "success"));
+            return json(msg(0, ($orderInfo['order_limit_time'] - 300), "success"));
 
         } catch (\Exception $exception) {
             logs(json_encode(['param' => $message,
