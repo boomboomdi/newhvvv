@@ -20,13 +20,24 @@ class Orderinfo extends Controller
      */
     public function order(Request $request)
     {
+//        $fp = fopen("__DIR__ . '/../lock.txt", "w+");
+//        if(flock($fp,LOCK_EX,LOCK_EX))
+//        {
+//            // 处理商品数据
+//
+//            flock($fp,LOCK_UN);
+//        }
+//        fclose($fp);
         $data = @file_get_contents('php://input');
         $message = json_decode($data, true);
-        $updateParam = [];
+        $lockfile = fopen("./order.lock", "r");
         try {
+
+
             logs(json_encode(['message' => $message, 'line' => $message]), 'order_fist');
             $validate = new OrderinfoValidate();
             if (!$validate->check($message)) {
+
                 return apiJsonReturn(-1, '', $validate->getError());
             }
             $db = new Db();
@@ -69,16 +80,27 @@ class Orderinfo extends Controller
             $insertOrderData['add_time'] = time();  //入库时间
             $insertOrderData['notify_url'] = $message['notify_url']; //下单回调地址 notify url
 
+            if ($lockfile === false) throw Exception('open lockfile fail');
+            if (!flock($lockfile, LOCK_EX)) {}throw Exception('lock lockfile fail');
+
+
             $orderModel = new OrderModel();
             $createOrderOne = $orderModel->addOrder($insertOrderData);
             if (!isset($createOrderOne['code']) || $createOrderOne['code'] != '0') {
+                if($lockfile){
+                    flock($lockfile,LOCK_UN);
+                    fclose($lockfile);
+                }
                 return apiJsonReturn(10008, $createOrderOne['msg'] . $createOrderOne['code']);
             }
             //2、分配核销单
             $orderHXModel = new OrderhexiaoModel();
             $getUseHxOrderRes = $orderHXModel->getUseHxOrder($insertOrderData);
             if (!isset($getUseHxOrderRes['code']) || $getUseHxOrderRes['code'] != 0) {
-
+                if($lockfile){
+                    flock($lockfile,LOCK_UN);
+                    fclose($lockfile);
+                }
                 logs(json_encode(['action' => 'getUseHxOrderRes',
                     'insertOrderData' => $insertOrderData,
                     'getUseHxOrderRes' => $getUseHxOrderRes
@@ -118,15 +140,31 @@ class Orderinfo extends Controller
 //            ]), 'localhostUpdateOrder');
 //            $orderModel->where('order_no', '=', $insertOrderData['order_no'])->update($updateOrderStatus);
             if (!isset($localOrderUpdateRes['code']) || $localOrderUpdateRes['code'] != 0) {
+                if($lockfile){
+                    flock($lockfile,LOCK_UN);
+                    fclose($lockfile);
+                }
                 return apiJsonReturn(10009, "下单失败！");
+            }
+            if($lockfile){
+                flock($lockfile,LOCK_UN);
+                fclose($lockfile);
             }
             return apiJsonReturn(10000, "下单成功", $url);
         } catch (\Error $error) {
+            if($lockfile){
+                flock($lockfile,LOCK_UN);
+                fclose($lockfile);
+            }
             logs(json_encode(['file' => $error->getFile(),
                 'line' => $error->getLine(), 'errorMessage' => $error->getMessage()
             ]), 'orderError');
             return json(msg(-22, '', $error->getMessage() . $error->getLine()));
         } catch (\Exception $exception) {
+            if($lockfile){
+                flock($lockfile,LOCK_UN);
+                fclose($lockfile);
+            }
             logs(json_encode(['file' => $exception->getFile(),
                 'line' => $exception->getLine(),
                 'errorMessage' => $exception->getMessage()
