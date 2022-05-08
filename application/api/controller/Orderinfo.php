@@ -20,6 +20,7 @@ class Orderinfo extends Controller
      */
     public function order(Request $request)
     {
+        session('[pause]');
 //        $fp = fopen("__DIR__ . '/../lock.txt", "w+");
 //        if(flock($fp,LOCK_EX,LOCK_EX))
 //        {
@@ -32,7 +33,6 @@ class Orderinfo extends Controller
         $message = json_decode($data, true);
         $lockfile = fopen("/www/wwwroot/hvvv/application/api/controller/order.lock", "r");
         try {
-
             logs(json_encode(['message' => $message, 'line' => $message]), 'order_fist');
             $validate = new OrderinfoValidate();
             if (!$validate->check($message)) {
