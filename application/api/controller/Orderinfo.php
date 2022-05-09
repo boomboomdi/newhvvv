@@ -94,8 +94,9 @@ class Orderinfo extends Controller
 
             $db::startTrans();
             $updateWhere['order_me'] = $orderMe;
+//            $createOrderOne['data'] =  自增ID
             $hxOrderInfo = $db::table("bsa_order")
-                ->where("order_no", "=", $updateWhere)
+                ->where("id", "=", $createOrderOne['data'])
                 ->lock(true)
                 ->find();
             if (!$hxOrderInfo) {
