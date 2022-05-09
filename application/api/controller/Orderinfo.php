@@ -149,7 +149,8 @@ class Orderinfo extends Controller
                 return apiJsonReturn(-1, 'could not order');
 //                die('could not fork');
             } else if ($pid) {
-
+                //如果不需要阻塞进程，⽽⼜想得到⼦进程的退出状态，则可以注释掉pcntl_wait($status)语句，或写成：
+                pcntl_wait($status, WNOHANG); //等待⼦进程中断，防⽌⼦进程成为僵⼫进程。
                 //⽗进程会得到⼦进程号，所以这⾥是⽗进程执⾏的逻辑
                 $data = @file_get_contents('php://input');
                 $message = json_decode($data, true);
@@ -268,8 +269,7 @@ class Orderinfo extends Controller
                     ]), 'orderException');
                     return json(msg(-11, '', $exception->getMessage() . $exception->getFile() . $exception->getLine()));
                 }
-                //如果不需要阻塞进程，⽽⼜想得到⼦进程的退出状态，则可以注释掉pcntl_wait($status)语句，或写成：
-                pcntl_wait($status, WNOHANG); //等待⼦进程中断，防⽌⼦进程成为僵⼫进程。
+
             } else {
                 $data = @file_get_contents('php://input');
                 $message = json_decode($data, true);
