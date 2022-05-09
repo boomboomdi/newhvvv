@@ -93,7 +93,7 @@ class Orderinfo extends Controller
             }
 
             $db::startTrans();
-            $updateWhere['order_no'] = $message['order_no'];
+            $updateWhere['order_me'] = $orderMe;
             $hxOrderInfo = $db::table("bsa_order")
                 ->where("order_no", "=", $updateWhere)
                 ->lock(true)
