@@ -15,9 +15,9 @@ use app\common\model\OrderModel;
 use app\common\model\SystemConfigModel;
 use tool\Log;
 
-class Zfbpay extends Controller
+class Ceshi extends Controller
 {
-    public function ceshi()
+    public function demo1()
     {
         return $this->fetch();
     }
