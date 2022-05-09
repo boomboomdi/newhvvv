@@ -249,9 +249,9 @@ class OrderhexiaoModel extends Model
                 ->where('status', '=', 0)
                 ->where('order_status', '=', 0)
                 ->where('order_limit_time', '<', time())
-//                ->where('check_status', '=', 0)  //是否查单使用中
+                ->where('check_status', '=', 0)  //是否查单使用中
 //                ->order("add_time asc")
-                ->lock(true)
+//                ->lock(true)
                 ->find();
 
             logs(json_encode(['action' => 'getUseHxOrder',
@@ -259,20 +259,21 @@ class OrderhexiaoModel extends Model
                 'hxOrderInfo' => $hxOrderInfo
             ]), 'getUseHxOrder_log');
 
-            sleep(2);
-            return modelReMsg(-1, '', '无可用下单！');
+
             if (!$hxOrderInfo) {
                 $db::rollback();
                 return modelReMsg(-1, '', '无可用下单！');
             }
-//            $hxOrderInfo = $db::table("bsa_order_hexiao")
-//                ->where("id", "=", $hxOrderInfo['id'])
-//                ->lock(true)
-//                ->find();
-//            if (empty($hxOrderInfo)) {
-//                $db::rollback();
-//                return modelReMsg(-1, '', '无可用下单！');
-//            }
+            $hxOrderInfo = $db::table("bsa_order_hexiao")
+                ->where("id", "=", $hxOrderInfo['id'])
+                ->lock(true)
+                ->find();
+            if (empty($hxOrderInfo)) {
+                $db::rollback();
+                return modelReMsg(-1, '', '无可用下单！');
+            }
+            sleep(2);
+            return modelReMsg(-1, '', '无可用下单！');
             $orderWhere['id'] = $hxOrderInfo['id'];
             $checking['order_status'] = 1;  //使用中
             $checking['check_status'] = 1;   //查询余额中
