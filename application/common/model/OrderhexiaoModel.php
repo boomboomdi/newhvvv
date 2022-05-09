@@ -93,15 +93,7 @@ class OrderhexiaoModel extends Model
         try {
 
             $checkStartTime = date('Y-m-d H:i:s', time());
-//            $notifyResult = curlPostJson("http://127.0.0.1:23943/queryBlance", $checkParam);
-            $param = array(
-                'url' => "http://127.0.0.1:23943/queryBlance",
-                'data' => $checkParam,
-            );
-            $asyncModel = new AsyncModel();
-            $asyncModel->set_param($param);
-            $notifyResult = $asyncModel->send();
-
+            $notifyResult = doSocket("http://127.0.0.1:23943/queryBlance", $checkParam);
 //            $notifyResult = curlPostJson("http://www.baidu.com", $checkParam);
 
             logs(json_encode([
@@ -242,7 +234,8 @@ class OrderhexiaoModel extends Model
      * @param $where
      * @return array
      */
-    public function getUseHxOrder($order, $getTimes = 1)
+    public
+    function getUseHxOrder($order, $getTimes = 1)
     {
         $db = new Db();
         $db::startTrans();
@@ -360,7 +353,8 @@ class OrderhexiaoModel extends Model
      * @param $tOrderData
      * @return void
      */
-    public function orderNotifyToWriteOff($orderHXData, $orderStatus = 1)
+    public
+    function orderNotifyToWriteOff($orderHXData, $orderStatus = 1)
     {
         $db = new Db();
         $db::startTrans();
@@ -453,7 +447,8 @@ class OrderhexiaoModel extends Model
      * @param $updateData
      * @return array
      */
-    public function localUpdateHXOrder($where, $updateData)
+    public
+    function localUpdateHXOrder($where, $updateData)
     {
         $this->startTrans();
         try {

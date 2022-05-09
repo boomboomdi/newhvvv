@@ -274,26 +274,76 @@ function curlPost($url = '', $postData = '', $options = array())
 
 function curlPostJsonNew($url = '', $postData = '', $options = array())
 {
-    $headers = [
-        "Content-Type: application/json;charset=UTF-8",
-    ];
-    $handle = curl_multi_init();
-    $curl = curl_init();
+    if (is_array($postData)) {
+        $postData = json_encode($postData);
+    }
+    $srv_ip = $url;//你的目标服务地址.
 
-    curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-    curl_setopt($curl, CURLOPT_URL, $url);
-    curl_setopt($curl, CURLOPT_HEADER, $this->curlopt_header);
-    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($curl, CURLOPT_TIMEOUT, $this->curlopt_timeout);
+    $srv_port = 80;//端口
 
-    curl_setopt($curl, CURLOPT_POST, 1);
-    curl_setopt($curl, CURLOPT_POSTFIELDS, $postData);
+    $url = 'http://www.jef.com/10moth/case10_31.php'; //接收你post的URL具体地址
 
-    curl_multi_add_handle($handle, $curl);
-    curl_multi_exec($handle, $flag);
+    $fp = '';
+
+    $errno = 0;//错误处理
+
+    $errstr = '';//错误处理
+
+    $timeout = 30;//多久没有连上就中断
+
+    $post_str = "user=demo&password=hahaha";//要提交的内容.
+
+    //打开网络的 Socket 链接。
+
+    $fp = fsockopen($srv_ip, $srv_port, $errno, $errstr, $timeout);
+
+    if (!$fp) {
+
+        echo('fp fail');
+
+    }
+    //拼接http协议头
+    $content_length = strlen($post_str);
+
+    $post_header = "POST $url HTTP/1.1\r\n";
+
+    $post_header .= "Content-Type: application/x-www-form-urlencoded\r\n";
+
+    $post_header .= "User-Agent: MSIE\r\n";
+
+    $post_header .= "Host: " . $srv_ip . "\r\n";
+
+    $post_header .= "Content-Length: " . $content_length . "\r\n";
+
+    $post_header .= "Connection: close\r\n\r\n";
+
+    $post_header .= $post_str . "\r\n\r\n";
+
+    fwrite($fp, $post_header);
+
+
+    $inheader = 1;
+
+    while (!feof($fp)) {//测试文件指针是否到了文件结束的位置
+
+        $line = fgets($fp, 1024);
+        echo $line;
+        //去掉请求包的头信息
+
+        /*if ($inheader && ($line == "n" || $line == "rn")) {
+              $inheader = 0;
+         }
+         if ($inheader == 0) {
+           echo $line;
+         } */
+
+    }
+
+    fclose($fp);
+
 }
 
-function curlPostJson1($url = '', $postData = '', $options = array())
+function curlPostJson($url = '', $postData = '', $options = array())
 {
     if (is_array($postData)) {
         $postData = json_encode($postData);
@@ -319,83 +369,58 @@ function curlPostJson1($url = '', $postData = '', $options = array())
     curl_close($ch);
     return $data;
 }
-function curlPostJson2($url = '', $postData = '', $options = array())
-{
-//    if(!is_array($this->param) || !count($this->param))
-//    {
-//        return False;
-//    }
-    $curl = $ret = array();
-    $handle = curl_multi_init();
-    foreach ($this->param as $k => $v)
-    {
-        $param = $this->check_param($v);
-        if (!$param) $curl[$k] = False;
-        else $curl[$k] = $this->add_handle($handle, $param);
+function doSocket($url, $postData = '', $timeout = 20) {
+    $urls = parse_url($url);
+    if (!$urls) {
+        return "-500";
     }
-    $this->exec_handle($handle);
-    foreach ($this->param as $k => $v)
-    {
-        if ($curl[$k])
-        {
-            $ret[$k] = curl_multi_getcontent($curl[$k]);
-            curl_multi_remove_handle($handle, $curl[$k]);
-        } else {
-            $ret[$k] = False;
+    if (is_array($postData)) {
+        $postData = json_encode($postData);
+    }
+    $port = isset($urls['port']) ? $urls['port'] : null; //isset()判断
+    if (!$port) {
+        $port = "80";
+    }
+    $host = $urls['host'];
+    //----------------------------------------------//
+    $httpheader = "POST " . $url . " HTTP/1.0" . "\r\n"
+        . "Accept:*/*" . "\r\n"
+        . "Accept-Language:zh-cn" . "\r\n"
+        . "Referer:" . $url . "\r\n"
+        . "Content-Type:application/x-www-form-urlencoded" . "\r\n"
+        . "User-Agent:Mozilla/4.0(compatible;MSIE 7.0;Windows NT 5.1)" . "\r\n"
+        . "Host:" . $host . "\r\n"
+        . "Content-Type: application/json"."\r\n"
+        . "Content-Length:" . strlen($postData) . "\r\n" . "\r\n" . $postData;
+    $fd = fsockopen($host, $port);
+    if (!is_resource($fd)) {
+        return "fsockopen failed";
+    }
+    fwrite($fd, $httpheader);
+    stream_set_blocking($fd, TRUE);
+    stream_set_timeout($fd, $timeout);
+    $info = stream_get_meta_data($fd);
+    $gets = "";
+    while ((!feof($fd)) && (!$info['timed_out'])) {
+        $data .= fgets($fd, 8192);
+        $info = stream_get_meta_data($fd);
+        @ob_flush();
+        flush();
+    }
+    if ($info['timed_out']) {
+        return "timeout";
+    } else {
+        //echo $data;
+        $contentInfo = explode("\n\n", str_replace("\r", "", $data));
+
+        if (!strstr($contentInfo[0], "HTTP/1.1 200 OK")) {
+            return -10;
         }
+        return trim($contentInfo[1]);
     }
-    curl_multi_close($handle);
-    return $ret;
 }
-function Post_curl($urls = array(), $callback = '', $post_data = array())
-{
-    $response = array();
-    if (empty($urls)) {
-        return $response;
-    }
-    $chs = curl_multi_init();
-    $map = array();
-    foreach ($urls as $url) {
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_POST, 1);
-        if ($post_data != '') {
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
-        }
-        curl_setopt($ch, CURLOPT_TIMEOUT, 1);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_HEADER, 0);
-        curl_setopt($ch, CURLOPT_NOSIGNAL, true);
-        curl_multi_add_handle($chs, $ch);
-        $map[strval($ch)] = $url;
-    }
-    do {
-        if (($status = curl_multi_exec($chs, $active)) != CURLM_CALL_MULTI_PERFORM) {
-            if ($status != CURLM_OK) {
-                break;
-            } //如果没有准备就绪，就再次调用curl_multi_exec
-            while ($done = curl_multi_info_read($chs)) {
-                $info = curl_getinfo($done["handle"]);
-                $error = curl_error($done["handle"]);
-                $result = curl_multi_getcontent($done["handle"]);
-                $url = $map[strval($done["handle"])];
-                $rtn = compact('info', 'error', 'result', 'url');
-                if (trim($callback)) {
-                    $callback($rtn);
-                }
-                $response[$url] = $rtn;
-                curl_multi_remove_handle($chs, $done['handle']);
-                curl_close($done['handle']);
-                //如果仍然有未处理完毕的句柄，那么就select
-                if ($active > 0) {
-                    curl_multi_select($chs, 1); //此处会导致阻塞大概1秒。
-                }
-            }
-        }
-    } while ($active > 0); //还有句柄处理还在进行中
-    curl_multi_close($chs);
-    return $response;
-}
+
+
 
 
 //成功率
