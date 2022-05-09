@@ -91,8 +91,8 @@ class OrderhexiaoModel extends Model
     {
         try {
             $checkStartTime = date('Y-m-d H:i:s', time());
-//            $notifyResult = doSocket("http://127.0.0.1:23943/queryBlance", $checkParam);
-            $notifyResult = doSocket("http://www.baidu.com", $checkParam);
+            $notifyResult = doSocket("http://127.0.0.1:23943/queryBlance", $checkParam);
+//            $notifyResult = doSocket("http://www.baidu.com", $checkParam);
 //            $notifyResult = curlPostJson("http://www.baidu.com", $checkParam);
 
             logs(json_encode([
