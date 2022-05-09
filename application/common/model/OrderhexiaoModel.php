@@ -239,7 +239,7 @@ class OrderhexiaoModel extends Model
         try {
             $db = new Db();
             $db::startTrans();
-            $lock = $db::table("bsa_order_hexiao")
+            $hxOrderInfo = $db::table("bsa_order_hexiao")
                 ->where('order_amount', '=', $order['amount'])
                 ->where('order_me', '=', null)
                 ->where('status', '=', 0)
@@ -260,21 +260,14 @@ class OrderhexiaoModel extends Model
 //                })->find();
             logs(json_encode(['action' => 'getUseHxOrder',
                 'orderNo' => $order['order_no'],
-                'hxOrderInfo' => $lock
+                'hxOrderInfo' => $hxOrderInfo
             ]), 'getUseHxOrder_log');
 
-            if (!$lock) {
+            if (!$hxOrderInfo) {
                 $db::rollback();
                 return modelReMsg(-1, '', '无可用下单！-1');
             }
-            $hxOrderInfo = $db::table("bsa_order_hexiao")
-                ->where("id", "=", $lock['id'])
-                ->lock(true)
-                ->find();
-            if (!empty($hxOrderInfo) || $hxOrderInfo['check_status'] == 1) {
-                $db::rollback();
-                return modelReMsg(-2, '', '无可用下单！-2');
-            }
+
             $orderWhere['id'] = $hxOrderInfo['id'];
             $checking['order_status'] = 1;  //使用中
             $checking['check_status'] = 1;   //查询余额中
