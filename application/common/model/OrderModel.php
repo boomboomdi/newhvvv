@@ -44,17 +44,17 @@ class OrderModel extends Model
             if (!empty($has)) {
                 return modelReMsg(-2, '', '订单号已经存在');
             }
-            $insId = $this->create($Order)->getLastInsID();
-//            $insId = $this->getLastInsID();
-            if(!$insId){
-                return modelReMsg(-3, $insId, "下单失败");
+            $this->create($Order);
+
+            $insData = $this->where('order_no', $Order['order_no'])->find();
+            if (!isset($insData['id'])) {
+                return modelReMsg(-3, "", "下单失败");
             }
         } catch (\Exception $e) {
-
             return modelReMsg(-1, '', $e->getMessage());
         }
 
-        return modelReMsg(0, $insId, '添加订单成功');
+        return modelReMsg(0, $insData['id'], '添加订单成功');
     }
 
     /**
