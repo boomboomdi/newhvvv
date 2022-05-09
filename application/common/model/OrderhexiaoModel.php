@@ -311,7 +311,7 @@ class OrderhexiaoModel extends Model
                     'checkPhoneAmountNewRes' => $checkRes,
                     'updateHxDataForStopRes' => $updateHxDataForStopRes,
                     'getLastSql' => $db::table("bsa_order_hexiao")->getLastSql(),
-                ]), 'ADONTMatchHxDataResFAIL');
+                ]), 'ADONTMatchHxDataCheckResFAIL');
                 if (!$updateHxDataForStopRes) {
                     $db::rollback();
                 }
