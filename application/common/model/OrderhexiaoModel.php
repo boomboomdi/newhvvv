@@ -241,7 +241,8 @@ class OrderhexiaoModel extends Model
         $db = new Db();
         $db::startTrans();
         try {
-            $hxOrderInfo = $db::table("bsa_order_hexiao")
+//            $hxOrderInfo = $db::table("bsa_order_hexiao")
+           $hxOrderInfo = $this
                 ->where('order_amount', '=', $order['amount'])
                 ->where('order_me', '=', null)
                 ->where('status', '=', 0)
@@ -256,12 +257,12 @@ class OrderhexiaoModel extends Model
 //                'hxOrderInfo' => $hxOrderInfo
 //            ]), 'getUseHxOrder_log');
 
-            if (!$hxOrderInfo || empty($hxOrderInfo)) {
+            if (!$hxOrderInfo) {
                 $db::rollback();
                 return modelReMsg(-1, '', '无可用下单！');
             }
 //            $hxOrderInfo = $db::table("bsa_order_hexiao")
-//                ->where("id", "=", $lock['id'])
+//                ->where("id", "=", $hxOrderInfo['id'])
 //                ->lock(true)
 //                ->find();
 //            if (empty($hxOrderInfo)) {
