@@ -340,7 +340,7 @@ class Orderinfo extends Controller
 
             } else {
                 try {
-                    logs(json_encode(['message' => $message, 'line' => $message]), 'order_fist1');
+                    logs(json_encode(['message' => $message, 'line' => $message]), 'order_fist2');
                     $validate = new OrderinfoValidate();
                     if (!$validate->check($message)) {
                         return apiJsonReturn(-1, '', $validate->getError());
