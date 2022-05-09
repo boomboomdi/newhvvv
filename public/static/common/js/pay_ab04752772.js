@@ -1,4 +1,5 @@
-define("zenjs/util/money", ["require"],
+define
+("zenjs/util/money", ["require"],
     function (t) {
         "use strict";
 
@@ -32,7 +33,8 @@ define("zenjs/util/money", ["require"],
                 return "[object Number]" == Object.prototype.toString.call(t)
             },
             e
-    }),
+    }
+    ),
     define("zenjs/util/money_cent", ["require", "./money"],
         function (t) {
             "use strict";
