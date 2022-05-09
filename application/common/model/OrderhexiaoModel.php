@@ -53,7 +53,6 @@ class OrderhexiaoModel extends Model
     public function checkPhoneAmount($checkParam, $orderNo)
     {
         try {
-
             $checkStartTime = date('Y-m-d H:i:s', time());
             $notifyResult = curlPostJson("http://127.0.0.1:23943/queryBlance", $checkParam);
 //            $notifyResult = curlPostJson("http://www.baidu.com", $checkParam);
@@ -93,7 +92,7 @@ class OrderhexiaoModel extends Model
         try {
             $checkStartTime = date('Y-m-d H:i:s', time());
             sleep(2);
-
+            return "dada";
 //            $notifyResult = doSocket("http://127.0.0.1:23943/queryBlance", $checkParam);
             $notifyResult = doSocket("http://www.baidu.com", $checkParam);
 //            $notifyResult = curlPostJson("http://www.baidu.com", $checkParam);
