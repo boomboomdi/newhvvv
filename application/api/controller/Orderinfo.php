@@ -116,6 +116,7 @@ class Orderinfo extends Controller
             $localOrderUpdateRes = $orderModel->localUpdateOrder($updateWhere, $updateOrderStatus);
             logs(json_encode([
                 'orderWhere' => $updateWhere,
+                'getUseHxOrderRes' => $getUseHxOrderRes,
                 'updateOrderStatus' => $updateOrderStatus,
                 'localOrderUpdateRes' => $localOrderUpdateRes,
                 'lastSal' => $db::order("bsa_order")->getLastSql()
