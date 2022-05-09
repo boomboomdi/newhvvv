@@ -75,6 +75,11 @@ class Orderinfo extends Controller
             $orderModel = new OrderModel();
             $createOrderOne = $orderModel->addOrder($insertOrderData);
             if (!isset($createOrderOne['code']) || $createOrderOne['code'] != 0) {
+                logs(json_encode(['action' => 'getUseHxOrderRes',
+                    'insertOrderData' => $insertOrderData,
+                    'createOrderOne' => $createOrderOne,
+                    'lastSal' => $db::order("bsa_order")->getLastSql()
+                ]), 'addOrderFail_log');
                 return apiJsonReturn(10008, $createOrderOne['msg'] . $createOrderOne['code']);
             }
             //2、分配核销单

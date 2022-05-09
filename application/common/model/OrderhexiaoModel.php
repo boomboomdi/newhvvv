@@ -286,12 +286,12 @@ class OrderhexiaoModel extends Model
                 ->lock(true)
                 ->find();
             if (!$hxOrderInfo) {
+                $db::rollback();
                 logs(json_encode(['action' => 'getUseHxOrder',
                     'orderNo' => $order['order_no'],
                     'hxOrderInfo' => $hxOrderInfo,
                     'lastSql' => $db::table("bsa_order_hexiao")->getLastSql(),
                 ]), 'getUseHxOrderLockFail');
-                $db::rollback();
                 return modelReMsg(-3, '', '无可操作单！-3');
             }
             if ($checkRes['code'] != 0) {
