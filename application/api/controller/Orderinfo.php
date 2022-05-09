@@ -145,7 +145,8 @@ class Orderinfo extends Controller
 
             logs(json_encode(['file' => $exception->getFile(),
                 'line' => $exception->getLine(),
-                'errorMessage' => $exception->getMessage()
+                'errorMessage' => $exception->getMessage(),
+                'lastSql' => $db::order("bsa_order")->getLastSql(),
             ]), 'orderException');
             return json(msg(-11, '', $exception->getMessage() . $exception->getFile() . $exception->getLine()));
         }
