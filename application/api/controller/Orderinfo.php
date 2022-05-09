@@ -321,10 +321,10 @@ class Orderinfo extends Controller
 
     public function order()
     {
+        $data = @file_get_contents('php://input');
+        $message = json_decode($data, true);
         try {
 
-            $data = @file_get_contents('php://input');
-            $message = json_decode($data, true);
             $pid = pcntl_fork();    //创建⼦进程
             if ($pid == -1) {
                 //错误处理：创建⼦进程失败时返回-1.
@@ -334,13 +334,121 @@ class Orderinfo extends Controller
                 //如果不需要阻塞进程，⽽⼜想得到⼦进程的退出状态，则可以注释掉pcntl_wait($status)语句，或写成：
                 pcntl_wait($status, WNOHANG); //等待⼦进程中断，防⽌⼦进程成为僵⼫进程。
                 //⽗进程会得到⼦进程号，所以这⾥是⽗进程执⾏的逻辑
-                logs(json_encode(['message' => $message, 'line' => $message]), 'order_fist1');
+                try {
+                    $validate = new OrderinfoValidate();
+                    if (!$validate->check($message)) {
+                        return apiJsonReturn(-1, '', $validate->getError());
+                    }
+                    $db = new Db();
+                    //验证商户
+                    $token = $db::table('bsa_merchant')->where('merchant_sign', '=', $message['merchant_sign'])->find()['token'];
+                    if (empty($token)) {
+                        return apiJsonReturn(10001, "商户验证失败！");
+                    }
+                    $sig = md5($message['merchant_sign'] . $message['order_no'] . $message['amount'] . $message['time'] . $token);
+                    if ($sig != $message['sign']) {
+                        logs(json_encode(['orderParam' => $message, 'doMd5' => $sig]), 'orderParam_signfail');
+                        return apiJsonReturn(10006, "验签失败！");
+                    }
+                    $orderFind = $db::table('bsa_order')->where('order_no', '=', $message['order_no'])->count();
+                    if ($orderFind > 0) {
+                        return apiJsonReturn(11001, "单号重复！");
+                    }
 
-                return apiJsonReturn(-99, 'cant order');
+                    //$user_id = $message['user_id'];  //用户标识
+                    // 根据user_id  未付款次数 限制下单 end
 
+                    $orderMe = uuidA();
+
+                    $orderFind = $db::table('bsa_order')->where('order_me', '=', $orderMe)->find();
+                    if (!empty($orderFind)) {
+                        $orderMe = uuidA();
+                    }
+                    $orderNoFind = $db::table('bsa_order')->where('order_no', '=', $message['order_no'])->find();
+                    if (!empty($orderNoFind)) {
+                        return apiJsonReturn(10066, "该订单号已存在！");
+                    }
+                    //1、入库
+                    $insertOrderData['merchant_sign'] = $message['merchant_sign'];  //商户
+                    $insertOrderData['order_no'] = $message['order_no'];  //商户订单号
+                    $insertOrderData['order_status'] = 3;  //  1、支付成功（下单成功）！2、支付失败（下单成功）！3、下单失败！4、等待支付（下单成功）！5、已手动回调。
+                    $insertOrderData['order_me'] = $orderMe; //本平台订单号
+                    $insertOrderData['amount'] = $message['amount']; //支付金额
+                    $insertOrderData['payable_amount'] = $message['amount'];  //应付金额
+                    $insertOrderData['payment'] = "HUAFEI"; //alipay
+                    $insertOrderData['add_time'] = time();  //入库时间
+                    $insertOrderData['notify_url'] = $message['notify_url']; //下单回调地址 notify url
+
+                    $orderModel = new OrderModel();
+                    $createOrderOne = $orderModel->addOrder($insertOrderData);
+                    if (!isset($createOrderOne['code']) || $createOrderOne['code'] != '0') {
+
+                        return apiJsonReturn(10008, $createOrderOne['msg'] . $createOrderOne['code']);
+                    }
+                    //2、分配核销单
+                    $orderHXModel = new OrderhexiaoModel();
+                    $getUseHxOrderRes = $orderHXModel->getUseHxOrder($insertOrderData);
+                    if (!isset($getUseHxOrderRes['code']) || $getUseHxOrderRes['code'] != 0) {
+
+                        logs(json_encode(['action' => 'getUseHxOrderRes',
+                            'insertOrderData' => $insertOrderData,
+                            'getUseHxOrderRes' => $getUseHxOrderRes
+                        ]), 'getUseHxOrder_log');
+
+                        //修改订单为下单失败状态。
+                        $updateOrderStatus['last_use_time'] = time();
+                        $updateOrderStatus['order_desc'] = "下单失败|" . $getUseHxOrderRes['msg'];
+                        $orderModel->where('order_no', $insertOrderData['order_no'])->update($updateOrderStatus);
+                        return apiJsonReturn(10010, $getUseHxOrderRes['msg'], "");
+                    }
+                    $updateOrderStatus['order_status'] = 4;   //等待支付状态
+                    $updateOrderStatus['check_times'] = 1;   //下单成功就查询一次
+                    $updateOrderStatus['order_pay'] = $getUseHxOrderRes['data']['order_no'];   //匹配核销单订单号
+                    $updateOrderStatus['order_limit_time'] = time() + 900;  //订单表 限制使用时间
+                    $updateOrderStatus['start_check_amount'] = $getUseHxOrderRes['data']['last_check_amount'];  //开单余额
+                    $updateOrderStatus['last_check_amount'] = $getUseHxOrderRes['data']['last_check_amount'];  //开单余额
+                    $updateOrderStatus['end_check_amount'] = $getUseHxOrderRes['data']['last_check_amount'] + $insertOrderData['amount'];  //应到余额
+                    $updateOrderStatus['next_check_time'] = time() + 90;   //下次查询余额时间
+                    $updateOrderStatus['account'] = $getUseHxOrderRes['data']['account'];   //匹配核销单账号
+                    $updateOrderStatus['write_off_sign'] = $getUseHxOrderRes['data']['write_off_sign'];   //匹配核销单核销商标识
+                    $updateOrderStatus['order_desc'] = "下单成功,等待支付！";
+                    $url = "http://175.178.241.238/pay/#/huafei";
+//            订单号order_id   金额 amount   手机号 phone  二维码链接 img_url    有效时间 limit_time 秒
+//            $imgUrl = "http://175.178.195.147:9090/upload/huafei.jpg";
+                    $imgUrl = "http://175.178.195.147:9090/upload/tengxun.jpg";
+                    $imgUrl = urlencode($imgUrl);
+                    $limitTime = ($updateOrderStatus['order_limit_time'] - 720);
+                    $url = $url . "?order_id=" . $message['order_no'] . "&amount=" . $message['amount'] . "&phone=" . $getUseHxOrderRes['data']['account'] . "&img_url=" . $imgUrl . "&limit_time=" . $limitTime;
+                    $updateOrderStatus['qr_url'] = $url;   //支付订单
+                    $updateWhere['order_no'] = $message['order_no'];
+                    $localOrderUpdateRes = $orderModel->localUpdateOrder($updateWhere, $updateOrderStatus);
+//            logs(json_encode([
+//                'orderWhere' => $updateWhere,
+//                'updateOrderStatus' => $updateOrderStatus,
+//                'localOrderUpdateRes' => $localOrderUpdateRes
+//            ]), 'localhostUpdateOrder');
+//            $orderModel->where('order_no', '=', $insertOrderData['order_no'])->update($updateOrderStatus);
+                    if (!isset($localOrderUpdateRes['code']) || $localOrderUpdateRes['code'] != 0) {
+
+                        return apiJsonReturn(10009, "下单失败！");
+                    }
+
+                    return apiJsonReturn(10000, "下单成功", $url);
+                } catch (\Error $error) {
+
+                    logs(json_encode(['file' => $error->getFile(),
+                        'line' => $error->getLine(), 'errorMessage' => $error->getMessage()
+                    ]), 'orderError');
+                    return json(msg(-22, '', $error->getMessage() . $error->getLine()));
+                } catch (\Exception $exception) {
+                    logs(json_encode(['file' => $exception->getFile(),
+                        'line' => $exception->getLine(),
+                        'errorMessage' => $exception->getMessage()
+                    ]), 'orderException');
+                    return json(msg(-11, '', $exception->getMessage() . $exception->getFile() . $exception->getLine()));
+                }
             } else {
                 try {
-                    logs(json_encode(['message' => $message, 'line' => $message]), 'order_fist2');
                     $validate = new OrderinfoValidate();
                     if (!$validate->check($message)) {
                         return apiJsonReturn(-1, '', $validate->getError());
