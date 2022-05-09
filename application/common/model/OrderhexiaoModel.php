@@ -268,9 +268,6 @@ class OrderhexiaoModel extends Model
                 'hxOrderInfo' => $hxOrderInfo
             ]), 'getUseHxOrder_log');
 
-            $db::commit();
-            sleep(2);
-            return modelReMsg(-1, '', '无可用下单！');
             if (!$hxOrderInfo) {
                 $db::rollback();
                 return modelReMsg(-1, '', '无可用下单！');
@@ -292,6 +289,7 @@ class OrderhexiaoModel extends Model
             $checkParam['phone'] = $hxOrderInfo['account'];
             $checkParam['order_no'] = $hxOrderInfo['account'];
             $checkParam['action'] = 'first';
+            $db::commit();
             $checkRes = $this->checkPhoneAmountNew($checkParam, $hxOrderInfo['order_no']);
             if ($checkRes['code'] != 0) {
                 //停用该核销单
@@ -310,11 +308,12 @@ class OrderhexiaoModel extends Model
                         'orderWhere' => $updateHxWhereForStop,
                         'updateHxDataForStop' => $updateHxDataForStop,
                         'updateMatchRes' => $updateHxDataForStopRes,
-                    ]), 'ADONTDELETEupdateHxWhereForStopFAIL');
+                    ]), 'ADONTDELETEUpdateHxWhereForStopFAIL');
                 }
-                $db::commit();
                 return modelReMsg(-2, '', '下单频繁，请稍后再下-2！');
             }
+
+            $db::startTrans();
             //查询成功更新余额order_hexiao $order order_hexiao
             $orderWhere['id'] = $hxOrderInfo['id'];
             $updateMatch['last_check_amount'] = (float)$checkRes['data'];
@@ -337,12 +336,9 @@ class OrderhexiaoModel extends Model
                     'updateMatch' => $updateMatch,
                     'updateMatchRes' => $updateMatchRes,
                 ]), 'getUseHxOrder_log');
-
                 return modelReMsg(-3, '', '下单频繁，请稍后再下-3！');
             }
-
             $db::commit();
-            $hxOrderInfo['last_check_amount'] = $checkRes['data'];
             return modelReMsg(0, $hxOrderInfo, "getUseTOrderNew_res预拉失败");
 
         } catch (\Exception $exception) {
