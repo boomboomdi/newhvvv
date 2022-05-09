@@ -274,7 +274,7 @@ class OrderhexiaoModel extends Model
                 ->where("id", "=", $hxOrderInfo['id'])
                 ->lock(true)
                 ->find();
-            if (empty($hxOrderInfo)) {
+            if (empty($hxOrderInfo) || $hxOrderInfo['check_status'] == 1) {
                 $db::rollback();
                 return modelReMsg(-1, '', '无可用下单！');
             }
@@ -283,11 +283,11 @@ class OrderhexiaoModel extends Model
             $checking['check_status'] = 1;   //查询余额中
             $db::table("bsa_order_hexiao")->where($orderWhere)->update($checking);
 
+            $db::commit();
             $orderWhere['id'] = $hxOrderInfo['id'];
             $checkParam['phone'] = $hxOrderInfo['account'];
             $checkParam['order_no'] = $hxOrderInfo['account'];
             $checkParam['action'] = 'first';
-            $db::commit();
             $checkRes = $this->checkPhoneAmountNew($checkParam, $hxOrderInfo['order_no']);
             if ($checkRes['code'] != 0) {
                 //停用该核销单
