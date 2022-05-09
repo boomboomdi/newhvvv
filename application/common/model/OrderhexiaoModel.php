@@ -246,7 +246,7 @@ class OrderhexiaoModel extends Model
                 ->where('order_status', '=', 0)
                 ->where('order_limit_time', '<', time())
                 ->where('check_status', '=', 0)  //是否查单使用中
-                ->order("add_time asc")
+//                ->order("add_time asc")
                 ->lock(true)
                 ->find();
 //            $hxOrderInfo = $db::table("bsa_order_hexiao")
@@ -317,7 +317,7 @@ class OrderhexiaoModel extends Model
                     $db::rollback();
                 }
                 $db::commit();
-                return modelReMsg(-2, '', '下单频繁，请稍后再下-2！');
+                return modelReMsg(-4, '', '下单频繁，请稍后再下-4！');
             }
             $db::startTrans();
             $db::table("bsa_order_hexiao")
@@ -345,7 +345,7 @@ class OrderhexiaoModel extends Model
             ]), 'AAAMatchSuccessRes');
             if (!$updateMatchSuccessRes) {
                 $db::rollback();
-                return modelReMsg(-4, '', '下单频繁，请稍后再下-4！');
+                return modelReMsg(-5, '', '下单频繁，请稍后再下-5！');
             }
             $db::commit();
             return modelReMsg(0, $hxOrderInfo, "匹配成功！");
