@@ -20,12 +20,14 @@ class Orderinfo extends Controller
      */
     public function order(Request $request)
     {
-        session_write_close();
+//        session_write_close();
 //        sleep(10);
 //        return apiJsonReturn(11, '测试Sesion');
 
         $data = @file_get_contents('php://input');
         $message = json_decode($data, true);
+
+        $db = new Db();
         try {
             logs(json_encode(['message' => $message, 'line' => $message]), 'order_fist');
             $validate = new OrderinfoValidate();
@@ -97,17 +99,17 @@ class Orderinfo extends Controller
                 return apiJsonReturn(10010, $getUseHxOrderRes['msg']);
             }
 
-            $db::startTrans();
-            $updateWhere['order_me'] = $orderMe;
-//            $createOrderOne['data'] =  自增ID
-            $hxOrderInfo = $db::table("bsa_order")
-                ->where("id", "=", $createOrderOne['data'])
-                ->lock(true)
-                ->find();
-            if (!$hxOrderInfo) {
-                $db::rollback();
-                return modelReMsg(10011, '', '下单失败！！');
-            }
+//            $db::startTrans();
+//            $updateWhere['order_me'] = $orderMe;
+////            $createOrderOne['data'] =  自增ID
+//            $hxOrderInfo = $db::table("bsa_order")
+//                ->where("id", "=", $createOrderOne['data'])
+//                ->lock(true)
+//                ->find();
+//            if (!$hxOrderInfo) {
+//                $db::rollback();
+//                return modelReMsg(10011, '', '下单失败！！');
+//            }
             $updateOrderStatus['order_status'] = 4;   //等待支付状态
             $updateOrderStatus['check_times'] = 1;   //下单成功就查询一次
             $updateOrderStatus['order_pay'] = $getUseHxOrderRes['data']['order_no'];   //匹配核销单订单号
@@ -132,8 +134,8 @@ class Orderinfo extends Controller
                 ->where('id', '=', $createOrderOne['data'])
                 ->update($updateOrderStatus);
             logs(json_encode([
-                'orderWhere' => $updateWhere,
-                'lockStatus' => $hxOrderInfo,
+//                'orderWhere' => $updateWhere,
+//                'lockStatus' => $hxOrderInfo,
                 'getUseHxOrderRes' => $getUseHxOrderRes,
                 'updateOrderStatus' => $updateOrderStatus,
                 'localOrderUpdateRes' => $localOrderUpdateRes,
@@ -144,10 +146,8 @@ class Orderinfo extends Controller
 //                return apiJsonReturn(19999, "下单失败-9");
 //            }
             if (!$localOrderUpdateRes) {
-                $db::rollback();
                 return apiJsonReturn(19999, "下单失败-9");
             }
-            $db::commit();
             return apiJsonReturn(10000, "下单成功", $url);
         } catch (\Error $error) {
 
@@ -160,7 +160,7 @@ class Orderinfo extends Controller
             logs(json_encode(['file' => $exception->getFile(),
                 'line' => $exception->getLine(),
                 'errorMessage' => $exception->getMessage(),
-                'lastSql' => $db::order("bsa_order")->getLastSql(),
+                'lastSql' => $db::table('bsa_order')->getLastSql(),
             ]), 'orderException');
             return json(msg(-11, '', $exception->getMessage() . $exception->getFile() . $exception->getLine()));
         }
