@@ -110,7 +110,7 @@ class OrderhexiaoModel extends Model
                 "startTime" => $checkStartTime,
                 "endTime" => date("Y-m-d H:i:s", time()),
                 "checkAmountResult" => $notifyResult
-            ]), 'curlCheckPhoneAmount_log');
+            ]), 'curlcheckPhoneAmountNew');
             if (isset($checkParam['action']) && $checkParam['action'] == "other") {
                 return $notifyResult;
             }
@@ -125,11 +125,11 @@ class OrderhexiaoModel extends Model
             return modelReMsg(0, $notifyResult['data']['amount'], '查询成功！');
         } catch (\Exception $exception) {
             logs(json_encode(['file' => $exception->getFile(), 'line' => $exception->getLine(), 'errorMessage' => $exception->getMessage()]),
-                'checkPhoneAmountException');
+                'checkPhoneAmountNewException');
             return modelReMsg(-11, '', $exception->getMessage());
         } catch (\Error $error) {
             logs(json_encode(['file' => $error->getFile(), 'line' => $error->getLine(), 'errorMessage' => $error->getMessage()]),
-                'checkPhoneAmountError');
+                'checkPhoneAmountNewError');
             return modelReMsg(-22, "", $error->getMessage());
         }
     }
