@@ -237,6 +237,8 @@ class OrderhexiaoModel extends Model
     function getUseHxOrder($order, $getTimes = 1)
     {
         try {
+            $db = new Db();
+            $db::startTrans();
 
 //            $hxOrderInfo = $db::table("bsa_order_hexiao")
             $hxOrderInfo = $this
@@ -250,8 +252,6 @@ class OrderhexiaoModel extends Model
                 ->lock(true)
                 ->find();
 
-            $db = new Db();
-            $db::startTrans();
 //            $hxOrderInfo = $db::table("bsa_order_hexiao")
 //                ->field("bsa_order_hexiao.*")
 //                ->leftJoin("bsa_order", "bsa_order_hexiao.account = bsa_order.account")
@@ -274,10 +274,10 @@ class OrderhexiaoModel extends Model
 //                ->where("id", "=", $lock['id'])
 //                ->lock(true)
 //                ->find();
-            if (empty($hxOrderInfo) || $hxOrderInfo['check_status'] == 1) {
-                $db::rollback();
-                return modelReMsg(-1, '', '无可用下单！');
-            }
+//            if (empty($hxOrderInfo) || $hxOrderInfo['check_status'] == 1) {
+//                $db::rollback();
+//                return modelReMsg(-1, '', '无可用下单！');
+//            }
             $orderWhere['id'] = $hxOrderInfo['id'];
             $checking['order_status'] = 1;  //使用中
             $checking['check_status'] = 1;   //查询余额中
@@ -291,11 +291,12 @@ class OrderhexiaoModel extends Model
             $checkRes = $this->checkPhoneAmountNew($checkParam, $hxOrderInfo['order_no']);
 
             $db::startTrans();
+
+            $hxOrderInfo = $db::table("bsa_order_hexiao")
+                ->where("id", "=", $hxOrderInfo['id'])
+                ->lock(true)
+                ->find();
             if ($checkRes['code'] != 0) {
-                $hxOrderInfo = $db::table("bsa_order_hexiao")
-                    ->where("id", "=", $lock['id'])
-                    ->lock(true)
-                    ->find();
                 //停用该核销单
                 $updateHxWhereForStop['id'] = $hxOrderInfo['id'];
                 $updateHxDataForStop['status'] = 2;
@@ -305,7 +306,6 @@ class OrderhexiaoModel extends Model
                 $updateHxDataForStop['check_status'] = 0;
                 $updateHxDataForStop['order_desc'] = "不可查单，立即回调" . json_encode($checkRes);
                 $updateHxDataForStopRes = $db::table("bsa_order_hexiao")->where($updateHxWhereForStop)->update($updateHxDataForStop);
-
                 if (!$updateHxDataForStopRes) {
                     logs(json_encode([
                         'action' => 'updateHxWhereForStop',
@@ -314,6 +314,7 @@ class OrderhexiaoModel extends Model
                         'updateMatchRes' => $updateHxDataForStopRes,
                     ]), 'ADONTDELETEUpdateHxWhereForStopFAIL');
                 }
+                $db::rollback();
                 return modelReMsg(-2, '', '下单频繁，请稍后再下-2！');
             }
 
