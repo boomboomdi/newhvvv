@@ -263,7 +263,7 @@ class Orderinfo extends Controller
         }
     }
 
-    public function order()
+    public function order1()
     {
         $url = "http://175.178.195.147:9090/api/orderinfo/orderNew";
         $data = @file_get_contents('php://input');
@@ -319,7 +319,7 @@ class Orderinfo extends Controller
         }
     }
 
-    public function order4()
+    public function order()
     {
         try {
             $pid = pcntl_fork();    //创建⼦进程
@@ -450,7 +450,7 @@ class Orderinfo extends Controller
                 }
 
             } else {
-
+                return apiJsonReturn(-99, 'cant order');
             }
         } catch (\Error $error) {
             logs(json_encode(['file' => $error->getFile(),
