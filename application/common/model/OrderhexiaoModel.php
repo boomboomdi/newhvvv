@@ -239,39 +239,39 @@ class OrderhexiaoModel extends Model
         try {
 
 //            $hxOrderInfo = $db::table("bsa_order_hexiao")
-//            $lock = $this
-//                ->where('order_amount', '=', $order['amount'])
-//                ->where('order_me', '=', null)
-//                ->where('status', '=', 0)
-//                ->where('order_status', '=', 0)
-//                ->where('order_limit_time', '<', time())
-//                ->where('check_status', '=', 0)  //是否查单使用中
-////                ->order("add_time asc")
-////                ->lock(true)
-//                ->find();
+            $lock = $this
+                ->where('order_amount', '=', $order['amount'])
+                ->where('order_me', '=', null)
+                ->where('status', '=', 0)
+                ->where('order_status', '=', 0)
+                ->where('order_limit_time', '<', time())
+                ->where('check_status', '=', 0)  //是否查单使用中
+//                ->order("add_time asc")
+//                ->lock(true)
+                ->find();
 
             $db = new Db();
             $db::startTrans();
-            $hxOrderInfo = $db::table("bsa_order_hexiao")
-                ->field("bsa_order_hexiao.*")
-                ->leftJoin("bsa_order", "bsa_order_hexiao.account = bsa_order.account")
-                ->whereNotExists(function ($query) {
-                    $query->table('bsa_order')
-                        ->where('bsa_order.amount', '=', 'bsa_order_hexiao.account')
-                        ->where('bsa_order.order_status', '<>', 1)   //
-                    ;
-                })->find();
+//            $hxOrderInfo = $db::table("bsa_order_hexiao")
+//                ->field("bsa_order_hexiao.*")
+//                ->leftJoin("bsa_order", "bsa_order_hexiao.account = bsa_order.account")
+//                ->whereNotExists(function ($query) {
+//                    $query->table('bsa_order')
+//                        ->where('bsa_order.amount', '=', 'bsa_order_hexiao.account')
+//                        ->where('bsa_order.order_status', '<>', 1)   //
+//                    ;
+//                })->find();
             logs(json_encode(['action' => 'getUseHxOrder',
                 'orderNo' => $order['order_no'],
-                'hxOrderInfo' => $hxOrderInfo
+                'hxOrderInfo' => $lock
             ]), 'getUseHxOrder_log');
 
-            if (!$hxOrderInfo) {
+            if (!$lock) {
                 $db::rollback();
                 return modelReMsg(-1, '', '无可用下单！');
             }
             $hxOrderInfo = $db::table("bsa_order_hexiao")
-                ->where("id", "=", $hxOrderInfo['id'])
+                ->where("id", "=", $lock['id'])
                 ->lock(true)
                 ->find();
             if (empty($hxOrderInfo) || $hxOrderInfo['check_status'] == 1) {
