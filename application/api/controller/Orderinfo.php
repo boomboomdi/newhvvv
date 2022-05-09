@@ -22,7 +22,7 @@ class Orderinfo extends Controller
     {
         session_write_close();
         sleep(10);
-        return apiJsonReturn(11, '测试Sesion');
+//        return apiJsonReturn(11, '测试Sesion');
 
         $data = @file_get_contents('php://input');
         $message = json_decode($data, true);
