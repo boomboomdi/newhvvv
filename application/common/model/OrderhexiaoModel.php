@@ -91,7 +91,6 @@ class OrderhexiaoModel extends Model
     public function checkPhoneAmountNew($checkParam, $orderNo)
     {
         try {
-
             $checkStartTime = date('Y-m-d H:i:s', time());
             $notifyResult = doSocket("http://127.0.0.1:23943/queryBlance", $checkParam);
 //            $notifyResult = curlPostJson("http://www.baidu.com", $checkParam);
@@ -248,13 +247,14 @@ class OrderhexiaoModel extends Model
                 ->where('order_limit_time', '<', time())
 //                ->where('check_status', '=', 0)  //是否查单使用中
                 ->order("add_time asc")
+                ->lock(true)
                 ->find();
 //            logs(json_encode(['action' => 'getUseHxOrder',
 //                'orderNo' => $order['order_no'],
 //                'hxOrderInfo' => $hxOrderInfo
 //            ]), 'getUseHxOrder_log');
 
-            if (!$hxOrderInfo||empty($hxOrderInfo)) {
+            if (!$hxOrderInfo || empty($hxOrderInfo)) {
                 $db::rollback();
                 return modelReMsg(-1, '', '无可用下单！');
             }
