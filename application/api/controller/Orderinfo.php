@@ -85,12 +85,11 @@ class Orderinfo extends Controller
                     'insertOrderData' => $insertOrderData,
                     'getUseHxOrderRes' => $getUseHxOrderRes
                 ]), 'getUseHxOrder_log');
-
                 //修改订单为下单失败状态。
                 $updateOrderStatus['last_use_time'] = time();
                 $updateOrderStatus['order_desc'] = "下单失败|" . $getUseHxOrderRes['msg'];
                 $orderModel->where('order_no', $insertOrderData['order_no'])->update($updateOrderStatus);
-                return apiJsonReturn(10010, $getUseHxOrderRes['msg'], "");
+                return apiJsonReturn(10010, $getUseHxOrderRes['msg']);
             }
 
             $db::startTrans();

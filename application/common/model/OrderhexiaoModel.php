@@ -240,8 +240,7 @@ class OrderhexiaoModel extends Model
             $db = new Db();
             $db::startTrans();
 
-//            $hxOrderInfo = $db::table("bsa_order_hexiao")
-            $lock = $this
+            $lock = $db::table("bsa_order_hexiao")
                 ->where('order_amount', '=', $order['amount'])
                 ->where('order_me', '=', null)
                 ->where('status', '=', 0)
