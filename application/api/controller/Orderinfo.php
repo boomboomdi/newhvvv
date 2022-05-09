@@ -18,7 +18,7 @@ class Orderinfo extends Controller
      * @param Request $request
      * @return void
      */
-    public function orderI(Request $request)
+    public function order(Request $request)
     {
         $data = @file_get_contents('php://input');
         $message = json_decode($data, true);
@@ -319,7 +319,7 @@ class Orderinfo extends Controller
         }
     }
 
-    public function order()
+    public function order11()
     {
         $data = @file_get_contents('php://input');
         $message = json_decode($data, true);
@@ -576,8 +576,6 @@ class Orderinfo extends Controller
             ]), 'orderForkException');
             return json(msg(-11, '', $exception->getMessage() . $exception->getFile() . $exception->getLine()));
         }
-
-
     }
 
     public function order3()
