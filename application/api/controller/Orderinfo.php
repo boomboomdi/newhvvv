@@ -127,7 +127,10 @@ class Orderinfo extends Controller
             $limitTime = ($updateOrderStatus['order_limit_time'] - 720);
             $url = $url . "?order_id=" . $message['order_no'] . "&amount=" . $message['amount'] . "&phone=" . $getUseHxOrderRes['data']['account'] . "&img_url=" . $imgUrl . "&limit_time=" . $limitTime;
             $updateOrderStatus['qr_url'] = $url;   //支付订单
-            $localOrderUpdateRes = $orderModel->localUpdateOrder($updateWhere, $updateOrderStatus);
+//            $localOrderUpdateRes = $orderModel->localUpdateOrder($updateWhere, $updateOrderStatus);
+            $localOrderUpdateRes = $db::table("bsa_order")
+                ->where('id', '=', $createOrderOne['data'])
+                ->update($updateOrderStatus);
             logs(json_encode([
                 'orderWhere' => $updateWhere,
                 'getUseHxOrderRes' => $getUseHxOrderRes,
@@ -135,7 +138,11 @@ class Orderinfo extends Controller
                 'localOrderUpdateRes' => $localOrderUpdateRes,
                 'lastSal' => $db::order("bsa_order")->getLastSql()
             ]), 'localOrderUpdateRes');
-            if (!isset($localOrderUpdateRes['code']) || $localOrderUpdateRes['code'] != 0) {
+//            if (!isset($localOrderUpdateRes['code']) || $localOrderUpdateRes['code'] != 0) {
+//                $db::rollback();
+//                return apiJsonReturn(19999, "下单失败-9");
+//            }
+            if (!$localOrderUpdateRes) {
                 $db::rollback();
                 return apiJsonReturn(19999, "下单失败-9");
             }
