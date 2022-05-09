@@ -311,10 +311,9 @@ class OrderhexiaoModel extends Model
                     'updateHxDataForStopRes' => $updateHxDataForStopRes,
                     'getLastSql' => $db::table("bsa_order_hexiao")->getLastSql(),
                 ]), 'ADONTMatchHxDataCheckResFAIL');
-                if (!$updateHxDataForStopRes) {
-                    $db::rollback();
-                }
-                $db::commit();
+//                if (!$updateHxDataForStopRes) {
+//                    $db::rollback();
+//                }
                 return modelReMsg(-4, '', '下单频繁，请稍后再下-4！');
             }
 //            $db::startTrans();
