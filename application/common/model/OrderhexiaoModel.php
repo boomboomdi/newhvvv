@@ -238,8 +238,6 @@ class OrderhexiaoModel extends Model
     public
     function getUseHxOrder($order, $getTimes = 1)
     {
-        $db = new Db();
-        $db::startTrans();
         try {
 
 //            $hxOrderInfo = $db::table("bsa_order_hexiao")
@@ -253,6 +251,9 @@ class OrderhexiaoModel extends Model
 ////                ->order("add_time asc")
 ////                ->lock(true)
 //                ->find();
+
+            $db = new Db();
+            $db::startTrans();
             $hxOrderInfo = $db::table("bsa_order_hexiao")
                 ->field("bsa_order_hexiao.*")
                 ->leftJoin("bsa_order", "bsa_order_hexiao.account = bsa_order.account")
@@ -267,6 +268,9 @@ class OrderhexiaoModel extends Model
                 'hxOrderInfo' => $hxOrderInfo
             ]), 'getUseHxOrder_log');
 
+            $db::commit();
+            sleep(2);
+            return modelReMsg(-1, '', '无可用下单！');
             if (!$hxOrderInfo) {
                 $db::rollback();
                 return modelReMsg(-1, '', '无可用下单！');
@@ -284,8 +288,6 @@ class OrderhexiaoModel extends Model
             $checking['check_status'] = 1;   //查询余额中
             $db::table("bsa_order_hexiao")->where($orderWhere)->update($checking);
 
-            sleep(2);
-            return modelReMsg(-1, '', '无可用下单！');
             $orderWhere['id'] = $hxOrderInfo['id'];
             $checkParam['phone'] = $hxOrderInfo['account'];
             $checkParam['order_no'] = $hxOrderInfo['account'];
@@ -344,14 +346,12 @@ class OrderhexiaoModel extends Model
             return modelReMsg(0, $hxOrderInfo, "getUseTOrderNew_res预拉失败");
 
         } catch (\Exception $exception) {
-            $db::rollback();
             logs(json_encode(['orderNo' => $order['order_no'],
                 'file' => $exception->getFile(),
                 'line' => $exception->getLine(),
                 'errorMessage' => $exception->getMessage()]), 'getUseHxOrderException');
             return modelReMsg(-11, '', $exception->getMessage());
         } catch (\Error $error) {
-            $db::rollback();
             logs(json_encode(['orderNo' => $order['order_no'],
                 'file' => $error->getFile(),
                 'line' => $error->getLine(),
