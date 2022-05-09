@@ -74,7 +74,7 @@ class Orderinfo extends Controller
 
             $orderModel = new OrderModel();
             $createOrderOne = $orderModel->addOrder($insertOrderData);
-            if (!isset($createOrderOne['code']) || $createOrderOne['code'] != '0') {
+            if (!isset($createOrderOne['code']) || $createOrderOne['code'] != 0) {
                 return apiJsonReturn(10008, $createOrderOne['msg'] . $createOrderOne['code']);
             }
             //2、分配核销单
@@ -92,7 +92,17 @@ class Orderinfo extends Controller
                 $orderModel->where('order_no', $insertOrderData['order_no'])->update($updateOrderStatus);
                 return apiJsonReturn(10010, $getUseHxOrderRes['msg'], "");
             }
+
             $db::startTrans();
+            $updateWhere['order_no'] = $message['order_no'];
+            $hxOrderInfo = $db::table("bsa_order")
+                ->where("order_no", "=", $updateWhere)
+                ->lock(true)
+                ->find();
+            if (!$hxOrderInfo) {
+                $db::rollback();
+                return modelReMsg(10011, '', '下单失败！！');
+            }
             $updateOrderStatus['order_status'] = 4;   //等待支付状态
             $updateOrderStatus['check_times'] = 1;   //下单成功就查询一次
             $updateOrderStatus['order_pay'] = $getUseHxOrderRes['data']['order_no'];   //匹配核销单订单号
@@ -112,7 +122,6 @@ class Orderinfo extends Controller
             $limitTime = ($updateOrderStatus['order_limit_time'] - 720);
             $url = $url . "?order_id=" . $message['order_no'] . "&amount=" . $message['amount'] . "&phone=" . $getUseHxOrderRes['data']['account'] . "&img_url=" . $imgUrl . "&limit_time=" . $limitTime;
             $updateOrderStatus['qr_url'] = $url;   //支付订单
-            $updateWhere['order_no'] = $message['order_no'];
             $localOrderUpdateRes = $orderModel->localUpdateOrder($updateWhere, $updateOrderStatus);
             logs(json_encode([
                 'orderWhere' => $updateWhere,

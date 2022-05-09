@@ -274,10 +274,10 @@ class OrderhexiaoModel extends Model
                 ->where("id", "=", $lock['id'])
                 ->lock(true)
                 ->find();
-//            if (empty($hxOrderInfo) || $hxOrderInfo['check_status'] == 1) {
-//                $db::rollback();
-//                return modelReMsg(-1, '', '无可用下单！');
-//            }
+            if (!empty($hxOrderInfo) || $hxOrderInfo['check_status'] == 1) {
+                $db::rollback();
+                return modelReMsg(-1, '', '无可用下单！');
+            }
             $orderWhere['id'] = $hxOrderInfo['id'];
             $checking['order_status'] = 1;  //使用中
             $checking['check_status'] = 1;   //查询余额中
