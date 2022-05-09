@@ -10,6 +10,7 @@
 namespace app\common\model;
 
 
+use think\Model;
 //**
 class AsyncModel extends Model
 {
