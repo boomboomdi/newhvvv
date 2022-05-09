@@ -123,6 +123,7 @@ class Orderinfo extends Controller
             ]), 'localOrderUpdateRes');
             if (!isset($localOrderUpdateRes['code']) || $localOrderUpdateRes['code'] != 0) {
                 $db::rollback();
+                return apiJsonReturn(19999, "下单失败-9");
             }
             $db::commit();
             return apiJsonReturn(10000, "下单成功", $url);
