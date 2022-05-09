@@ -47,7 +47,7 @@ class OrderModel extends Model
             $this->create($Order);
             $insId = $this->getLastInsID();
             if(!$insId){
-                return modelReMsg(-3, '', "下单失败");
+                return modelReMsg(-3, $insId, "下单失败");
             }
         } catch (\Exception $e) {
 
