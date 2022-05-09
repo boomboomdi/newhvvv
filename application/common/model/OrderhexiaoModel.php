@@ -239,7 +239,6 @@ class OrderhexiaoModel extends Model
         try {
             $db = new Db();
             $db::startTrans();
-
             $lock = $db::table("bsa_order_hexiao")
                 ->where('order_amount', '=', $order['amount'])
                 ->where('order_me', '=', null)
@@ -250,7 +249,6 @@ class OrderhexiaoModel extends Model
                 ->order("add_time asc")
                 ->lock(true)
                 ->find();
-
 //            $hxOrderInfo = $db::table("bsa_order_hexiao")
 //                ->field("bsa_order_hexiao.*")
 //                ->leftJoin("bsa_order", "bsa_order_hexiao.account = bsa_order.account")
@@ -267,7 +265,7 @@ class OrderhexiaoModel extends Model
 
             if (!$lock) {
                 $db::rollback();
-                return modelReMsg(-1, '', '无可用下单！');
+                return modelReMsg(-1, '', '无可用下单！-1');
             }
             $hxOrderInfo = $db::table("bsa_order_hexiao")
                 ->where("id", "=", $lock['id'])
@@ -275,24 +273,28 @@ class OrderhexiaoModel extends Model
                 ->find();
             if (!empty($hxOrderInfo) || $hxOrderInfo['check_status'] == 1) {
                 $db::rollback();
-                return modelReMsg(-1, '', '无可用下单！');
+                return modelReMsg(-2, '', '无可用下单！-2');
             }
             $orderWhere['id'] = $hxOrderInfo['id'];
             $checking['order_status'] = 1;  //使用中
             $checking['check_status'] = 1;   //查询余额中
             $db::table("bsa_order_hexiao")->where($orderWhere)->update($checking);
-            $db::commit();
             $orderWhere['id'] = $hxOrderInfo['id'];
             $checkParam['phone'] = $hxOrderInfo['account'];
             $checkParam['order_no'] = $hxOrderInfo['account'];
             $checkParam['action'] = 'first';
-            $checkRes = $this->checkPhoneAmountNew($checkParam, $hxOrderInfo['order_no']);
 
-            $db::startTrans();
+            $db::commit();  //表事务结束
+            $checkRes = $this->checkPhoneAmountNew($checkParam, $hxOrderInfo['order_no']);
+            $db::startTrans();   //核销单事务开始
             $hxOrderInfo = $db::table("bsa_order_hexiao")
                 ->where("id", "=", $hxOrderInfo['id'])
                 ->lock(true)
                 ->find();
+            if (!$hxOrderInfo) {
+                $db::rollback();
+                return modelReMsg(-3, '', '无可用下单！-3');
+            }
             if ($checkRes['code'] != 0) {
                 //停用该核销单
                 $updateHxWhereForStop['id'] = $hxOrderInfo['id'];
@@ -343,7 +345,7 @@ class OrderhexiaoModel extends Model
             ]), 'AAAMatchSuccessRes');
             if (!$updateMatchSuccessRes) {
                 $db::rollback();
-                return modelReMsg(-3, '', '下单频繁，请稍后再下-3！');
+                return modelReMsg(-4, '', '下单频繁，请稍后再下-4！');
             }
             $db::commit();
             return modelReMsg(0, $hxOrderInfo, "匹配成功！");
