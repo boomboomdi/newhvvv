@@ -346,12 +346,16 @@ class OrderhexiaoModel extends Model
             return modelReMsg(0, $hxOrderInfo, "匹配成功！");
 
         } catch (\Exception $exception) {
+
+            $db::rollback();
             logs(json_encode(['orderNo' => $order['order_no'],
                 'file' => $exception->getFile(),
                 'line' => $exception->getLine(),
                 'errorMessage' => $exception->getMessage()]), 'getUseHxOrderException');
             return modelReMsg(-11, '', $exception->getMessage());
         } catch (\Error $error) {
+
+            $db::rollback();
             logs(json_encode(['orderNo' => $order['order_no'],
                 'file' => $error->getFile(),
                 'line' => $error->getLine(),
