@@ -239,7 +239,7 @@ class OrderModel extends Model
                     'orderWhere' => $where,
                     'updateData' => $updateData,
                     'orderInfo' => $orderInfo
-                ]), 'localhostUpdateOrderFail_log');
+                ]), 'AAlocalhostUpdateOrderFail_log');
                 return modelReMsg(-1, "", "更新失败!");
             }
             $updateRes = $this->where($where)->update($updateData);
@@ -250,15 +250,15 @@ class OrderModel extends Model
                     'orderWhere' => $where,
                     'updateData' => $updateData,
                     'updateRes' => $updateRes
-                ]), 'localhostUpdateOrderFail_log');
+                ]), 'AAlocalhostUpdateOrderFail_log');
                 return modelReMsg(-2, "", "更新失败");
             }
-//            logs(json_encode([
-//                'orderWhere' => $where,
-//                'updateData' => $updateData,
-//                'updateRes' => $updateRes
-//            ]), 'localhostUpdateOrder');
-            $this->commit();
+            logs(json_encode([
+                'orderWhere' => $where,
+                'updateData' => $updateData,
+                'updateRes' => $updateRes
+            ]), 'localhostUpdateOrder_log');
+            $db::commit();
             return modelReMsg(0, "", "更新成功");
 
         } catch (\Exception $exception) {

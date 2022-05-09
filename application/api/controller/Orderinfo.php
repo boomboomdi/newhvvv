@@ -75,14 +75,12 @@ class Orderinfo extends Controller
             $orderModel = new OrderModel();
             $createOrderOne = $orderModel->addOrder($insertOrderData);
             if (!isset($createOrderOne['code']) || $createOrderOne['code'] != '0') {
-
                 return apiJsonReturn(10008, $createOrderOne['msg'] . $createOrderOne['code']);
             }
             //2、分配核销单
             $orderHXModel = new OrderhexiaoModel();
             $getUseHxOrderRes = $orderHXModel->getUseHxOrder($insertOrderData);
             if (!isset($getUseHxOrderRes['code']) || $getUseHxOrderRes['code'] != 0) {
-
                 logs(json_encode(['action' => 'getUseHxOrderRes',
                     'insertOrderData' => $insertOrderData,
                     'getUseHxOrderRes' => $getUseHxOrderRes
@@ -94,6 +92,7 @@ class Orderinfo extends Controller
                 $orderModel->where('order_no', $insertOrderData['order_no'])->update($updateOrderStatus);
                 return apiJsonReturn(10010, $getUseHxOrderRes['msg'], "");
             }
+            $db::startTrans();
             $updateOrderStatus['order_status'] = 4;   //等待支付状态
             $updateOrderStatus['check_times'] = 1;   //下单成功就查询一次
             $updateOrderStatus['order_pay'] = $getUseHxOrderRes['data']['order_no'];   //匹配核销单订单号
@@ -115,17 +114,15 @@ class Orderinfo extends Controller
             $updateOrderStatus['qr_url'] = $url;   //支付订单
             $updateWhere['order_no'] = $message['order_no'];
             $localOrderUpdateRes = $orderModel->localUpdateOrder($updateWhere, $updateOrderStatus);
-//            logs(json_encode([
-//                'orderWhere' => $updateWhere,
-//                'updateOrderStatus' => $updateOrderStatus,
-//                'localOrderUpdateRes' => $localOrderUpdateRes
-//            ]), 'localhostUpdateOrder');
-//            $orderModel->where('order_no', '=', $insertOrderData['order_no'])->update($updateOrderStatus);
+            logs(json_encode([
+                'orderWhere' => $updateWhere,
+                'updateOrderStatus' => $updateOrderStatus,
+                'localOrderUpdateRes' => $localOrderUpdateRes
+            ]), 'localOrderUpdateRes');
             if (!isset($localOrderUpdateRes['code']) || $localOrderUpdateRes['code'] != 0) {
-
-                return apiJsonReturn(10009, "下单失败！");
+                $db::rollback();
             }
-
+            $db::commit();
             return apiJsonReturn(10000, "下单成功", $url);
         } catch (\Error $error) {
 
