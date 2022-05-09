@@ -369,13 +369,13 @@ function curlPostJson($url = '', $postData = '', $options = array())
     curl_close($ch);
     return $data;
 }
-function doSocket($url, $postData = '', $timeout = 20) {
+function doSocket($url, $data = '', $timeout = 20) {
     $urls = parse_url($url);
     if (!$urls) {
         return "-500";
     }
-    if (is_array($postData)) {
-        $postData = json_encode($postData);
+    if (is_array($data)) {
+        $data = json_encode($data);
     }
     $port = isset($urls['port']) ? $urls['port'] : null; //isset()判断
     if (!$port) {
@@ -391,7 +391,7 @@ function doSocket($url, $postData = '', $timeout = 20) {
         . "User-Agent:Mozilla/4.0(compatible;MSIE 7.0;Windows NT 5.1)" . "\r\n"
         . "Host:" . $host . "\r\n"
         . "Content-Type: application/json"."\r\n"
-        . "Content-Length:" . strlen($postData) . "\r\n" . "\r\n" . $postData;
+        . "Content-Length:" . strlen($data) . "\r\n" . "\r\n" . $data;
     $fd = fsockopen($host, $port);
     if (!is_resource($fd)) {
         return "fsockopen failed";
