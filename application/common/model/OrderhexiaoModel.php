@@ -255,10 +255,10 @@ class OrderhexiaoModel extends Model
                 ->order("add_time asc")
                 ->lock(true)
                 ->find();
-//            logs(json_encode(['action' => 'getUseHxOrder',
-//                'orderNo' => $order['order_no'],
-//                'hxOrderInfo' => $hxOrderInfo
-//            ]), 'getUseHxOrder_log');
+            logs(json_encode(['action' => 'getUseHxOrder',
+                'orderNo' => $order['order_no'],
+                'hxOrderInfo' => $hxOrderInfo
+            ]), 'getUseHxOrder_log');
 
             if (!$hxOrderInfo) {
                 $db::rollback();
