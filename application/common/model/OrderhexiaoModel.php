@@ -236,9 +236,9 @@ class OrderhexiaoModel extends Model
     public
     function getUseHxOrder($order, $getTimes = 1)
     {
+        $db = new Db();
+        $db::startTrans();
         try {
-            $db = new Db();
-            $db::startTrans();
             $hxOrderInfo = $db::table("bsa_order_hexiao")
                 ->where('order_amount', '=', $order['amount'])
                 ->where('order_me', '=', null)
@@ -271,7 +271,11 @@ class OrderhexiaoModel extends Model
             $orderWhere['id'] = $hxOrderInfo['id'];
             $checking['order_status'] = 1;  //使用中
             $checking['check_status'] = 1;   //查询余额中
-            $db::table("bsa_order_hexiao")->where($orderWhere)->update($checking);
+            $checkRes = $db::table("bsa_order_hexiao")->where($orderWhere)->update($checking);
+            if (!$checkRes) {
+                $db::rollback();
+                return modelReMsg(-1, '', '无可用下单！-1');
+            }
             $orderWhere['id'] = $hxOrderInfo['id'];
             $checkParam['phone'] = $hxOrderInfo['account'];
             $checkParam['order_no'] = $hxOrderInfo['account'];
@@ -280,20 +284,15 @@ class OrderhexiaoModel extends Model
             $db::commit();  //表事务结束
             $checkRes = $this->checkPhoneAmountNew($checkParam, $hxOrderInfo['order_no']);
 
-            $db::startTrans();   //核销单事务开始
-            $hxOrderInfo = $db::table("bsa_order_hexiao")
-                ->where("id", "=", $hxOrderInfo['id'])
-                ->lock(true)
-                ->find();
-            if (!$hxOrderInfo) {
-                $db::rollback();
-                logs(json_encode(['action' => 'getUseHxOrder',
-                    'orderNo' => $order['order_no'],
-                    'hxOrderInfo' => $hxOrderInfo,
-                    'lastSql' => $db::table("bsa_order_hexiao")->getLastSql(),
-                ]), 'getUseHxOrderLockFail');
-                return modelReMsg(-3, '', '无可操作单！-3');
-            }
+
+//            if (!$hxOrderInfo) {
+//                logs(json_encode(['action' => 'getUseHxOrder',
+//                    'orderNo' => $order['order_no'],
+//                    'hxOrderInfo' => $hxOrderInfo,
+//                    'lastSql' => $db::table("bsa_order_hexiao")->getLastSql(),
+//                ]), 'getUseHxOrderLockFail');
+//                return modelReMsg(-3, '', '无可操作单！-3');
+//            }
             if ($checkRes['code'] != 0) {
                 //停用该核销单
                 $updateHxWhereForStop['id'] = $hxOrderInfo['id'];
@@ -318,10 +317,10 @@ class OrderhexiaoModel extends Model
                 $db::commit();
                 return modelReMsg(-4, '', '下单频繁，请稍后再下-4！');
             }
-            $db::startTrans();
-            $db::table("bsa_order_hexiao")
-                ->where("id", "=", $hxOrderInfo['id'])
-                ->lock(true);
+//            $db::startTrans();
+//            $db::table("bsa_order_hexiao")
+//                ->where("id", "=", $hxOrderInfo['id'])
+//                ->lock(true);
             //查询成功更新余额order_hexiao $order order_hexiao
             $orderWhere['id'] = $hxOrderInfo['id'];
             $updateMatch['last_check_amount'] = (float)$checkRes['data'];
@@ -343,10 +342,8 @@ class OrderhexiaoModel extends Model
                 'updateMatchSuccessRes' => $updateMatchSuccessRes,
             ]), 'AAAMatchSuccessRes');
             if (!$updateMatchSuccessRes) {
-                $db::rollback();
                 return modelReMsg(-5, '', '下单频繁，请稍后再下-5！');
             }
-            $db::commit();
             return modelReMsg(0, $hxOrderInfo, "匹配成功！");
 
         } catch (\Exception $exception) {
