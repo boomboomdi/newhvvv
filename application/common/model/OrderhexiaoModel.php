@@ -240,7 +240,10 @@ class OrderhexiaoModel extends Model
     {
         $db = new Db();
         $db::startTrans();
+        sleep(2);
+        return modelReMsg(-1, '', '无可用下单！');
         try {
+
 //            $hxOrderInfo = $db::table("bsa_order_hexiao")
            $hxOrderInfo = $this
                 ->where('order_amount', '=', $order['amount'])
