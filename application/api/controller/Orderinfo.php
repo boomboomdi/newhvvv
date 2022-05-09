@@ -133,6 +133,7 @@ class Orderinfo extends Controller
                 ->update($updateOrderStatus);
             logs(json_encode([
                 'orderWhere' => $updateWhere,
+                'lockStatus' => $hxOrderInfo,
                 'getUseHxOrderRes' => $getUseHxOrderRes,
                 'updateOrderStatus' => $updateOrderStatus,
                 'localOrderUpdateRes' => $localOrderUpdateRes,
