@@ -304,16 +304,16 @@ class OrderhexiaoModel extends Model
                 $updateHxDataForStop['check_status'] = 0;
                 $updateHxDataForStop['order_desc'] = "不可查单，立即回调" . json_encode($checkRes);
                 $updateHxDataForStopRes = $db::table("bsa_order_hexiao")->where($updateHxWhereForStop)->update($updateHxDataForStop);
+                logs(json_encode([
+                    'action' => 'updateHxWhereForStop',
+                    'orderWhere' => $updateHxWhereForStop,
+                    'updateHxDataForStop' => $updateHxDataForStop,
+                    'checkPhoneAmountNewRes' => $checkRes,
+                    'updateHxDataForStopRes' => $updateHxDataForStopRes,
+                    'getLastSql' => $db::table("bsa_order_hexiao")->getLastSql(),
+                ]), 'ADONTMatchHxDataResFAIL');
                 if (!$updateHxDataForStopRes) {
                     $db::rollback();
-                    logs(json_encode([
-                        'action' => 'updateHxWhereForStop',
-                        'orderWhere' => $updateHxWhereForStop,
-                        'updateHxDataForStop' => $updateHxDataForStop,
-                        'checkPhoneAmountNewRes' => $checkRes,
-                        'updateHxDataForStopRes' => $updateHxDataForStopRes,
-                        'getLastSql' => $db::table("bsa_order_hexiao")->getLastSql(),
-                    ]), 'ADONTDELETEUpdateHxDataForStopResFAIL');
                 }
                 $db::commit();
                 return modelReMsg(-2, '', '下单频繁，请稍后再下-2！');
