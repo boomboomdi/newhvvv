@@ -279,14 +279,20 @@ class OrderhexiaoModel extends Model
 
             $db::commit();  //表事务结束
             $checkRes = $this->checkPhoneAmountNew($checkParam, $hxOrderInfo['order_no']);
+
             $db::startTrans();   //核销单事务开始
             $hxOrderInfo = $db::table("bsa_order_hexiao")
                 ->where("id", "=", $hxOrderInfo['id'])
                 ->lock(true)
                 ->find();
             if (!$hxOrderInfo) {
+                logs(json_encode(['action' => 'getUseHxOrder',
+                    'orderNo' => $order['order_no'],
+                    'hxOrderInfo' => $hxOrderInfo,
+                    'lastSql' => $db::table("bsa_order_hexiao")->getLastSql(),
+                ]), 'getUseHxOrderLockFail');
                 $db::rollback();
-                return modelReMsg(-3, '', '无可用下单！-3');
+                return modelReMsg(-3, '', '无可操作单！-3');
             }
             if ($checkRes['code'] != 0) {
                 //停用该核销单
