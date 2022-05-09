@@ -5,6 +5,7 @@ namespace app\common\model;
 use app\admin\model\CookieModel;
 use app\api\model\OrderLog;
 use app\api\validate\OrderinfoValidate;
+use app\common\model\AsyncModel;
 use think\Db;
 use think\facade\Log;
 use think\Model;
@@ -52,8 +53,55 @@ class OrderhexiaoModel extends Model
     public function checkPhoneAmount($checkParam, $orderNo)
     {
         try {
+
             $checkStartTime = date('Y-m-d H:i:s', time());
             $notifyResult = curlPostJson("http://127.0.0.1:23943/queryBlance", $checkParam);
+//            $notifyResult = curlPostJson("http://www.baidu.com", $checkParam);
+
+            logs(json_encode([
+                'writeOrderNo' => $orderNo,  //核销order_no
+                'param' => $checkParam,
+                "startTime" => $checkStartTime,
+                "endTime" => date("Y-m-d H:i:s", time()),
+                "checkAmountResult" => $notifyResult
+            ]), 'curlCheckPhoneAmount_log');
+            if (isset($checkParam['action']) && $checkParam['action'] == "other") {
+                return $notifyResult;
+            }
+            $notifyResult = json_decode($notifyResult, true);
+            //查询成功
+
+//            $notifyResultData = json_decode($notifyResult['data'], true);
+            //{"code":0,"msg":"SUCCESS","data":{"phone":"13333338889","amount":469.19},"sign":"488864C0AB51AEA0AF551074446FBCEC"}
+            if (!isset($notifyResult['code']) || $notifyResult['code'] != 0) {
+                return modelReMsg(-1, "", $notifyResult['msg']);
+            }
+            return modelReMsg(0, $notifyResult['data']['amount'], '查询成功！');
+        } catch (\Exception $exception) {
+            logs(json_encode(['file' => $exception->getFile(), 'line' => $exception->getLine(), 'errorMessage' => $exception->getMessage()]),
+                'checkPhoneAmountException');
+            return modelReMsg(-11, '', $exception->getMessage());
+        } catch (\Error $error) {
+            logs(json_encode(['file' => $error->getFile(), 'line' => $error->getLine(), 'errorMessage' => $error->getMessage()]),
+                'checkPhoneAmountError');
+            return modelReMsg(-22, "", $error->getMessage());
+        }
+    }
+
+    public function checkPhoneAmountNew($checkParam, $orderNo)
+    {
+        try {
+
+            $checkStartTime = date('Y-m-d H:i:s', time());
+//            $notifyResult = curlPostJson("http://127.0.0.1:23943/queryBlance", $checkParam);
+            $param = array(
+                'url' => "http://127.0.0.1:23943/queryBlance",
+                'data' => $checkParam,
+            );
+            $asyncModel = new AsyncModel();
+            $asyncModel->set_param($param);
+            $notifyResult = $asyncModel->send();
+
 //            $notifyResult = curlPostJson("http://www.baidu.com", $checkParam);
 
             logs(json_encode([
@@ -209,10 +257,10 @@ class OrderhexiaoModel extends Model
                 ->order("add_time asc")
                 ->lock(true)
                 ->find();
-            logs(json_encode(['action' => 'getUseHxOrder',
-                'orderNo' => $order['order_no'],
-                'hxOrderInfo' => $hxOrderInfo
-            ]), 'getUseHxOrder_log');
+//            logs(json_encode(['action' => 'getUseHxOrder',
+//                'orderNo' => $order['order_no'],
+//                'hxOrderInfo' => $hxOrderInfo
+//            ]), 'getUseHxOrder_log');
 
             if (!$hxOrderInfo) {
                 $db::rollback();
@@ -226,7 +274,7 @@ class OrderhexiaoModel extends Model
             $checkParam['phone'] = $hxOrderInfo['account'];
             $checkParam['order_no'] = $hxOrderInfo['account'];
             $checkParam['action'] = 'first';
-            $checkRes = $this->checkPhoneAmount($checkParam, $hxOrderInfo['order_no']);
+            $checkRes = $this->checkPhoneAmountNew($checkParam, $hxOrderInfo['order_no']);
             if ($checkRes['code'] != 0) {
                 //停用该核销单
                 $updateHxWhereForStop['id'] = $hxOrderInfo['id'];

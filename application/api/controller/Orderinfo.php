@@ -21,7 +21,7 @@ class Orderinfo extends Controller
     public function order(Request $request)
     {
         session_write_close();
-        sleep(10);
+//        sleep(10);
 //        return apiJsonReturn(11, '测试Sesion');
 
         $data = @file_get_contents('php://input');

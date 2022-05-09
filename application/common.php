@@ -272,7 +272,28 @@ function curlPost($url = '', $postData = '', $options = array())
     return $data;
 }
 
-function curlPostJson($url = '', $postData = '', $options = array())
+function curlPostJsonNew($url = '', $postData = '', $options = array())
+{
+    $headers = [
+        "Content-Type: application/json;charset=UTF-8",
+    ];
+    $handle = curl_multi_init();
+    $curl = curl_init();
+
+    curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($curl, CURLOPT_URL, $url);
+    curl_setopt($curl, CURLOPT_HEADER, $this->curlopt_header);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($curl, CURLOPT_TIMEOUT, $this->curlopt_timeout);
+
+    curl_setopt($curl, CURLOPT_POST, 1);
+    curl_setopt($curl, CURLOPT_POSTFIELDS, $postData);
+
+    curl_multi_add_handle($handle, $curl);
+    curl_multi_exec($handle, $flag);
+}
+
+function curlPostJson1($url = '', $postData = '', $options = array())
 {
     if (is_array($postData)) {
         $postData = json_encode($postData);
@@ -298,19 +319,47 @@ function curlPostJson($url = '', $postData = '', $options = array())
     curl_close($ch);
     return $data;
 }
-
-function Post_curl($urls = array(),$callback = '', $post_data = array()){
+function curlPostJson2($url = '', $postData = '', $options = array())
+{
+//    if(!is_array($this->param) || !count($this->param))
+//    {
+//        return False;
+//    }
+    $curl = $ret = array();
+    $handle = curl_multi_init();
+    foreach ($this->param as $k => $v)
+    {
+        $param = $this->check_param($v);
+        if (!$param) $curl[$k] = False;
+        else $curl[$k] = $this->add_handle($handle, $param);
+    }
+    $this->exec_handle($handle);
+    foreach ($this->param as $k => $v)
+    {
+        if ($curl[$k])
+        {
+            $ret[$k] = curl_multi_getcontent($curl[$k]);
+            curl_multi_remove_handle($handle, $curl[$k]);
+        } else {
+            $ret[$k] = False;
+        }
+    }
+    curl_multi_close($handle);
+    return $ret;
+}
+function Post_curl($urls = array(), $callback = '', $post_data = array())
+{
     $response = array();
     if (empty($urls)) {
         return $response;
     }
     $chs = curl_multi_init();
     $map = array();
-    foreach($urls as $url){
+    foreach ($urls as $url) {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt ($ch, CURLOPT_POST, 1);
-        if($post_data != ''){
+        curl_setopt($ch, CURLOPT_POST, 1);
+        if ($post_data != '') {
             curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
         }
         curl_setopt($ch, CURLOPT_TIMEOUT, 1);
@@ -320,9 +369,11 @@ function Post_curl($urls = array(),$callback = '', $post_data = array()){
         curl_multi_add_handle($chs, $ch);
         $map[strval($ch)] = $url;
     }
-    do{
+    do {
         if (($status = curl_multi_exec($chs, $active)) != CURLM_CALL_MULTI_PERFORM) {
-            if ($status != CURLM_OK) { break; } //如果没有准备就绪，就再次调用curl_multi_exec
+            if ($status != CURLM_OK) {
+                break;
+            } //如果没有准备就绪，就再次调用curl_multi_exec
             while ($done = curl_multi_info_read($chs)) {
                 $info = curl_getinfo($done["handle"]);
                 $error = curl_error($done["handle"]);
@@ -341,8 +392,7 @@ function Post_curl($urls = array(),$callback = '', $post_data = array()){
                 }
             }
         }
-    }
-    while($active > 0); //还有句柄处理还在进行中
+    } while ($active > 0); //还有句柄处理还在进行中
     curl_multi_close($chs);
     return $response;
 }
