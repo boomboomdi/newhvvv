@@ -240,8 +240,6 @@ class OrderhexiaoModel extends Model
     {
         $db = new Db();
         $db::startTrans();
-        sleep(2);
-        return modelReMsg(-1, '', '无可用下单！');
         try {
 
 //            $hxOrderInfo = $db::table("bsa_order_hexiao")
@@ -255,11 +253,14 @@ class OrderhexiaoModel extends Model
                 ->order("add_time asc")
                 ->lock(true)
                 ->find();
+
             logs(json_encode(['action' => 'getUseHxOrder',
                 'orderNo' => $order['order_no'],
                 'hxOrderInfo' => $hxOrderInfo
             ]), 'getUseHxOrder_log');
 
+            sleep(2);
+            return modelReMsg(-1, '', '无可用下单！');
             if (!$hxOrderInfo) {
                 $db::rollback();
                 return modelReMsg(-1, '', '无可用下单！');
