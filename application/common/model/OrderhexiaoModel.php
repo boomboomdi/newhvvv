@@ -240,7 +240,7 @@ class OrderhexiaoModel extends Model
         $db = new Db();
         $db::startTrans();
         try {
-            $hxOrderInfo = $this
+            $hxOrderInfo = $db::table("bsa_order_hexiao")
                 ->where('order_amount', '=', $order['amount'])
                 ->where('order_me', '=', null)
                 ->where('status', '=', 0)
@@ -248,17 +248,24 @@ class OrderhexiaoModel extends Model
                 ->where('order_limit_time', '<', time())
 //                ->where('check_status', '=', 0)  //是否查单使用中
                 ->order("add_time asc")
-                ->lock(true)
                 ->find();
 //            logs(json_encode(['action' => 'getUseHxOrder',
 //                'orderNo' => $order['order_no'],
 //                'hxOrderInfo' => $hxOrderInfo
 //            ]), 'getUseHxOrder_log');
 
-            if (!$hxOrderInfo) {
+            if (!$hxOrderInfo||empty($hxOrderInfo)) {
                 $db::rollback();
                 return modelReMsg(-1, '', '无可用下单！');
             }
+//            $hxOrderInfo = $db::table("bsa_order_hexiao")
+//                ->where("id", "=", $lock['id'])
+//                ->lock(true)
+//                ->find();
+//            if (empty($hxOrderInfo)) {
+//                $db::rollback();
+//                return modelReMsg(-1, '', '无可用下单！');
+//            }
             $orderWhere['id'] = $hxOrderInfo['id'];
             $checking['order_status'] = 1;  //使用中
             $checking['check_status'] = 1;   //查询余额中

@@ -825,6 +825,7 @@ class Orderinfo extends Controller
     //结果回调
     public function checkPhoneAmountNotify0076()
     {
+        session_write_close();
         $data = @file_get_contents('php://input');
         $message = json_decode($data, true);
         try {
