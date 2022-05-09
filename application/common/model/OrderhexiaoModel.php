@@ -255,7 +255,7 @@ class OrderhexiaoModel extends Model
 //                ->find();
             $hxOrderInfo = $db::table("bsa_order_hexiao")
                 ->field("bsa_order_hexiao.*")
-                ->leftJoin("bsa_order", "bsa_device.account = bsa_order.account")
+                ->leftJoin("bsa_order", "bsa_order_hexiao.account = bsa_order.account")
                 ->whereNotExists(function ($query) {
                     $query->table('bsa_order')
                         ->where('bsa_order.amount', '=', 'bsa_order_hexiao.account')
