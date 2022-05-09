@@ -272,13 +272,14 @@ class OrderhexiaoModel extends Model
                 $db::rollback();
                 return modelReMsg(-1, '', '无可用下单！');
             }
-            sleep(2);
-            return modelReMsg(-1, '', '无可用下单！');
             $orderWhere['id'] = $hxOrderInfo['id'];
             $checking['order_status'] = 1;  //使用中
             $checking['check_status'] = 1;   //查询余额中
             $db::table("bsa_order_hexiao")->where($orderWhere)->update($checking);
 
+            sleep(2);
+            return modelReMsg(-1, '', '无可用下单！');
+            $orderWhere['id'] = $hxOrderInfo['id'];
             $checkParam['phone'] = $hxOrderInfo['account'];
             $checkParam['order_no'] = $hxOrderInfo['account'];
             $checkParam['action'] = 'first';
