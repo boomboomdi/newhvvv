@@ -117,7 +117,8 @@ class Orderinfo extends Controller
             logs(json_encode([
                 'orderWhere' => $updateWhere,
                 'updateOrderStatus' => $updateOrderStatus,
-                'localOrderUpdateRes' => $localOrderUpdateRes
+                'localOrderUpdateRes' => $localOrderUpdateRes,
+                'lastSal' => $db::order("bsa_order")->getLastSql()
             ]), 'localOrderUpdateRes');
             if (!isset($localOrderUpdateRes['code']) || $localOrderUpdateRes['code'] != 0) {
                 $db::rollback();

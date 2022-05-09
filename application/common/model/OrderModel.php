@@ -256,7 +256,8 @@ class OrderModel extends Model
             logs(json_encode([
                 'orderWhere' => $where,
                 'updateData' => $updateData,
-                'updateRes' => $updateRes
+                'updateRes' => $updateRes,
+                'lastSal' => $db::order("bsa_order")->getLastSql()
             ]), 'localhostUpdateOrder_log');
             $db::commit();
             return modelReMsg(0, "", "更新成功");
