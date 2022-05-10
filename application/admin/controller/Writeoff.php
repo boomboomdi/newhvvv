@@ -22,13 +22,19 @@ class Writeoff extends Base
         if (request()->isAjax()) {
 
             $limit = input('param.limit');
-            $merchantName = input('param.merchant_name'); //核销名称
+            $write_off_name = input('param.write_off_name'); //核销名称
 
             $where = [];
-            if (!empty($merchantName)) {
-                $where[] = ['merchant_name', 'like', $merchantName . '%'];
+//            if (!empty($merchantName)) {
+//                $where[] = ['merchant_name', 'like', $merchantName . '%'];
+//            }
+            if (!empty($writeOffSign)) {
+                $where[] = ['write_off_sign', '=', $writeOffSign . '%'];
             }
-
+            $writeOffSign = session("admin_role_id");
+            if ($writeOffSign == 8) {
+                $where[] = ['write_off_sign', '=', session("admin_user_name")];//默认情况下 登录名就是 核销商标识
+            }
             $writeOffModel = new WriteoffModel();
             $list = $writeOffModel->getWriteoffs($limit, $where);
             if (0 == $list['code']) {
