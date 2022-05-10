@@ -50,21 +50,25 @@ class Index extends Base
         //回调金额
         $payOrderAmount = $db::table("bsa_order")->where('order_status', '=', 1)->sum('actual_amount');
         //核销单总量
-        $tOrderNum = $db::table("bsa_torder_douyin")->count();
+        $tOrderNum = $db::table("bsa_order_hexiao")->count();
         //可下单数量
-        $canOrderTOrderNum = $db::table("bsa_torder_douyin")
-            ->where('url_status', '=', 1)
+        $canOrderTOrderNum = $db::table("bsa_order_hexiao")
             ->where('order_me', '=', null)
-            ->where('status', '=', 1)
-            ->where('get_url_time', '>', time() - 180)
-            ->where('get_url_time', '<', time())->count();
-        //可预拉数量
-        $canPrepareTOrderNum = $db::table("bsa_torder_douyin")
             ->where('status', '=', 0)
-            ->where('get_url_time', '=', 0)
+            ->where('order_status', '=', 0)
+            ->where('limit_time', '>', time())
+            ->count();
+        //可预拉数量
+        $canPrepareTOrderNum = $db::table("bsa_order_hexiao")
+            ->where('order_me', '=', null)
+            ->where('status', '=', 0)
+            ->where('order_status', '=', 0)
+            ->where('limit_time', '>', time())
             ->count();
         //预拉中数量
-        $preparingTOrderNum = $db::table("bsa_torder_douyin")->where('weight', '=', 1)->count();
+        $preparingTOrderNum = $db::table("bsa_order_hexiao")
+            ->where('order_status', '=', 1)
+            ->count();
 
         if (session("admin_role_id") != 1) {
             $orderNum = 10000;
