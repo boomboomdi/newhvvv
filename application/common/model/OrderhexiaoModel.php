@@ -271,6 +271,7 @@ class OrderhexiaoModel extends Model
             $orderWhere['id'] = $hxOrderInfo['id'];
             $checking['order_status'] = 1;  //使用中
             $checking['check_status'] = 1;   //查询余额中
+            $checking['last_check_time'] = time();   //查询上次查询时间
             $checkRes = $db::table("bsa_order_hexiao")->where($orderWhere)->update($checking);
             if (!$checkRes) {
                 $db::rollback();
@@ -283,7 +284,6 @@ class OrderhexiaoModel extends Model
 
             $db::commit();  //表事务结束
             $checkRes = $this->checkPhoneAmountNew($checkParam, $hxOrderInfo['order_no']);
-
 
 //            if (!$hxOrderInfo) {
 //                logs(json_encode(['action' => 'getUseHxOrder',
@@ -343,6 +343,7 @@ class OrderhexiaoModel extends Model
             if (!$updateMatchSuccessRes) {
                 return modelReMsg(-5, '', '下单频繁，请稍后再下-5！');
             }
+            $hxOrderInfo = $db::table("bsa_order_hexiao")->where($orderWhere)->find();
             return modelReMsg(0, $hxOrderInfo, "匹配成功！");
 
         } catch (\Exception $exception) {
