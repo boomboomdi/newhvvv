@@ -119,11 +119,10 @@ class Orderhexiao extends Controller
         $param = json_decode($data, true);
         Log::info('douyin orderInfo first!', $param);
         try {
-            $validate = new OrderdouyinValidate();
-            if (!$validate->scene("order_info")->check($param)) {
+            $validate = new OrderhexiaoValidate();
+            if (!$validate->scene("orderInfo")->check($param)) {
                 return json(msg(-1, '', $validate->getError()));
             }
-
             //验签
             $writeOffModel = new WriteoffModel();
             $writeOff = $writeOffModel->where(['write_off_sign' => $param['write_off_sign']])->find();
@@ -133,22 +132,19 @@ class Orderhexiao extends Controller
             if (md5($param['write_off_sign'] . $param['order_no'] . $param['account'] . $writeOff['token']) != $param['sign']) {
                 return json(msg(-1, '', 'fuck you!'));
             }
-            $orderDouYinModel = new OrderdouyinModel();
+            $orderHXModel = new OrderhexiaoModel();
             $where['account'] = $param['account'];
             $where['order_no'] = $param['order_no'];
-            $res = $orderDouYinModel->getTorderInfo($where);
+            $res = $orderHXModel->where($where)->find();
 
-            if ($res['code'] != 0) {
-                return json(msg('-2', $where['order_no'], $res['msg']));
+            if (!$res) {
+                return json(msg(-2, $where['order_no'], $res['msg']));
             }
-//            $data['order_status'] = $res['data']['order_status']; // 0：等待付款(使用中)1：已付款2：未到账(使用中) 4：未使用
-//            $data['success_amount'] = $res['data']['success_amount']; // 付款金额  1 整型
-            if (isset($res['data']['order_status']) && $res['data']['order_status'] != 1) {
-                if (isset($res['data']['status']) && $res['data']['status'] == 2) {
-                    $res['data']['order_status'] = 5;
-                }
+            if ($res['pay_status'] != 1) {
+                return json(msg($res['pay_status'], $where['order_no'], "success"));
+
             }
-            return json(msg($res['data']['order_status'], $where['order_no'], "success"));
+            return json(msg($res['pay_status'], $where['order_no'], "success"));
 
         } catch (\Exception $exception) {
             logs(json_encode(['param' => $param, 'file' => $exception->getFile(), 'line' => $exception->getLine(), 'errorMessage' => $exception->getMessage()]), 'orderInfo_exception');

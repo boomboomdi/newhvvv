@@ -41,7 +41,7 @@ class OrderhexiaoValidate extends Validate
     ];
     protected $scene = [
         'uploadOrder' => ['write_off_sign', 'order_no', 'order_type', 'account', 'order_amount', 'notify_url', 'limit_time', 'sign'],
-        'order_info' => ['write_off_sign', 'account', 'order_no']
+        'orderInfo' => ['write_off_sign', 'account', 'order_no']
     ];
 
 
