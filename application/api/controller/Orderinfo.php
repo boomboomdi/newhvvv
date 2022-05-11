@@ -200,9 +200,10 @@ class Orderinfo extends Controller
                 if (!$localOrderUpdateRes) {
                     json(msg(-3, "", '下单失败-3'));
                 }
+                $limitTime = (($updateOrderStatus['order_limit_time'] - 720) - time());
                 $returnData['phone'] = $updateOrderStatus['account'];
                 $returnData['amount'] = $orderInfo['amount'];
-                $returnData['limitTime'] = $limitTime;
+                $returnData['limitTime'] = (int)($limitTime);
                 $returnData['imgUrl'] = $imgUrl;
                 json(msg(0, $returnData, 'order_success'));
             } else {
@@ -218,7 +219,8 @@ class Orderinfo extends Controller
                 }
                 $returnData['phone'] = $orderInfo['account'];
                 $returnData['amount'] = $orderInfo['amount'];
-                $returnData['limitTime'] = ($orderInfo['order_limit_time'] - 720);
+                $limitTime = (($orderInfo['order_limit_time'] - 720) - time());
+                $returnData['limitTime'] = (int)($limitTime);
                 $imgUrl = "http://175.178.195.147:9090/upload/tengxun.jpg";
 //                $imgUrl = urlencode($imgUrl);
                 $returnData['imgUrl'] = $imgUrl;
