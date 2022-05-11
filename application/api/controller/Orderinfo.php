@@ -199,7 +199,7 @@ class Orderinfo extends Controller
                 ]), 'localOrderUpdateRes');
 
                 if (!$localOrderUpdateRes) {
-                    json(msg(-3, "", '下单失败-3'));
+                    return json(msg(-3, "", '下单失败-3'));
                 }
                 $limitTime = (($updateOrderStatus['order_limit_time'] - 720) - time());
                 $returnData['phone'] = $updateOrderStatus['account'];
