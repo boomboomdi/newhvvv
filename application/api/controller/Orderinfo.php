@@ -204,7 +204,7 @@ class Orderinfo extends Controller
                 $returnData['amount'] = $orderInfo['amount'];
                 $returnData['limitTime'] = $limitTime;
                 $returnData['imgUrl'] = $imgUrl;
-                return apiJsonReturn(0, "order_success", json_encode($returnData));
+                return apiJsonReturn(0, "order_success", $returnData);
             } else {
                 if (empty($orderInfo['order_no'])) {
                     return json(msg(-2, '', '无此推单！'));
@@ -222,7 +222,7 @@ class Orderinfo extends Controller
                 $imgUrl = "http://175.178.195.147:9090/upload/tengxun.jpg";
                 $imgUrl = urlencode($imgUrl);
                 $returnData['imgUrl'] = $imgUrl;
-                return json(msg(0, json_encode($returnData), "success"));
+                return json(msg(0, $returnData, "success"));
             }
         } catch (\Exception $exception) {
             logs(json_encode(['param' => $message,
