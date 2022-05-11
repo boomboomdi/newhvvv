@@ -52,6 +52,7 @@ class Timecheckorder extends Command
                         if ($lock['check_status'] == 0) {
                             //修改订单查询状态为查询中
                             $updateCheckData['check_status'] = 1;
+                            $updateCheckData['last_use_time'] = time();
                             $db::table("bsa_order")->where($updateCheckWhere)
                                 ->update($updateCheckData);
                             //修改订单查询状态为查询中 end
