@@ -211,7 +211,12 @@ class Orderinfo extends Controller
                 if (($orderInfo['order_limit_time'] - 720) < time()) {
                     return json(msg(-4, '', '订单超时，请重新下单'));
                 }
-
+                $returnData['phone'] = $orderInfo['account'];
+                $returnData['amount'] = $orderInfo['amount'];
+                $returnData['limitTime'] = ($orderInfo['order_limit_time'] - 720);
+                $imgUrl = "http://175.178.195.147:9090/upload/tengxun.jpg";
+                $imgUrl = urlencode($imgUrl);
+                $returnData['imgUrl'] = $imgUrl;
                 return json(msg(0, ($orderInfo['order_limit_time'] - 720), "success"));
             }
 
