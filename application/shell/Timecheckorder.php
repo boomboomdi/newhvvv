@@ -68,6 +68,7 @@ class Timecheckorder extends Command
                                 $db::table("bsa_order")->where($updateCheckWhere)
                                     ->update($updateCheckData);
                             }
+
                             logs(json_encode(['phone' => $v['account'],
                                 "order_no" => $v['order_no'],
                                 "startTime" => $checkStartTime,
@@ -75,10 +76,10 @@ class Timecheckorder extends Command
                                 "getPhoneAmountRes" => $getPhoneAmountRes
                             ]), 'TimecheckordercheckPhoneAmount');
 //                            $db::commit();
-                        }else{
+                        } else {
 //                            $db::rollback();
                         }
-                    }else{
+                    } else {
 //                        $db::rollback();
                     }
                 }

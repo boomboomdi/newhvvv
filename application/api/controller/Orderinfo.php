@@ -18,7 +18,7 @@ class Orderinfo extends Controller
      * @param Request $request
      * @return void
      */
-    public function orderNew(Request $request)
+    public function order(Request $request)
     {
         session_write_close();
 
@@ -338,7 +338,7 @@ class Orderinfo extends Controller
      * @param Request $request
      * @return void
      */
-    public function order(Request $request)
+    public function orderOLD(Request $request)
     {
         session_write_close();
 
