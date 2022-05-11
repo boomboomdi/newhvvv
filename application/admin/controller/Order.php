@@ -32,6 +32,9 @@ class Order extends Base
             if (isset($searchParam['order_me']) && !empty($searchParam['order_me'])) {
                 $where[] = ['order_me', 'like', $searchParam['order_me'] . '%'];
             }
+            if (isset($searchParam['order_pay']) && !empty($searchParam['order_pay'])) {
+                $where[] = ['order_pay', 'like', $searchParam['order_pay'] . '%'];
+            }
 //            if (!empty($startTime)) {
 //                $where[] = ['add_time', '>', strtotime($startTime)];
 //            }
