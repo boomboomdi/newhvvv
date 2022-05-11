@@ -144,14 +144,15 @@ class Orderinfo extends Controller
             $where['order_no'] = $message['order_no'];
             $orderInfo = $orderModel->where($where)->find();
             if (empty($orderInfo)) {
-                return json(msg(-2, '', '无此推单！'));
+                return json(msg(-1, '', '无此推单！'));
             }
             if ($orderInfo['order_status'] == 0) {
                 //2、分配核销单
                 $orderHXModel = new OrderhexiaoModel();
                 $getUseHxOrderRes = $orderHXModel->getUseHxOrder($orderInfo);
                 if (!isset($getUseHxOrderRes['code']) || $getUseHxOrderRes['code'] != 0) {
-                    logs(json_encode(['action' => 'getUseHxOrderRes',
+                    logs(json_encode([
+                        'action' => 'getUseHxOrderRes',
                         'insertOrderData' => $orderInfo,
                         'getUseHxOrderRes' => $getUseHxOrderRes
                     ]), 'getUseHxOrder_log');
@@ -197,6 +198,7 @@ class Orderinfo extends Controller
                 $returnData['phone'] = $updateOrderStatus['account'];
                 $returnData['amount'] = $orderInfo['amount'];
                 $returnData['limitTime'] = $limitTime;
+                $returnData['imgUrl'] = $imgUrl;
                 return apiJsonReturn(0, "order_success", $returnData);
             } else {
                 if (empty($orderInfo['order_no'])) {
