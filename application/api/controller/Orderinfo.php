@@ -135,6 +135,11 @@ class Orderinfo extends Controller
         header('Access-Control-Allow-Methods:GET,POST,PUT,DELETE,OPTIONS,PATCH');
         $data = @file_get_contents('php://input');
         $message = json_decode($data, true);
+
+        logs(json_encode([
+            'action' => 'getOrderInfo',
+            'message' => $message
+        ]), 'getOrderInfo');
         if (!isset($message['order_no']) || empty($message['order_no'])) {
             return json(msg(-1, '', '单号有误！'));
         }
@@ -219,7 +224,6 @@ class Orderinfo extends Controller
                 $returnData['imgUrl'] = $imgUrl;
                 return json(msg(0, ($orderInfo['order_limit_time'] - 720), "success"));
             }
-
         } catch (\Exception $exception) {
             logs(json_encode(['param' => $message,
                 'file' => $exception->getFile(),
