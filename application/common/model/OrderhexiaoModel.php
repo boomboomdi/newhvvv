@@ -233,8 +233,7 @@ class OrderhexiaoModel extends Model
      * @param $where
      * @return array
      */
-    public
-    function getUseHxOrder($order, $getTimes = 1)
+    public function getUseHxOrder($order, $getTimes = 1)
     {
         $db = new Db();
         $db::startTrans();
@@ -479,11 +478,12 @@ class OrderhexiaoModel extends Model
     public
     function localUpdateHXOrder($where, $updateData)
     {
-        $this->startTrans();
+        $db = new Db();
+        $db::startTrans();
         try {
-            $orderHxInfo = $this->where($where)->lock(true)->find();
+            $orderHxInfo = $db::table("bsa_order_hexiao")->where($where)->lock(true)->find();
             if (!$orderHxInfo) {
-                $this->rollback();
+                $db::rollback();
                 logs(json_encode([
                     'orderWhere' => $where,
                     'updateData' => $updateData,
@@ -492,13 +492,14 @@ class OrderhexiaoModel extends Model
                 return modelReMsg(-1, "", "更新失败!");
             }
             $updateData['order_desc'] = "订单冻结.等待第" . $orderHxInfo['use_times'] . "使用!";
-            $updateRes = $this->where($where)->update($updateData);
+            $updateRes = $db::table("bsa_order_hexiao")->where($where)->update($updateData);
             if (!$updateRes) {
-                $this->rollback();
+                $db::rollback();
                 logs(json_encode([
                     'orderWhere' => $where,
                     'updateData' => $updateData,
-                    'updateRes' => $updateRes
+                    'updateRes' => $updateRes,
+                    'updateSql' => $db::table("bsa_order_hexiao")->getLastSql(),
                 ]), 'localUpdateHXOrderFail_log');
                 return modelReMsg(-2, "", "更新失败");
             }
@@ -508,18 +509,18 @@ class OrderhexiaoModel extends Model
 //                'updateRes' => $updateRes
 //            ]), 'localhostUpdateHxOrder');
 
-            $this->commit();
+            $db::commit();
             return modelReMsg(0, "", "更新成功");
 
         } catch (\Exception $exception) {
-            $this->rollback();
+            $db::rollback();
             logs(json_encode(['file' => $exception->getFile(),
                 'line' => $exception->getLine(),
                 'errorMessage' => $exception->getMessage()
             ]), 'localUpdateHXOrderException');
             return modelReMsg(-11, "", $exception->getMessage());
         } catch (\Error $error) {
-            $this->rollback();
+            $db::rollback();
             logs(json_encode([
                 'file' => $error->getFile(),
                 'line' => $error->getLine(),
