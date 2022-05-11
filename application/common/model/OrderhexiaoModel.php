@@ -260,7 +260,8 @@ class OrderhexiaoModel extends Model
 //                })->find();
             logs(json_encode(['action' => 'getUseHxOrder',
                 'orderNo' => $order['order_no'],
-                'hxOrderInfo' => $hxOrderInfo
+                'hxOrderInfo' => $hxOrderInfo,
+                'lastSql' => $db::table("bsa_order_hexiao")->getLastSql(),
             ]), 'getUseHxOrder_log');
 
             if (!$hxOrderInfo) {

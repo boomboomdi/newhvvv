@@ -18,7 +18,7 @@ class Orderinfo extends Controller
      * @param Request $request
      * @return void
      */
-    public function order(Request $request)
+    public function orderNew(Request $request)
     {
         session_write_close();
 
@@ -262,9 +262,9 @@ class Orderinfo extends Controller
             }
             $db = new Db();
             $checkResult = "第" . ($orderInfo['check_times'] + 1) . "次查询结果" . $message['amount'] . "(" . date("Y-m-d H:i:s") . ")";
-            $nextCheckTime = time() + 40;
+            $nextCheckTime = time() + 90;
             if ($orderInfo['check_times'] > 3) {
-                $nextCheckTime = time() + 50;
+                $nextCheckTime = time() + 90;
             }
             if ($message['check_status'] != 1) {
                 $updateCheckTimesRes = $db::table("bsa_order")->where($orderWhere)
@@ -338,7 +338,7 @@ class Orderinfo extends Controller
      * @param Request $request
      * @return void
      */
-    public function orderOld(Request $request)
+    public function order(Request $request)
     {
         session_write_close();
 

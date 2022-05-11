@@ -43,7 +43,7 @@ class Timerestarthxorder extends Command
                     $updateHXOrderData['order_status'] = 0;
                     $updateHXOrderData['status'] = 0;
                     $updateHXOrderData['last_use_time'] = time();
-                    $updateHXOrderData['order_me'] = " ";
+                    $updateHXOrderData['order_me'] = null;
                     $updateHXOrderData['use_time'] = 0;
                     $updateHXOrderData['order_limit_time'] = 0;
                     $updateHXOrderData['order_desc'] = "等待第" . ($v['use_times'] + 1) . "次使用";
