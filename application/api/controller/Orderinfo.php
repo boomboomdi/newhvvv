@@ -165,7 +165,7 @@ class Orderinfo extends Controller
                     $updateOrderStatus['last_use_time'] = time();
                     $updateOrderStatus['order_desc'] = "下单失败|" . $getUseHxOrderRes['msg'];
                     $orderModel->where('order_no', $orderInfo['order_no'])->update($updateOrderStatus);
-                    return apiJsonReturn(10010, $getUseHxOrderRes['msg']);
+                    return json(msg(10010, '', $getUseHxOrderRes['msg']));
                 }
                 $updateOrderStatus['order_status'] = 4;   //等待支付状态
                 $updateOrderStatus['check_times'] = 1;   //下单成功就查询一次
@@ -198,7 +198,7 @@ class Orderinfo extends Controller
                 ]), 'localOrderUpdateRes');
 
                 if (!$localOrderUpdateRes) {
-                    return apiJsonReturn(19999, "下单失败-9");
+                    json(msg(19999, "", '下单失败-9'));
                 }
                 $returnData['phone'] = $updateOrderStatus['account'];
                 $returnData['amount'] = $orderInfo['amount'];
