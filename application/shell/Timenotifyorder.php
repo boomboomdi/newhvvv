@@ -48,7 +48,7 @@ class Timenotifyorder extends Command
                         logs(json_encode(['orderData' => $v,
                             "time" => date("Y-m-d H:i:s", time()),
                             "notifyRes" => json_encode($notifyOrderRes),
-                        ]), 'ADONTDELETETimeOrderNotifyFail');
+                        ]), 'ADONTDELETENotifyOrderFail');
                     }
                     $notifying['do_notify'] = 0;
                     $db::table('bsa_order')->where($orderWhere)->update($notifying);

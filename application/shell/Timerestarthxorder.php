@@ -41,6 +41,7 @@ class Timerestarthxorder extends Command
                 foreach ($orderHXData as $k => $v) {
                     $orderWhere['id'] = $v['id'];
                     $updateHXOrderData['order_status'] = 0;
+                    $updateHXOrderData['status'] = 0;
                     $updateHXOrderData['last_use_time'] = time();
                     $updateHXOrderData['order_me'] = " ";
                     $updateHXOrderData['use_time'] = 0;
