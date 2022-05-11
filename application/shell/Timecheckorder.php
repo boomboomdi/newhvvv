@@ -44,10 +44,10 @@ class Timecheckorder extends Command
             $totalNum = count($orderData);
             if ($totalNum > 0) {
                 foreach ($orderData as $k => $v) {
-                    $db::startTrans();
+//                    $db::startTrans();
                     $updateCheckWhere['order_no'] = $v['order_no'];
 //                    $updateCheckWhere['check_status'] = 0;
-                    $lock = $db::table("bsa_order")->where($updateCheckWhere)->lock(true)->find();
+                    $lock = $db::table("bsa_order")->where($updateCheckWhere)->find();
                     if ($lock) {
                         if ($lock['check_status'] == 0) {
                             //修改订单查询状态为查询中
@@ -73,12 +73,12 @@ class Timecheckorder extends Command
                                 "endTime" => date("Y-m-d H:i:s", time()),
                                 "getPhoneAmountRes" => $getPhoneAmountRes
                             ]), 'TimecheckordercheckPhoneAmount');
-                            $db::commit();
+//                            $db::commit();
                         }else{
-                            $db::rollback();
+//                            $db::rollback();
                         }
                     }else{
-                        $db::rollback();
+//                        $db::rollback();
                     }
                 }
 
