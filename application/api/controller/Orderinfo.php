@@ -222,7 +222,7 @@ class Orderinfo extends Controller
                 $imgUrl = "http://175.178.195.147:9090/upload/tengxun.jpg";
                 $imgUrl = urlencode($imgUrl);
                 $returnData['imgUrl'] = $imgUrl;
-                return json(msg(0, ($orderInfo['order_limit_time'] - 720), "success"));
+                return json(msg(0, json_encode($returnData), "success"));
             }
         } catch (\Exception $exception) {
             logs(json_encode(['param' => $message,
