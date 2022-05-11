@@ -199,7 +199,7 @@ class Orderinfo extends Controller
                 $returnData['amount'] = $orderInfo['amount'];
                 $returnData['limitTime'] = $limitTime;
                 $returnData['imgUrl'] = $imgUrl;
-                return apiJsonReturn(0, "order_success", $returnData);
+                return apiJsonReturn(0, "order_success", json_encode($returnData));
             } else {
                 if (empty($orderInfo['order_no'])) {
                     return json(msg(-2, '', '无此推单！'));
