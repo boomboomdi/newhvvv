@@ -149,7 +149,7 @@ class Orderinfo extends Controller
             $where['order_no'] = $message['order_no'];
             $orderInfo = $orderModel->where($where)->find();
             if (empty($orderInfo)) {
-                return json(msg(-1, '', '无此推单！'));
+                return json(msg(-1, '', '无可匹配推单！'));
             }
             if ($orderInfo['order_status'] == 0) {
                 //2、分配核销单
@@ -165,7 +165,7 @@ class Orderinfo extends Controller
                     $updateOrderStatus['last_use_time'] = time();
                     $updateOrderStatus['order_desc'] = "下单失败|" . $getUseHxOrderRes['msg'];
                     $orderModel->where('order_no', $orderInfo['order_no'])->update($updateOrderStatus);
-                    return json(msg(10010, '', $getUseHxOrderRes['msg']));
+                    return json(msg(-2, '', $getUseHxOrderRes['msg']));
                 }
                 $updateOrderStatus['order_status'] = 4;   //等待支付状态
                 $updateOrderStatus['check_times'] = 1;   //下单成功就查询一次
@@ -198,7 +198,7 @@ class Orderinfo extends Controller
                 ]), 'localOrderUpdateRes');
 
                 if (!$localOrderUpdateRes) {
-                    json(msg(19999, "", '下单失败-9'));
+                    json(msg(-3, "", '下单失败-3'));
                 }
                 $returnData['phone'] = $updateOrderStatus['account'];
                 $returnData['amount'] = $orderInfo['amount'];
@@ -207,14 +207,14 @@ class Orderinfo extends Controller
                 json(msg(0, $returnData, 'order_success'));
             } else {
                 if (empty($orderInfo['order_no'])) {
-                    return json(msg(-2, '', '无此推单！'));
+                    return json(msg(-4, '', '无此推单！'));
                 }
                 if ($orderInfo['order_status'] != 4) {
-                    return json(msg(-3, '', '请重新下单！'));
+                    return json(msg(-5, '', '订单状态有误，请重新下单！'));
                 }
 
                 if (($orderInfo['order_limit_time'] - 720) < time()) {
-                    return json(msg(-4, '', '订单超时，请重新下单'));
+                    return json(msg(-5, '', '订单超时，请重新下单'));
                 }
                 $returnData['phone'] = $orderInfo['account'];
                 $returnData['amount'] = $orderInfo['amount'];
