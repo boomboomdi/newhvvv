@@ -121,7 +121,7 @@ class Orderinfo extends Controller
             logs(json_encode(['file' => $error->getFile(),
                 'line' => $error->getLine(), 'errorMessage' => $error->getMessage()
             ]), 'orderError');
-            return json(msg(-22, '', $error->getMessage() . $error->getLine()));
+            return json(msg(-22, '', "接口异常!-22"));
         } catch (\Exception $exception) {
 
             logs(json_encode(['file' => $exception->getFile(),
@@ -129,7 +129,7 @@ class Orderinfo extends Controller
                 'errorMessage' => $exception->getMessage(),
                 'lastSql' => $db::table('bsa_order')->getLastSql(),
             ]), 'orderException');
-            return json(msg(-11, '', $exception->getMessage() . $exception->getFile() . $exception->getLine()));
+            return json(msg(-11, '', "接口异常!-11"));
         }
     }
 
