@@ -99,7 +99,7 @@ class Statistics extends Base
                         ->where("order_amount", "=", $vo['order_amount'])
                         ->where("", "=", $vo['order_amount'])
                         ->find()['totalPayOrderAmount'];
-                    $totalPayOrderAmount += $totalPayOrderAmount;
+                    $totalPayOrderAmount +=  $data[$key]['totalPayOrderAmount'];
 
                 }
                 $total['order_amount'] = '总统计';
