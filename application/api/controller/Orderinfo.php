@@ -123,7 +123,6 @@ class Orderinfo extends Controller
             ]), 'orderError');
             return json(msg(-22, '', "接口异常!-22"));
         } catch (\Exception $exception) {
-
             logs(json_encode(['file' => $exception->getFile(),
                 'line' => $exception->getLine(),
                 'errorMessage' => $exception->getMessage(),
