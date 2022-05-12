@@ -27,7 +27,8 @@
                 <div class="layui-inline">
                     <label class="layui-form-label">操作日期</label>
                     <div class="layui-input-block">
-                        <input type="text" name="startTime" placeholder="默认当天00:00:00" autocomplete="off" class="layui-input" id="startTime">
+                        <input type="text" name="startTime" placeholder="默认当天00:00:00" autocomplete="off"
+                               class="layui-input" id="startTime">
                     </div>
                 </div>
                 <div class="layui-inline">
@@ -106,11 +107,11 @@
     function renderTable() {
         layTool.table("#LAY-user-table", "/admin/statistics/index", [
             [{
-                field: "write_off_sign",
-                title: "核销商"
-            }, {
                 field: "order_amount",
                 title: "金额",
+            }, {
+                field: "write_off_sign",
+                title: "核销商"
             }, {
                 field: "orderTotalNum",
                 title: "推单数量",
