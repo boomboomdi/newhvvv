@@ -42,16 +42,16 @@ class Orderinfo extends Controller
             //验证商户
             $token = $db::table('bsa_merchant')->where('merchant_sign', '=', $message['merchant_sign'])->find()['token'];
             if (empty($token)) {
-                return apiJsonReturn(10001, "商户验证失败！");
+                return apiJsonReturn(-2, "商户验证失败！");
             }
             $sig = md5($message['merchant_sign'] . $message['order_no'] . $message['amount'] . $message['time'] . $token);
             if ($sig != $message['sign']) {
                 logs(json_encode(['orderParam' => $message, 'doMd5' => $sig]), 'orderParam_signfail');
-                return apiJsonReturn(10006, "验签失败！");
+                return apiJsonReturn(-3, "验签失败！");
             }
             $orderFind = $db::table('bsa_order')->where('order_no', '=', $message['order_no'])->count();
             if ($orderFind > 0) {
-                return apiJsonReturn(11001, "单号重复！");
+                return apiJsonReturn(-4, "单号重复！");
             }
 
             //$user_id = $message['user_id'];  //用户标识
@@ -65,7 +65,7 @@ class Orderinfo extends Controller
             }
             $orderNoFind = $db::table('bsa_order')->where('order_no', '=', $message['order_no'])->find();
             if (!empty($orderNoFind)) {
-                return apiJsonReturn(10066, "该订单号已存在！");
+                return apiJsonReturn(-5, "该订单号已存在！");
             }
             $hxOrderCount = $db::table("bsa_order_hexiao")
                 ->where('order_amount', '=', $message['amount'])
@@ -110,10 +110,10 @@ class Orderinfo extends Controller
                     'createOrderOne' => $createOrderOne,
                     'lastSal' => $db::order("bsa_order")->getLastSql()
                 ]), 'addOrderFail_log');
-                return apiJsonReturn(10008, $createOrderOne['msg'] . $createOrderOne['code']);
+                return apiJsonReturn(-6, $createOrderOne['msg'] . $createOrderOne['code']);
             }
             if ($hxOrderCount == 0) {
-                return apiJsonReturn(10099, "下单失败无可匹配订单！");
+                return apiJsonReturn(-7, "下单失败无可匹配订单！");
             }
             return apiJsonReturn(10000, "下单成功", $url);
         } catch (\Error $error) {

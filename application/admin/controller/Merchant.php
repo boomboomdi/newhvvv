@@ -86,6 +86,7 @@ class Merchant extends Base
 
             $param['merchant_password'] = makePassword($param['merchant_password']);
             $param['merchant_validate_password'] = makePassword($param['merchant_validate_password']);
+            $param['token'] = makePassword($param['merchant_validate_password']);
 
             $admin = new MerchantModel();
             $res = $admin->addMerchant($param);
