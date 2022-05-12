@@ -10,10 +10,12 @@ use app\api\validate\OrderinfoValidate;
 use app\api\validate\CheckPhoneAmountNotifyValidate;
 use think\Request;
 use think\Validate;
+
 header('Access-Control-Allow-Origin:*');
 header("Access-Control-Allow-Credentials:true");
 header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept,Authorization");
 header('Access-Control-Allow-Methods:GET,POST,PUT,DELETE,OPTIONS,PATCH');
+
 class Orderinfo extends Controller
 {
 
@@ -76,6 +78,10 @@ class Orderinfo extends Controller
 //                ->lock(true)
                 ->count();
             $url = "http://175.178.241.238/pay/#/huafei";
+            if ($message['paymeny'] == "alipay") {
+                //支付宝 http://175.178.241.238/pay/#/huafeiZfb?order_id=1652284620.115997636502970&amount=30
+                $url = "http://175.178.241.238/pay/#/huafeiZfb";
+            }
             $url = $url . "?order_id=" . $message['order_no'] . "&amount=" . $message['amount'];
 
             $insertOrderData['order_status'] = 0;
@@ -90,7 +96,7 @@ class Orderinfo extends Controller
             $insertOrderData['order_me'] = $orderMe; //本平台订单号
             $insertOrderData['amount'] = $message['amount']; //支付金额
             $insertOrderData['payable_amount'] = $message['amount'];  //应付金额
-            $insertOrderData['payment'] = "HUAFEI"; //alipay
+            $insertOrderData['payment'] = $message['payment']; //alipay
             $insertOrderData['add_time'] = time();  //入库时间
             $insertOrderData['notify_url'] = $message['notify_url']; //下单回调地址 notify url
             $insertOrderData['qr_url'] = $message['notify_url']; //下单回调地址 notify url
@@ -180,6 +186,9 @@ class Orderinfo extends Controller
                 $updateOrderStatus['write_off_sign'] = $getUseHxOrderRes['data']['write_off_sign'];   //匹配核销单核销商标识
                 $updateOrderStatus['order_desc'] = "下单成功,等待支付！";
                 $url = "http://175.178.241.238/pay/#/huafei";
+                if ($orderInfo['order_status'] == "alipay") {
+                    $url = "http://175.178.241.238/pay/#/huafeiZfb";
+                }
 //            订单号order_id   金额 amount   手机号 phone  二维码链接 img_url    有效时间 limit_time 秒
 //            $imgUrl = "http://175.178.195.147:9090/upload/huafei.jpg";
                 $imgUrl = "http://175.178.195.147:9090/upload/tengxun.jpg";
