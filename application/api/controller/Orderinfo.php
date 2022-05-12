@@ -80,7 +80,8 @@ class Orderinfo extends Controller
             $url = "http://175.178.241.238/pay/#/huafei";
             if (isset($message['payment']) && $message['payment'] == "alipay") {
                 //支付宝 http://175.178.241.238/pay/#/huafeiZfb?order_id=1652284620.115997636502970&amount=30
-                $url = "http://175.178.241.238/pay/#/huafeiZfb";
+//                $url = "http://175.178.241.238/pay/#/huafeiZfb";
+                $url = "http://175.178.241.238/pay/#/huafeiNewZfb";
             }
             $url = $url . "?order_id=" . $message['order_no'] . "&amount=" . $message['amount'];
 
@@ -186,11 +187,12 @@ class Orderinfo extends Controller
                 $updateOrderStatus['order_desc'] = "下单成功,等待支付！";
                 $url = "http://175.178.241.238/pay/#/huafei";
                 if (isset($orderInfo['payment']) && $orderInfo['payment'] == "alipay") {
-                    $url = "http://175.178.241.238/pay/#/huafeiZfb";
+                    $url = "http://175.178.241.238/pay/#/huafeiNewZfb";
                 }
 //            订单号order_id   金额 amount   手机号 phone  二维码链接 img_url    有效时间 limit_time 秒
 //            $imgUrl = "http://175.178.195.147:9090/upload/huafei.jpg";
-                $imgUrl = "http://175.178.195.147:9090/upload/tengxun.jpg";
+//                $imgUrl = "http://175.178.195.147:9090/upload/tengxun.jpg";
+                $imgUrl = "http://175.178.195.147:9090/upload/weixin513.jpg";
 //                $imgUrl = urlencode($imgUrl);
                 $limitTime = ($updateOrderStatus['order_limit_time'] - 720);
                 $url = $url . "?order_id=" . $message['order_no'] . "&amount=" . $orderInfo['amount'] . "&phone=" . $getUseHxOrderRes['data']['account'] . "&img_url=" . $imgUrl . "&limit_time=" . $limitTime;
@@ -230,7 +232,9 @@ class Orderinfo extends Controller
                 $returnData['amount'] = $orderInfo['amount'];
                 $limitTime = (($orderInfo['order_limit_time'] - 720) - time());
                 $returnData['limitTime'] = (int)($limitTime);
-                $imgUrl = "http://175.178.195.147:9090/upload/tengxun.jpg";
+//                $imgUrl = "http://175.178.195.147:9090/upload/tengxun.jpg";
+
+                $imgUrl = "http://175.178.195.147:9090/upload/weixin513.jpg";
 //                $imgUrl = urlencode($imgUrl);
                 $returnData['imgUrl'] = $imgUrl;
                 return json(msg(0, $returnData, "success"));
