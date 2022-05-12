@@ -30,6 +30,9 @@ class Orderhexiao extends Base
 //            $endTime = input('param.end_time');
 
             $where = [];
+            if (!empty(input('param.write_off_sign'))) {
+                $where[] = ['write_off_sign', '=', input('param.write_off_sign')];
+            }
             if (!empty($order_no)) {
                 $where[] = ['order_no', '=', $order_no];
             }

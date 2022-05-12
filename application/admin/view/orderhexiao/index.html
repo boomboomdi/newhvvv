@@ -39,6 +39,13 @@
                 </div>
 
                 <div class="layui-inline">
+                    <label class="layui-form-label">核销标识</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="write_off_sign" placeholder="请输入" autocomplete="off"
+                               class="layui-input">
+                    </div>
+                </div>
+                 <div class="layui-inline">
                     <label class="layui-form-label">账号</label>
                     <div class="layui-input-block">
                         <input type="text" name="account" placeholder="请输入" autocomplete="off"
@@ -55,6 +62,7 @@
 
         <div class="layui-card-body">
 
+            <table id="LAY-user-table" lay-filter="LAY-user-table"></table>
             <table id="LAY-user-table" lay-filter="LAY-user-table"></table>
             <script type="text/html" id="statusTpl">
                 {{#  if(d.status == 0){ }}

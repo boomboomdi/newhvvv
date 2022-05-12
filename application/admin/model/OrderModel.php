@@ -29,7 +29,31 @@ class OrderModel extends Model
         try {
             $res = $this->field($prefix . 'order.*')
                 ->where($where)
-                ->order('id', 'desc')->paginate($limit);
+                ->order('id', 'desc')
+                ->paginate($limit);
+
+        } catch (\Exception $e) {
+
+            return modelReMsg(-1, '', $e->getMessage());
+        }
+        return modelReMsg(0, $res, 'ok');
+    }
+
+    /**
+     * 获取统计数据
+     * @param $limit
+     * @param $where
+     * @return array
+     */
+    public function getStatistics($limit, $where)
+    {
+        $prefix = config('database.prefix');
+
+        try {
+            $res = $this->field($prefix . 'order.*')
+                ->where($where)
+                ->order('id', 'desc')
+                ->paginate($limit);
 
         } catch (\Exception $e) {
 

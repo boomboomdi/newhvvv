@@ -120,4 +120,21 @@ class WriteoffModel extends Model
         return modelReMsg(0, '', '删除成功');
     }
 
+    /**
+     * 获取核销商信息
+     * @param $writeoffId
+     * @return array
+     */
+    public function getWriteOffBySign($writeoffSign)
+    {
+        try {
+
+            $info = $this->where('write_off_sign', $writeoffSign)->findOrEmpty()->toArray();
+        }catch (\Exception $e) {
+
+            return modelReMsg(-1, '', $e->getMessage());
+        }
+
+        return modelReMsg(0, $info, 'ok');
+    }
 }
