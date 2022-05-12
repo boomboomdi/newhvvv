@@ -78,7 +78,7 @@ class Orderinfo extends Controller
 //                ->lock(true)
                 ->count();
             $url = "http://175.178.241.238/pay/#/huafei";
-            if ($message['paymeny'] == "alipay") {
+            if (isset($message['payment']) && $message['payment'] == "alipay") {
                 //支付宝 http://175.178.241.238/pay/#/huafeiZfb?order_id=1652284620.115997636502970&amount=30
                 $url = "http://175.178.241.238/pay/#/huafeiZfb";
             }
@@ -186,7 +186,7 @@ class Orderinfo extends Controller
                 $updateOrderStatus['write_off_sign'] = $getUseHxOrderRes['data']['write_off_sign'];   //匹配核销单核销商标识
                 $updateOrderStatus['order_desc'] = "下单成功,等待支付！";
                 $url = "http://175.178.241.238/pay/#/huafei";
-                if ($orderInfo['order_status'] == "alipay") {
+                if (isset($orderInfo['payment']) && $orderInfo['payment'] == "alipay") {
                     $url = "http://175.178.241.238/pay/#/huafeiZfb";
                 }
 //            订单号order_id   金额 amount   手机号 phone  二维码链接 img_url    有效时间 limit_time 秒
