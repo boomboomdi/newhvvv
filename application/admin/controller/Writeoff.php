@@ -71,7 +71,7 @@ class Writeoff extends Base
                 return ['code' => -1, 'data' => '', 'msg' => $validate->getError()];
             }
 
-//            $param['merchant_password'] = makePassword($param['merchant_password']);
+            $param['write_off_username'] = $param['write_off_sign'];
 //            $param['merchant_validate_password'] = makePassword($param['merchant_validate_password']);
 
             $writeOffModel = new WriteoffModel();
@@ -101,6 +101,7 @@ class Writeoff extends Base
                 return ['code' => -1, 'data' => '', 'msg' => $validate->getError()];
             }
 
+            $param['write_off_username'] = $param['write_off_sign'];
             $writeOffModel = new WriteoffModel();
             $res = $writeOffModel->editWriteoff($param);
 
