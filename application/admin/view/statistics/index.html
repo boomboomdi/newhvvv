@@ -25,6 +25,12 @@
                     </div>
                 </div>
                 <div class="layui-inline">
+                    <label class="layui-form-label">操作日期</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="startTime" placeholder="默认当天00:00:00" autocomplete="off" class="layui-input" id="startTime">
+                    </div>
+                </div>
+                <div class="layui-inline">
                     <button class="layui-btn layuiadmin-btn-admin" lay-submit lay-filter="LAY-user-back-search">
                         <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
                     </button>
@@ -158,6 +164,8 @@
                 });
         });
     }
+
+    layTool.layDate('#startTime')
 </script>
 </body>
 </html>
