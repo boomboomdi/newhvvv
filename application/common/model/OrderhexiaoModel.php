@@ -243,8 +243,8 @@ class OrderhexiaoModel extends Model
                 ->where('order_me', '=', null)
                 ->where('status', '=', 0)
                 ->where('order_status', '=', 0)
-                ->where('order_limit_time', '<', time())
-                ->where('limit_time', '<', time() - 420) //c
+                ->where('order_limit_time', '=', 0)
+                ->where('limit_time', '>', time() + 420) //当前时间-420s 仍然<limit_time
                 ->where('check_status', '=', 0)  //是否查单使用中
 //                ->order("add_time asc")
                 ->lock(true)
