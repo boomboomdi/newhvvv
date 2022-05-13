@@ -116,7 +116,7 @@ class OrderModel extends Model
             }
             $notifyRes = $this->orderNotifyForMerchant($orderData, $status);
 
-            if ($notifyRes['code'] != 1000) {
+            if ($notifyRes['code'] != 0) {
                 logs(json_encode([
                     'orderData' => $orderData,
                     'status' => $status,
