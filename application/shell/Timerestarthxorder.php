@@ -35,6 +35,7 @@ class Timerestarthxorder extends Command
                 ->where('do_notify', '=', 0)
                 ->where('check_status', '=', 0)
                 ->where('order_limit_time', '<', time())
+                ->where('limit_time', '<', time() - 3600)     //当前时间> limit_time+3600 才重新启用
                 ->select();
             $totalNum = count($orderHXData);
             if ($totalNum > 0) {
