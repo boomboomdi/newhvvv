@@ -25,31 +25,13 @@ class Writeoff extends Base
             $writeOffSign = input('param.write_off_sign'); //核销名称
 
             $where = [];
-//            if (!empty($merchantName)) {
-//                $where[] = ['merchant_name', 'like', $merchantName . '%'];
-//            }
             if (!empty($writeOffSign)) {
-                $where[] = ['write_off_sign', '=', $writeOffSign . '%'];
+                $where[] = ['write_off_sign', '=', $writeOffSign];
             }
 
             $writeOffModel = new WriteoffModel();
             $list = $writeOffModel->getWriteoffs($limit, $where);
             if (0 == $list['code']) {
-//                $data = $list['data'];
-//                foreach ($data as $key => $vo) {
-//                    //查询核销订单量 总
-//                    $data[$key]['order_total'] = (new \app\admin\model\OrderModel())->getAllOrderNumberByMerchantSign($data[$key]['merchant_sign'])['data'];
-//                    //查询核销订单量 支付成功量
-//                    $data[$key]['success_order_total'] = (new \app\admin\model\OrderModel())->getAllOrderSuccessNumberByMerchantSign($data[$key]['merchant_sign'])['data'];
-//                    $data[$key]['success_order_rate'] = makeSuccessRate((int)$data[$key]['success_order_total'], (int)$data[$key]['order_total']);
-//
-//                    //查询核销订单量 总 30分钟
-//                    $startTime = time() - 300;
-//                    $data[$key]['order_total5'] = (new \app\admin\model\OrderModel())->getAllOrderNumberByMerchantSign($data[$key]['merchant_sign'], $startTime)['data'];
-//                    //查询核销订单量 支付成功量 30分钟
-//                    $data[$key]['success_order_total5'] = (new \app\admin\model\OrderModel())->getAllOrderSuccessNumberByMerchantSign($data[$key]['merchant_sign'], $startTime)['data'];
-//                    $data[$key]['success_order_rate5'] = makeSuccessRate((int)$data[$key]['success_order_total'], (int)$data[$key]['order_total']);
-//                }
                 return json(['code' => 0, 'msg' => 'ok', 'count' => $list['data']->total(), 'data' => $list['data']->all()]);
             }
 
