@@ -419,9 +419,7 @@ class Orderinfo extends Controller
             $insertOrderData['payment'] = "HUAFEI"; //alipay
             $insertOrderData['add_time'] = time();  //入库时间
             $insertOrderData['notify_url'] = $message['notify_url']; //下单回调地址 notify url
-
 //
-
             $orderModel = new OrderModel();
             $createOrderOne = $orderModel->addOrder($insertOrderData);
             if (!isset($createOrderOne['code']) || $createOrderOne['code'] != 0) {
