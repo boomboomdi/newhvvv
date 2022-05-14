@@ -90,8 +90,12 @@ class OrderhexiaoModel extends Model
     public function checkPhoneAmountNew($checkParam, $orderNo)
     {
         try {
+//            $ceshiDemoReturn['phone'] = "13283544164";
+//            $ceshiDemoReturn['amount'] = 0.00;
+//            return modelReMsg(0, 0.00, '查询成功！');
             $checkStartTime = date('Y-m-d H:i:s', time());
-            $notifyResult = doSocket("http://127.0.0.1:23943/queryBlance", $checkParam);
+            $notifyResult = curlPostJson("http://127.0.0.1:23943/queryBlance", $checkParam);
+//            $notifyResult = doSocket("http://127.0.0.1:23943/queryBlance", $checkParam);
 //            $notifyResult = doSocket("http://www.baidu.com", $checkParam);
 //            $notifyResult = curlPostJson("http://www.baidu.com", $checkParam);
 
@@ -238,20 +242,38 @@ class OrderhexiaoModel extends Model
         $db = new Db();
         $db::startTrans();
         try {
+            $bsaWriteOff = $db::table("bsa_write_off")->where('status', '=', 1)->column('write_off_sign');
+//            var_dump($bsaWriteOff);exit;
+
             $hxOrderInfo = $db::table("bsa_order_hexiao")
                 ->field("bsa_order_hexiao.*")
-                ->leftJoin("bsa_write_off", "bsa_order_hexiao.write_off_sign = bsa_write_off.write_off_sign")
-                ->where('bsa_order_hexiao.order_amount', '=', $order['amount'])
-                ->where('bsa_order_hexiao.order_me', '=', null)
-                ->where('bsa_order_hexiao.status', '=', 0)
-                ->where('bsa_order_hexiao.order_status', '=', 0)
-                ->where('bsa_order_hexiao.order_limit_time', '<', time())
-                ->where('bsa_order_hexiao.check_status', '=', 0)  //是否查单使用中
-                ->where('bsa_order_hexiao.limit_time', '>', time() + 420) //当前时间-420s 仍然<limit_time
-                ->where('bsa_write_off.status', '=', 1)
+                ->where('order_amount', '=', $order['amount'])
+                ->where('order_me', '=', null)
+                ->where('status', '=', 0)
+                ->where('order_status', '=', 0)
+                ->where('write_off_sign', 'in', $bsaWriteOff)
+                ->where('order_limit_time', '=', 0)
+                ->where('check_status', '=', 0)  //是否查单使用中
+                ->where('limit_time', '>', time() + 420) //当前时间-420s 仍然<limit_time
 //                ->order("add_time asc")
                 ->lock(true)
                 ->find();
+//            var_dump($hxOrderInfo);exit;
+//            $hxOrderInfo = $db::table("bsa_order_hexiao")
+//                ->field("bsa_order_hexiao.*")
+//                ->leftJoin("bsa_write_off", "bsa_order_hexiao.write_off_sign = bsa_write_off.write_off_sign")
+//                ->where('bsa_order_hexiao.order_amount', '=', $order['amount'])
+//                ->where('bsa_order_hexiao.order_me', '=', null)
+//                ->where('bsa_order_hexiao.status', '=', 0)
+//                ->where('bsa_order_hexiao.order_status', '=', 0)
+//                ->where('bsa_order_hexiao.order_limit_time', '=', 0)
+//                ->where('bsa_order_hexiao.check_status', '=', 0)  //是否查单使用中
+//                ->where('bsa_order_hexiao.limit_time', '>', time() + 420) //当前时间-420s 仍然<limit_time
+//                ->where('bsa_write_off.status', '=', 1)
+////                ->order("add_time asc")
+//                ->lock(true)
+//                ->find();
+
 //            $hxOrderInfo = $db::table("bsa_order_hexiao")
 //                ->field("bsa_order_hexiao.*")
 //                ->leftJoin("bsa_order", "bsa_order_hexiao.account = bsa_order.account")
