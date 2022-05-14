@@ -26,7 +26,7 @@ class Writeoff extends Base
 
             $where = [];
             if (!empty($writeOffSign)) {
-                $where[] = ['write_off_sign', '=', $writeOffSign];
+                $where[] = ['write_off_sign', 'like', $writeOffSign . '%'];
             }
 
             $writeOffModel = new WriteoffModel();
