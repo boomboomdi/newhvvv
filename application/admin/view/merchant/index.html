@@ -154,7 +154,7 @@
                                 btn: ['确定', '取消']
                             }, function () {
 
-                                $.getJSON('{:url("merchant/delMerchant")}', {id: e.data.merchant_id}, function (res) {
+                                $.getJSON('{:url("merchant/delMerchant")}', {merchantId: e.data.merchant_id}, function (res) {
 
                                     if (0 == res.code) {
 

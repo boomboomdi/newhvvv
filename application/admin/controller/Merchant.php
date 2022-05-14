@@ -147,7 +147,6 @@ class Merchant extends Base
         if (request()->isAjax()) {
 
             $merchantId = input('param.merchantId');
-
             $admin = new MerchantModel();
             $res = $admin->delMerchant($merchantId);
 

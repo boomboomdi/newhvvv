@@ -112,7 +112,7 @@ class MerchantModel extends Model
                 return modelReMsg(-2, '', '测试商户不可删除');
             }
 
-            $this->where('merchantId', $merchantId)->delete();
+            $this->where('merchant_id', $merchantId)->delete();
         } catch (\Exception $e) {
 
             return modelReMsg(-1, '', $e->getMessage());
