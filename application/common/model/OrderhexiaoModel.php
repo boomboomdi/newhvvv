@@ -239,13 +239,16 @@ class OrderhexiaoModel extends Model
         $db::startTrans();
         try {
             $hxOrderInfo = $db::table("bsa_order_hexiao")
-                ->where('order_amount', '=', $order['amount'])
-                ->where('order_me', '=', null)
-                ->where('status', '=', 0)
-                ->where('order_status', '=', 0)
-                ->where('order_limit_time', '=', 0)
-                ->where('limit_time', '>', time() + 420) //当前时间-420s 仍然<limit_time
-                ->where('check_status', '=', 0)  //是否查单使用中
+                ->field("bsa_order_hexiao.*")
+                ->leftJoin("bsa_write_off", "bsa_order_hexiao.write_off_sign = bsa_write_off.write_off_sign")
+                ->where('bsa_order_hexiao.order_amount', '=', $order['amount'])
+                ->where('bsa_order_hexiao.order_me', '=', null)
+                ->where('bsa_order_hexiao.status', '=', 0)
+                ->where('bsa_order_hexiao.order_status', '=', 0)
+                ->where('bsa_order_hexiao.order_limit_time', '<', time())
+                ->where('bsa_order_hexiao.check_status', '=', 0)  //是否查单使用中
+                ->where('bsa_order_hexiao.limit_time', '>', time() + 420) //当前时间-420s 仍然<limit_time
+                ->where('bsa_write_off.status', '=', 1)
 //                ->order("add_time asc")
                 ->lock(true)
                 ->find();

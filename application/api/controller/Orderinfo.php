@@ -68,17 +68,20 @@ class Orderinfo extends Controller
                 return apiJsonReturn(-5, "该订单号已存在！");
             }
             $hxOrderCount = $db::table("bsa_order_hexiao")
-                ->where('order_amount', '=', $message['amount'])
-                ->where('order_me', '=', null)
-                ->where('status', '=', 0)
-                ->where('order_status', '=', 0)
-                ->where('order_limit_time', '<', time())
-                ->where('check_status', '=', 0)  //是否查单使用中
+                ->field("bsa_order_hexiao.*")
+                ->leftJoin("bsa_write_off", "bsa_order_hexiao.write_off_sign = bsa_write_off.write_off_sign")
+                ->where('bsa_order_hexiao.order_amount', '=', $message['amount'])
+                ->where('bsa_order_hexiao.order_me', '=', null)
+                ->where('bsa_order_hexiao.status', '=', 0)
+                ->where('bsa_write_off.status', '=', 1)
+                ->where('bsa_order_hexiao.order_status', '=', 0)
+                ->where('bsa_order_hexiao.order_limit_time', '<', time())
+                ->where('bsa_order_hexiao.check_status', '=', 0)  //是否查单使用中
 //                ->order("add_time asc")
 //                ->lock(true)
                 ->count();
             $url = "http://175.178.241.238/pay/#/huafei";
-            if (isset($message['payment']) && $message['payment'] == "alipay") {
+            if ($message['payment'] == "alipay") {
                 //支付宝 http://175.178.241.238/pay/#/huafeiZfb?order_id=1652284620.115997636502970&amount=30
 //                $url = "http://175.178.241.238/pay/#/huafeiZfb";
                 $url = "http://175.178.241.238/pay/#/huafeiNewZfb";
