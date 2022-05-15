@@ -46,7 +46,7 @@ class Index extends Base
         $payOrderNum = $db::table("bsa_order")->where('order_status', '=', 1)->count();
         //手动回调数量
         $notifyPayOrderNum = $db::table("bsa_order")->where('order_status', '=', 5)->count();
-        $successOrderRate = makeSuccessRate((int)$orderNum, ((int)$payOrderNum + (int)$notifyPayOrderNum));
+        $successOrderRate = makeSuccessRate(((int)$payOrderNum + (int)$notifyPayOrderNum), (int)$orderNum);
         //回调金额
         $payOrderAmount = $db::table("bsa_order")->where('order_status', '=', 1)->sum('actual_amount');
         //核销单总量
