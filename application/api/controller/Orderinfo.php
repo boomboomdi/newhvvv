@@ -211,7 +211,8 @@ class Orderinfo extends Controller
             if ($orderInfo['order_status'] == 0) {
                 $orderInfo = $db::table("bsa_order")
                     ->where("order_no", "=", $orderInfo['order_no'])
-                    ->lock(true);
+                    ->lock(true)
+                    ->find();
                 if (!$orderInfo || $orderInfo['order_status'] > 0) {
                     logs(json_encode([
                         'action' => 'lockFail',
