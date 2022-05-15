@@ -91,6 +91,8 @@ class Orderinfo extends Controller
             if (!$hxOrderData) {
                 $insertOrderData['order_status'] = 3;
                 $insertOrderData['qr_url'] = "";
+                $db::rollback();
+                return modelReMsg(-5, '', '无可用订单-5！');
             }
 
             $url = "http://175.178.241.238/pay/#/huafei";
