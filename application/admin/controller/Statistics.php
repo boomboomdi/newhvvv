@@ -184,25 +184,29 @@ class Statistics extends Base
 //            $list = $orderModel->getStatistics($limit, $where);
             if (0 < count($list)) {
                 $data = $list;
-                $orderTotalNum = 0; //总推单数量
-                $totalOrderAmount = 0; //推单总额
-                $totalPayOrderAmount = 0; //总支付金额
-                $totalPayOrderAmountNum = 0; //总支付数量
+                $orderTotalNum = 0; //总订单数量
+                $totalOrderAmount = 0; //推订单总额
+                $totalPayOrderAmount = 0; //订单总支付金额
+                $totalPayOrderAmountNum = 0; //订单总支付数量
                 $k = 0;
                 foreach ($data as $key => $vo) {
                     $k++;
 //                    $data[$key]['order_amount'] = $vo['order_amount'];
-                    //推单数量（每个金额）
+                    //订单数量（每个金额）
                     $data[$key]['orderTotalNum'] = $orderModel
-                        ->where($where)
+                        ->where('merchant_sign', "=", $merchantSign)
+                        ->where('add_time', ">", strtotime($startTime))
+                        ->where('add_time', "<", (strtotime($startTime) + 86400))
                         ->where("amount", "=", $vo['amount'])
                         ->count();
                     $orderTotalNum += $data[$key]['orderTotalNum'];
 
-                    //推单总额（每个金额）
+                    //订单总额（每个金额）
                     $data[$key]['totalOrderAmount'] = $orderModel
-                        ->where($where)
                         ->field("SUM(amount) as totalOrderAmount")
+                        ->where('merchant_sign', "=", $merchantSign)
+                        ->where('add_time', ">", strtotime($startTime))
+                        ->where('add_time', "<", (strtotime($startTime) + 86400))
                         ->where("amount", "=", $vo['amount'])
                         ->find()['totalOrderAmount'];
                     $totalOrderAmount += $data[$key]['totalOrderAmount'];
@@ -210,6 +214,7 @@ class Statistics extends Base
                     //总支付数量（每个金额）
                     $data[$key]['totalPayOrderAmountNum'] = $orderModel
                         ->where($where)
+                        ->where('pay_status', '=', 1)
                         ->where("amount", "=", $vo['amount'])
                         ->count();
                     $totalPayOrderAmountNum += $data[$key]['totalPayOrderAmountNum'];
