@@ -96,7 +96,7 @@ class Orderinfo extends Controller
                 return modelReMsg(-5, '', '无可用订单-5！');
             }
 
-//            var_dump($hxOrderData);exit;
+            var_dump($hxOrderData);exit;
             $url = "http://175.178.241.238/pay/#/huafei";
             if ($message['payment'] == "alipay") {
                 //支付宝 http://175.178.241.238/pay/#/huafeiZfb?order_id=1652284620.115997636502970&amount=30
