@@ -27,7 +27,7 @@ class Orderinfobeifen extends Controller
      * @param Request $request
      * @return void
      */
-    public function order(Request $request)
+    public function orderaa(Request $request)
     {
         session_write_close();
 
