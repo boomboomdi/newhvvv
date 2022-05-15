@@ -69,11 +69,7 @@ class Orderhexiao extends Controller
             $isHasWhere['notify_status'] = 0;
             $isHas = $orderHeXModel->where($isHasWhere)->find();
             if ($isHas) {
-                $exception['order_no'] = $param['order_no'];
-                $exception['action_result'] = 'check sign fail!';
-                $exception['content'] = json_encode(['param' => $param]);
-                $exception['desc'] = "有未回调订单" . $isHas['order_no'];
-                $orderExceptionModel->addLog($param['write_off_sign'], 'uploadOrder', $exception);
+
                 return json(msg(-4, '', '该账号有未回调订单!'));
             }
 

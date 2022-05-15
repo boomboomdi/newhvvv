@@ -161,26 +161,26 @@ class Orderinfo extends Controller
         $db = new Db();
         $orderModel = new OrderModel();
         $where['order_no'] = $message['order_no'];
-        $orderInfo = $db::table("bsa_order")->where($where)->lock(true)->find();
+        $orderInfo = $db::table("bsa_order")->where($where)->find();
         if (!$orderInfo) {
             logs(json_encode([
                 'action' => 'lockFail',
                 'message' => $message,
                 'lockRes' => $orderInfo,
             ]), 'getOrderInfoFail');
-            $db::rollback();
             return json(msg(-2, '', '访问繁忙，重新下单！'));
         }
         try {
             if ($orderInfo['order_status'] == 7) {
-                $i = 3;
-                for ($i = 0; $i < 3; $i++) {
+                logs(json_encode([
+                    'action' => 'doMatching',
+                    'message' => $message,
+                ]), 'getOrderInfodoMatching');
+                for ($i = 0; $i < 5; $i++) {
+
                     sleep(3);
                     $orderInfo = $db::table("bsa_order")->where("order_no", "=", $orderInfo['order_no'])->find();
-
-                    if ($orderInfo['order_status'] == 7) {
-                        continue;
-                    } else {
+                    if ($orderInfo['order_status'] != 7) {
                         if ($orderInfo['order_status'] != 4) {
                             return json(msg(-1, '', '订单状态有误，请重新下单！'));
                         }
@@ -201,25 +201,42 @@ class Orderinfo extends Controller
 //                $imgUrl = urlencode($imgUrl);
                         $returnData['imgUrl'] = $imgUrl;
                         return json(msg(0, $returnData, "success"));
+                    } else {
+                        sleep(1);
+                        continue;
                     }
                 }
                 return json(msg(-9, "", "网络异常，请刷新页面"));
             }
-
             if ($orderInfo['order_status'] == 0) {
+                $orderInfo = $db::table("bsa_order")
+                    ->where("order_no", "=", $orderInfo['order_no'])
+                    ->lock(true);
+                if (!$orderInfo || $orderInfo['order_status'] > 0) {
+                    logs(json_encode([
+                        'action' => 'lockFail',
+                        'message' => $message,
+                        'lockRes' => $orderInfo,
+                    ]), 'getOrderInfoFail');
+                    $db::rollback();
+                    return json(msg(-4, '', '匹配繁忙,请刷新或重新下单！-4'));
+                }
+
                 //更新为下当中状态
                 $doMatch['order_status'] = 7;
                 $doMatchRes = $db::table("bsa_order")->where("order_no", "=", $orderInfo['order_no'])->update($doMatch);
-                $db::commit();
                 if (!$doMatchRes) {
                     logs(json_encode([
                         'action' => 'doMatchFail',
                         'message' => $message,
                         'doMatchRes' => $doMatchRes,
+                        'getLastSql' => $db::table("bsa_order")->getLastSql(),
                     ]), 'getOrderInfoFail');
                     $db::rollback();
-                    return json(msg(-4, '', '匹配繁忙'));
+                    return json(msg(-5, '', '匹配繁忙-5'));
                 }
+
+                $db::commit();
                 //2、分配核销单
                 $orderHXModel = new OrderhexiaoModel();
                 $getUseHxOrderRes = $orderHXModel->getUseHxOrder($orderInfo);
@@ -240,10 +257,8 @@ class Orderinfo extends Controller
                             'message' => $message,
                             'updateMatchRes' => $updateMatchRes,
                         ]), 'getOrderInfoFail');
-                        $db::rollback();
                         return json(msg(-5, '', '下单繁忙'));
                     }
-                    $db::commit();
                     return json(msg(-6, '', $getUseHxOrderRes['msg']));
                 }
                 $updateOrderStatus['order_status'] = 4;   //等待支付状态
@@ -300,7 +315,6 @@ class Orderinfo extends Controller
                     return json(msg(-4, '', '无此推单！'));
                 }
                 if ($orderInfo['order_status'] != 4) {
-
                     $db::rollback();
                     return json(msg(-5, '', '订单状态有误，请重新下单！'));
                 }

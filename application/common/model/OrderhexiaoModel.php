@@ -253,13 +253,14 @@ class OrderhexiaoModel extends Model
                 ->field("bsa_order_hexiao.*")
                 ->where('order_amount', '=', $order['amount'])
                 ->where('order_me', '=', null)
+                ->where('use_time', '=', 0)
                 ->where('status', '=', 0)
                 ->where('order_status', '=', 0)
                 ->where('write_off_sign', 'in', $bsaWriteOff)
                 ->where('order_limit_time', '=', 0)
                 ->where('check_status', '=', 0)  //是否查单使用中
                 ->where('limit_time', '>', time() + 420) //当前时间-420s 仍然<limit_time
-                ->order("add_time asc")
+                ->order("add_time  asc")
                 ->lock(true)
                 ->find();
             logs(json_encode(['action' => 'getUseHxOrder',
@@ -287,7 +288,6 @@ class OrderhexiaoModel extends Model
             $checkParam['phone'] = $hxOrderInfo['account'];
             $checkParam['order_no'] = $hxOrderInfo['account'];
             $checkParam['action'] = 'first';
-
             $db::commit();  //表事务结束
             $checkRes = $this->checkPhoneAmountNew($checkParam, $hxOrderInfo['order_no']);
 
