@@ -38,6 +38,7 @@ class Statistics extends Base
             if (empty($startTime)) {
                 $startTime = date("Y-m-d", time());
             }
+            $where[] = ['write_off_sign', '=', $writeOffSign];
             $where[] = ['pay_time', '>', strtotime($startTime)];
             $where[] = ['pay_time', '<', (strtotime($startTime) + 86400)];
 //            if (!empty($writeOffSign)) {
@@ -53,7 +54,6 @@ class Statistics extends Base
             $orderHxModel = new Orderhexiaomodel();
             $list = $orderHxModel->field("order_amount,write_off_sign")
                 ->where($where)
-                ->where("write_off_sign", '=', $writeOffSign)
                 ->group("order_amount")
                 ->order("order_amount desc")
 //                ->select();
@@ -77,12 +77,14 @@ class Statistics extends Base
 //                    $data[$key]['order_amount'] = $vo['order_amount'];
                     //推单数量（每个金额）
                     $data[$key]['orderTotalNum'] = $orderHxModel
+                        ->where($where)
                         ->where("order_amount", "=", $vo['order_amount'])
                         ->count();
                     $orderTotalNum += $data[$key]['orderTotalNum'];
 
                     //推单总额（每个金额）
                     $data[$key]['totalOrderAmount'] = $orderHxModel
+                        ->where($where)
                         ->field("SUM(order_amount) as totalOrderAmount")
                         ->where("order_amount", "=", $vo['order_amount'])
                         ->find()['totalOrderAmount'];
@@ -90,6 +92,7 @@ class Statistics extends Base
 
                     //总支付数量（每个金额）
                     $data[$key]['totalPayOrderAmountNum'] = $orderHxModel
+                        ->where($where)
                         ->where("order_amount", "=", $vo['order_amount'])
                         ->where("", "=", $vo['order_amount'])
                         ->count();
@@ -97,8 +100,8 @@ class Statistics extends Base
                     //总支付金额（每个金额）
                     $data[$key]['totalPayOrderAmount'] = $orderHxModel
                         ->field("SUM(pay_amount) as totalPayOrderAmount")
+                        ->where($where)
                         ->where("order_amount", "=", $vo['order_amount'])
-                        ->where("", "=", $vo['order_amount'])
                         ->find()['totalPayOrderAmount'];
                     $totalPayOrderAmount += $data[$key]['totalPayOrderAmount'];
 
