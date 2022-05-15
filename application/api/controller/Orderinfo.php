@@ -131,7 +131,7 @@ class Orderinfo extends Controller
             ;  // 0、等待下单 1、支付成功（下单成功）！2、支付失败（下单成功）！3、下单失败！4、等待支付（下单成功）！5、已手动回调。
             $insertOrderData['order_me'] = $orderMe; //本平台订单号
 
-            $insertOrderData['order_pay'] = $hxOrderData['data']['order_no'];   //匹配核销单订单号
+            $insertOrderData['order_pay'] = $hxOrderData['order_no'];   //匹配核销单订单号
             $insertOrderData['order_limit_time'] = time() + 900;  //订单表 限制使用时间
             $insertOrderData['next_check_time'] = time() + 90;   //下次查询余额时间
             $insertOrderData['account'] = $hxOrderData['account'];   //匹配核销单账号
