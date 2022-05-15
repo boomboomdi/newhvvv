@@ -30,7 +30,7 @@ class Order extends Base
             if (isset($searchParam['order_no']) && !empty($searchParam['order_no'])) {
                 $where[] = ['order_no', 'like', $searchParam['order_no'] . '%'];
             }
-             if (isset($searchParam['account']) && !empty($searchParam['$account'])) {
+             if (isset($searchParam['account']) && !empty($searchParam['account'])) {
                 $where[] = ['account', '=', $searchParam['account']];
             }
             if (isset($searchParam['order_me']) && !empty($searchParam['order_me'])) {
