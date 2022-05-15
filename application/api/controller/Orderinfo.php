@@ -337,7 +337,7 @@ class Orderinfo extends Controller
                     return json(msg(-7, '', '下单繁忙'));
                 }
                 $limitTime = (($orderInfo['order_limit_time'] - 720) - time());
-                $returnData['phone'] = $updateOrderStatus['account'];
+                $returnData['phone'] = $orderInfo['account'];
                 $returnData['amount'] = $orderInfo['amount'];
                 $returnData['limitTime'] = (int)($limitTime);
                 $returnData['imgUrl'] = $imgUrl;
