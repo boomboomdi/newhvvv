@@ -336,7 +336,7 @@ class Orderinfo extends Controller
                     $orderModel->where('order_no', $orderInfo['order_no'])->update($updateOrderStatus);
                     return json(msg(-7, '', '下单繁忙'));
                 }
-                $limitTime = (($updateOrderStatus['order_limit_time'] - 720) - time());
+                $limitTime = (($orderInfo['order_limit_time'] - 720) - time());
                 $returnData['phone'] = $updateOrderStatus['account'];
                 $returnData['amount'] = $orderInfo['amount'];
                 $returnData['limitTime'] = (int)($limitTime);
