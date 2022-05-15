@@ -71,7 +71,7 @@ class Orderinfo extends Controller
                 return apiJsonReturn(-5, "该订单号已存在！");
             }
             $bsaWriteOff = $db::table("bsa_write_off")->where('status', '=', 1)->column('write_off_sign');
-            if (!empty($orderNoFind)) {
+            if (empty($bsaWriteOff)) {
                 return apiJsonReturn(-6, "无可匹配订单！");
             }
             $db::startTrans();
