@@ -529,11 +529,11 @@ class OrderhexiaoModel extends Model
                 ]), 'localUpdateHXOrderFail_log');
                 return modelReMsg(-2, "", "更新失败");
             }
-//            logs(json_encode([
-//                'orderWhere' => $where,
-//                'updateData' => $updateData,
-//                'updateRes' => $updateRes
-//            ]), 'localhostUpdateHxOrder');
+            logs(json_encode([
+                'orderWhere' => $where,
+                'updateData' => $updateData,
+                'updateRes' => $updateRes
+            ]), 'localhostUpdateHxOrder');
 
             $db::commit();
             return modelReMsg(0, "", "更新成功");
