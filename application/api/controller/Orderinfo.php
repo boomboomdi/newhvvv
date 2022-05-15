@@ -365,7 +365,7 @@ class Orderinfo extends Controller
      * @param Request $request
      * @return void
      */
-    public function orderOLD(Request $request)
+    public function orderOld(Request $request)
     {
         session_write_close();
 
