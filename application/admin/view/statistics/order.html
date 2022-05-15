@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>核单统计</title>
+    <title>商单统计</title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport"
@@ -18,16 +18,16 @@
             <div class="layui-form-item">
 
                 <div class="layui-inline">
-                    <label class="layui-form-label">核销商标识</label>
+                    <label class="layui-form-label">四方标识</label>
                     <div class="layui-input-block">
-                        <input type="text" name="write_off_sign" placeholder="请输入" autocomplete="off"
+                        <input type="text" name="merchant_sign" placeholder="请输入" autocomplete="off"
                                class="layui-input">
                     </div>
                 </div>
                 <div class="layui-inline">
                     <label class="layui-form-label">操作日期</label>
                     <div class="layui-input-block">
-                        <input type="text" name="startTime" placeholder="默认当天00:00:00" autocomplete="off"
+                        <input type="text" name="startTime" placeholder="默认当天00:00:00-23:59:59" autocomplete="off"
                                class="layui-input" id="startTime">
                     </div>
                 </div>
@@ -105,19 +105,19 @@
 
     // 渲染表格
     function renderTable() {
-        layTool.table("#LAY-user-table", "/admin/statistics/index", [
+        layTool.table("#LAY-user-table", "/admin/statistics/order", [
             [{
-                field: "order_amount",
+                field: "amount",
                 title: "金额",
             }, {
-                field: "write_off_sign",
-                title: "核销商"
+                field: "merchant_sign",
+                title: "四方标识"
             }, {
                 field: "orderTotalNum",
-                title: "推单数量",
+                title: "订单数量",
             }, {
                 field: "totalOrderAmount",
-                title: "推单总额",
+                title: "订单总额",
             }, {
                 field: "totalPayOrderAmount",
                 title: "支付金额",
