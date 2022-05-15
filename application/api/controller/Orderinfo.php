@@ -88,6 +88,7 @@ class Orderinfo extends Controller
                 ->order("add_time asc")
                 ->lock(true)
                 ->find();
+            var_dump($hxOrderData);exit;
             if (!$hxOrderData||empty($hxOrderData)) {
                 $insertOrderData['order_status'] = 3;
                 $insertOrderData['qr_url'] = "";
