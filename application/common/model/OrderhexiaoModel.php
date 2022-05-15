@@ -244,12 +244,12 @@ class OrderhexiaoModel extends Model
             $db::startTrans();
             $bsaWriteOff = $db::table("bsa_write_off")->where('status', '=', 1)->column('write_off_sign');
 //
-
             $hxOrderInfo = $db::table("bsa_order_hexiao")
                 ->field("bsa_order_hexiao.*")
                 ->where('order_amount', '=', $order['amount'])
                 ->where('order_me', '=', null)
                 ->where('status', '=', 0)
+                ->where('use_time', '=', 0)
                 ->where('order_status', '=', 0)
                 ->where('write_off_sign', 'in', $bsaWriteOff)
                 ->where('order_limit_time', '=', 0)

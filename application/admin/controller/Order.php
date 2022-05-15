@@ -22,12 +22,16 @@ class Order extends Base
 
             $limit = input('param.limit');
             $orderNo = input('param.order_no');
+            $account = input('param.account');
             $startTime = input('param.start_time');
             $endTime = input('param.end_time');
             $searchParam = input('param.');
             $where = [];
             if (isset($searchParam['order_no']) && !empty($searchParam['order_no'])) {
                 $where[] = ['order_no', 'like', $searchParam['order_no'] . '%'];
+            }
+             if (isset($searchParam['account']) && !empty($searchParam['$account'])) {
+                $where[] = ['account', '=', $searchParam['account']];
             }
             if (isset($searchParam['order_me']) && !empty($searchParam['order_me'])) {
                 $where[] = ['order_me', 'like', $searchParam['order_me'] . '%'];
