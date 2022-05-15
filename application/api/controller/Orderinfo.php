@@ -153,7 +153,7 @@ class Orderinfo extends Controller
             $orderModel = new OrderModel();
 //            $createOrderOne = $orderModel->addOrder($insertOrderData);
             $createOrderOne = $db::table("bsa_order")->insert($insertOrderData);;
-            if (!isset($createOrderOne['code']) || $createOrderOne['code'] != 0) {
+            if (!$createOrderOne) {
                 $db::rollback();
                 logs(json_encode(['action' => 'getUseHxOrderRes',
                     'insertOrderData' => $insertOrderData,
