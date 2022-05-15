@@ -157,6 +157,7 @@ class OrderhexiaoModel extends Model
             }
             //更新核销表  start
             $orderWhere['order_me'] = $orderDataNo['order_me'];
+            $orderWhere['account'] = $orderDataNo['account'];
             $orderWhere['pay_status'] = 0;
 //            $orderWhere['account'] = $orderHxData['account'];
             $payTime = time();
@@ -243,7 +244,7 @@ class OrderhexiaoModel extends Model
         $db::startTrans();
         try {
             $bsaWriteOff = $db::table("bsa_write_off")->where('status', '=', 1)->column('write_off_sign');
-            if(empty($bsaWriteOff)){
+            if (empty($bsaWriteOff)) {
                 $db::rollback();
                 return modelReMsg(-1, '', '无可用下单！-0');
             }
@@ -258,46 +259,22 @@ class OrderhexiaoModel extends Model
                 ->where('order_limit_time', '=', 0)
                 ->where('check_status', '=', 0)  //是否查单使用中
                 ->where('limit_time', '>', time() + 420) //当前时间-420s 仍然<limit_time
-//                ->order("add_time asc")
+                ->order("add_time asc")
                 ->lock(true)
                 ->find();
-//            var_dump($hxOrderInfo);exit;
-//            $hxOrderInfo = $db::table("bsa_order_hexiao")
-//                ->field("bsa_order_hexiao.*")
-//                ->leftJoin("bsa_write_off", "bsa_order_hexiao.write_off_sign = bsa_write_off.write_off_sign")
-//                ->where('bsa_order_hexiao.order_amount', '=', $order['amount'])
-//                ->where('bsa_order_hexiao.order_me', '=', null)
-//                ->where('bsa_order_hexiao.status', '=', 0)
-//                ->where('bsa_order_hexiao.order_status', '=', 0)
-//                ->where('bsa_order_hexiao.order_limit_time', '=', 0)
-//                ->where('bsa_order_hexiao.check_status', '=', 0)  //是否查单使用中
-//                ->where('bsa_order_hexiao.limit_time', '>', time() + 420) //当前时间-420s 仍然<limit_time
-//                ->where('bsa_write_off.status', '=', 1)
-////                ->order("add_time asc")
-//                ->lock(true)
-//                ->find();
-
-//            $hxOrderInfo = $db::table("bsa_order_hexiao")
-//                ->field("bsa_order_hexiao.*")
-//                ->leftJoin("bsa_order", "bsa_order_hexiao.account = bsa_order.account")
-//                ->whereNotExists(function ($query) {
-//                    $query->table('bsa_order')
-//                        ->where('bsa_order.amount', '=', 'bsa_order_hexiao.account')
-//                        ->where('bsa_order.order_status', '<>', 1)   //
-//                    ;
-//                })->find();
             logs(json_encode(['action' => 'getUseHxOrder',
                 'orderNo' => $order['order_no'],
                 'hxOrderInfo' => $hxOrderInfo,
                 'lastSql' => $db::table("bsa_order_hexiao")->getLastSql(),
             ]), 'getUseHxOrder_log');
 
-            if (!$hxOrderInfo) {
+            if (!$hxOrderInfo || $hxOrderInfo['order_no'] != null) {
                 $db::rollback();
                 return modelReMsg(-1, '', '无可用下单！-1');
             }
 
             $orderWhere['id'] = $hxOrderInfo['id'];
+            $orderWhere['account'] = $hxOrderInfo['account'];
             $checking['order_status'] = 1;  //使用中
             $checking['check_status'] = 1;   //查询余额中
             $checking['last_check_time'] = time();   //查询上次查询时间
@@ -364,7 +341,8 @@ class OrderhexiaoModel extends Model
             $updateMatch['order_desc'] = "匹配成功！当前余额:" . $checkRes['data'];
 
             $updateMatchSuccessRes = $this->where($orderWhere)->update($updateMatch);
-            logs(json_encode(['action' => 'getUseHxOrderUpdateMatch',
+            logs(json_encode([
+                'action' => 'getUseHxOrderUpdateMatch',
                 'orderWhere' => $orderWhere,
                 'updateMatch' => $updateMatch,
                 'updateMatchSuccessRes' => $updateMatchSuccessRes,

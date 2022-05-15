@@ -164,30 +164,99 @@ class Orderinfo extends Controller
             $where['order_no'] = $message['order_no'];
             $orderInfo = $orderModel->where($where)->find();
             if (empty($orderInfo)) {
-                return json(msg(-1, '', '无可匹配推单！'));
+                return json(msg(-2, '', '无可匹配推单！'));
             }
+
+            if ($orderInfo['order_status'] == 7) {
+                $i = 3;
+                for ($i = 0; $i < 3; $i++) {
+                     sleep(3);
+                    $orderInfo = $db::table("bsa_order")->where("order_no", "=", $orderInfo['order_no'])->find();
+
+                    if($orderInfo['order_status']==7){
+                           continue;
+                    }else{
+                        if ($orderInfo['order_status'] != 4) {
+                            return json(msg(-1, '', '订单状态有误，请重新下单！'));
+                        }
+                        if ($orderInfo['order_status'] != 3) {
+                            return json(msg(-2, '', '下单失败，请重新下单！'));
+                        }
+
+                        if (($orderInfo['order_limit_time'] - 720) < time()) {
+                            return json(msg(-3, '', '订单超时，请重新下单'));
+                        }
+                        $returnData['phone'] = $orderInfo['account'];
+                        $returnData['amount'] = $orderInfo['amount'];
+                        $limitTime = (($orderInfo['order_limit_time'] - 720) - time());
+                        $returnData['limitTime'] = (int)($limitTime);
+//                $imgUrl = "http://175.178.195.147:9090/upload/tengxun.jpg";
+
+                        $imgUrl = "http://175.178.195.147:9090/upload/weixin513.jpg";
+//                $imgUrl = urlencode($imgUrl);
+                        $returnData['imgUrl'] = $imgUrl;
+                        return json(msg(0, $returnData, "success"));
+                    }
+                }
+                return json(msg(-9, "", "网络异常，请刷新页面"));
+            }
+
             if ($orderInfo['order_status'] == 0) {
+                $db::startTrans();
+                $lock = $db::table("bsa_order")->where("order_no", "=", $orderInfo['order_no'])->lock(true)->find();
+                if (!$lock) {
+                    logs(json_encode([
+                        'action' => 'lockFail',
+                        'message' => $message,
+                        'lockRes' => $lock,
+                    ]), 'getOrderInfoFail');
+                    $db::rollback();
+                    return json(msg(-3, '', '访问繁忙，请刷新页面'));
+                }
+                //更新为下当中状态
+                $doMatch['order_status'] = 7;
+                $doMatchRes = $db::table("bsa_order")->where("order_no", "=", $orderInfo['order_no'])->update($doMatch);
+                if (!$doMatchRes) {
+                    logs(json_encode([
+                        'action' => 'doMatchFail',
+                        'message' => $message,
+                        'doMatchRes' => $doMatchRes,
+                    ]), 'getOrderInfoFail');
+                    $db::rollback();
+                    return json(msg(-4, '', '匹配繁忙'));
+                }
                 //2、分配核销单
                 $orderHXModel = new OrderhexiaoModel();
                 $getUseHxOrderRes = $orderHXModel->getUseHxOrder($orderInfo);
                 if (!isset($getUseHxOrderRes['code']) || $getUseHxOrderRes['code'] != 0) {
                     logs(json_encode([
-                        'action' => 'getUseHxOrderRes',
+                        'action' => 'getUseHxOrderfail',
                         'insertOrderData' => $orderInfo,
                         'getUseHxOrderRes' => $getUseHxOrderRes
                     ]), 'getUseHxOrder_log');
                     //修改订单为下单失败状态。
+                    $updateOrderStatus['order_status'] = 3;
                     $updateOrderStatus['last_use_time'] = time();
                     $updateOrderStatus['order_desc'] = "下单失败|" . $getUseHxOrderRes['msg'];
-                    $orderModel->where('order_no', $orderInfo['order_no'])->update($updateOrderStatus);
-                    return json(msg(-2, '', $getUseHxOrderRes['msg']));
+                    $updateMatchRes = $orderModel->where('order_no', $orderInfo['order_no'])->update($updateOrderStatus);
+                    if (!$updateMatchRes) {
+                        logs(json_encode([
+                            'action' => 'updateMatchRes',
+                            'message' => $message,
+                            'updateMatchRes' => $updateMatchRes,
+                        ]), 'getOrderInfoFail');
+                        $db::rollback();
+                        return json(msg(-5, '', '下单繁忙'));
+                    }
+                    $db::commit();
+                    return json(msg(-6, '', $getUseHxOrderRes['msg']));
                 }
                 $updateOrderStatus['order_status'] = 4;   //等待支付状态
                 $updateOrderStatus['check_times'] = 1;   //下单成功就查询一次
                 $updateOrderStatus['order_pay'] = $getUseHxOrderRes['data']['order_no'];   //匹配核销单订单号
                 $updateOrderStatus['order_limit_time'] = time() + 900;  //订单表 限制使用时间
                 $updateOrderStatus['start_check_amount'] = $getUseHxOrderRes['data']['last_check_amount'];  //开单余额
-                $updateOrderStatus['last_check_amount'] = $getUseHxOrderRes['data']['last_check_amount'];  //开单余额
+                $updateOrderStatus['last_check_amount'] = $getUseHxOrderRes['data']['last_check_amount'];  //第一次查询余额
                 $updateOrderStatus['end_check_amount'] = $getUseHxOrderRes['data']['last_check_amount'] + $orderInfo['amount'];  //应到余额
                 $updateOrderStatus['next_check_time'] = time() + 90;   //下次查询余额时间
                 $updateOrderStatus['account'] = $getUseHxOrderRes['data']['account'];   //匹配核销单账号
@@ -210,16 +279,20 @@ class Orderinfo extends Controller
                     ->where('id', '=', $orderInfo['id'])
                     ->where('order_no', '=', $orderInfo['order_no'])
                     ->update($updateOrderStatus);
-                logs(json_encode([
-                    'getUseHxOrderRes' => $getUseHxOrderRes,
-                    'updateOrderStatus' => $updateOrderStatus,
-                    'localOrderUpdateRes' => $localOrderUpdateRes,
-                    'lastSal' => $db::order("bsa_order")->getLastSql()
-                ]), 'localOrderUpdateRes');
-
                 if (!$localOrderUpdateRes) {
-                    return json(msg(-3, "", '下单失败-3'));
+                    logs(json_encode([
+                        'action' => 'localOrderUpdate',
+                        'message' => $message,
+                        'localOrderUpdateRes' => $localOrderUpdateRes,
+                    ]), 'getOrderInfoFail');
+                    $db::rollback();
+                    $updateOrderStatus['order_status'] = 3;
+                    $updateOrderStatus['last_use_time'] = time();
+                    $updateOrderStatus['order_desc'] = "下单失败|" . "localOrderUpdateFail";
+                    $updateMatchRes = $orderModel->where('order_no', $orderInfo['order_no'])->update($updateOrderStatus);
+                    return json(msg(-7, '', '下单繁忙'));
                 }
+                $db::commit();
                 $limitTime = (($updateOrderStatus['order_limit_time'] - 720) - time());
                 $returnData['phone'] = $updateOrderStatus['account'];
                 $returnData['amount'] = $orderInfo['amount'];

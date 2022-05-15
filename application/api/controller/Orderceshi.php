@@ -19,7 +19,7 @@ class Orderceshi extends Controller
      */
     public function uploadOrder()
     {
-
+        $redis = new Redis();
         $data = @file_get_contents("php://input");
         $param = json_decode($data, true);
         logs(json_encode(['message' => $param, "time" => date("Y-m-d H:i:s", time())]), 'uploadOrder_log');
@@ -94,7 +94,9 @@ class Orderceshi extends Controller
             }
 ////            $returnData['code'] = 1;
 //            $returnData['order_no'] = $param['order_no'];
-
+            if (($param['limit_time'] - time()) > 420) ;
+            $hxOrderKey = $param['write_off_sign'] . "" .
+                $redis->lpush($param['write_off_sign'] . "upload", ($param['limit_time'] - time()));
             return json(msg(1, '', "success"));
 
         } catch (\Exception $exception) {
