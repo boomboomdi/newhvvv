@@ -2,6 +2,7 @@
 
 namespace app\api\controller;
 
+
 use think\Controller;
 use think\Db;
 use app\common\model\OrderhexiaoModel;
@@ -10,6 +11,7 @@ use app\api\validate\OrderinfoValidate;
 use app\api\validate\CheckPhoneAmountNotifyValidate;
 use think\Request;
 use think\Validate;
+use app\common\Redis;
 
 header('Access-Control-Allow-Origin:*');
 header("Access-Control-Allow-Credentials:true");

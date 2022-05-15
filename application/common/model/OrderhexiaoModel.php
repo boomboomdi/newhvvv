@@ -147,7 +147,6 @@ class OrderhexiaoModel extends Model
      */
     public function orderLocalUpdate($orderDataNo, $orderStatus = 1, $amount = "")
     {
-
         $db = new Db();
         $db::startTrans();
         try {
@@ -157,6 +156,7 @@ class OrderhexiaoModel extends Model
             }
             //更新核销表  start
             $orderWhere['order_me'] = $orderDataNo['order_me'];
+            $orderWhere['account'] = $orderDataNo['account'];
             $orderWhere['pay_status'] = 0;
 //            $orderWhere['account'] = $orderHxData['account'];
             $payTime = time();

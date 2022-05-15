@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: xh
- * Date: 2018/11/6
- * Time: 21:40
- */
 namespace app\common;
 
 class Redis{
