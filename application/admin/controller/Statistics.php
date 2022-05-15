@@ -96,7 +96,9 @@ class Statistics extends Base
 
                     //总支付数量（每个金额）
                     $data[$key]['totalPayOrderAmountNum'] = $orderHxModel
-                        ->where($where)
+                        ->where('write_off_sign', "=", $writeOffSign)
+                        ->where('pay_time', ">", strtotime($startTime))
+                        ->where('pay_time', "<", (strtotime($startTime) + 86400))
                         ->where("pay_status", '=', 1)
                         ->where("order_amount", "=", $vo['order_amount'])
                         ->count();
@@ -104,7 +106,10 @@ class Statistics extends Base
                     //总支付金额（每个金额）
                     $data[$key]['totalPayOrderAmount'] = $orderHxModel
                         ->field("SUM(pay_amount) as totalPayOrderAmount")
-                        ->where($where)
+                        ->where('write_off_sign', "=", $writeOffSign)
+                        ->where('pay_time', ">", strtotime($startTime))
+                        ->where('pay_time', "<", (strtotime($startTime) + 86400))
+                        ->where('pay_status', "=", 1)
                         ->where("order_amount", "=", $vo['order_amount'])
                         ->find()['totalPayOrderAmount'];
                     $totalPayOrderAmount += $data[$key]['totalPayOrderAmount'];
