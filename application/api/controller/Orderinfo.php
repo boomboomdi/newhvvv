@@ -165,7 +165,8 @@ class Orderinfo extends Controller
                 return apiJsonReturn(-6, "下单有误！");
             }
             $db::commit();
-            return apiJsonReturn(10000, "下单成功", $url);
+            return json(msg(10000, $url, "下单成功"));
+//            return apiJsonReturn(10000, "下单成功", $url);
         } catch (\Error $error) {
 
             logs(json_encode(['file' => $error->getFile(),
