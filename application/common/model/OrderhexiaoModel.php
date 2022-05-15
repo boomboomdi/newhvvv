@@ -243,6 +243,10 @@ class OrderhexiaoModel extends Model
             $db = new Db();
             $db::startTrans();
             $bsaWriteOff = $db::table("bsa_write_off")->where('status', '=', 1)->column('write_off_sign');
+            if(empty($bsaWriteOff)){
+                $db::rollback();
+                return modelReMsg(-1, '', '无可用下单！-1');
+            }
 //
             $hxOrderInfo = $db::table("bsa_order_hexiao")
                 ->field("bsa_order_hexiao.*")
