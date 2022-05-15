@@ -187,7 +187,7 @@ class OrderModel extends Model
                 'notify_url' => $data['notify_url'],
                 'notifyResult' => $notifyResult
             ]), 'curlPostForMerchant_log');
-            $notifyResultLog = "第" . ($data['notify_times'] + 1) . "次回调:" . $notifyResult . "(" . date("Y-m-d H:i:s") . ")";
+            $notifyResultLog = "第" . ($data['notify_times'] + 1) . "次回调:" . (string)($notifyResult) . "(" . date("Y-m-d H:i:s") . ")";
 
             //通知结果不为success
             if ($notifyResult != "success") {

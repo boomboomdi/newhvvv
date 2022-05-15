@@ -63,6 +63,9 @@ class Order extends Base
                 $data[$key]['order_limit_time'] = date('Y-m-d H:i:s', $data[$key]['order_limit_time']);
                 $data[$key]['notify_time'] = date('Y-m-d H:i:s', $data[$key]['notify_time']);
                 $data[$key]['add_time'] = date('Y-m-d H:i:s', $vo['add_time']);
+                if (!empty($data[$key]['order_status']) && $data[$key]['order_status'] == '7') {
+                    $data[$key]['order_status'] = '<button class="layui-btn layui-btn-disabled layui-btn-xs">匹配中···</button>';
+                }
                 if (!empty($data[$key]['order_status']) && $data[$key]['order_status'] == '1') {
                     $data[$key]['order_status'] = '<button class="layui-btn layui-btn-success layui-btn-xs">付款成功</button>';
                 }
@@ -75,8 +78,8 @@ class Order extends Base
                 if (!empty($data[$key]['order_status']) && $data[$key]['order_status'] == '4') {
                     $data[$key]['order_status'] = '<button class="layui-btn layui-btn-warm layui-btn-xs">等待支付</button>';
                 }
-                if (!empty($data[$key]['order_status']) && $data[$key]['order_status'] == '6') {
-                    $data[$key]['order_status'] = '<button class="layui-btn layui-btn-primary layui-btn-xs">回调中···</button>';
+                if (!empty($data[$key]['order_status']) && $data[$key]['order_status'] == '0') {
+                    $data[$key]['order_status'] = '<button class="layui-btn layui-btn-primary layui-btn-xs">下单中···</button>';
                 }
                 if (!empty($data[$key]['order_status']) && $data[$key]['order_status'] == '5') {
                     $data[$key]['order_status'] = '<button class="layui-btn label-important layui-btn-xs">手动回调</button>';
