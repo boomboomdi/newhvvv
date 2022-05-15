@@ -90,10 +90,10 @@ class Orderinfo extends Controller
                 ->find();
 //            var_dump($hxOrderData);exit;
             if (!$hxOrderData) {
-                $insertOrderData['order_status'] = 3;
-                $insertOrderData['qr_url'] = "";
+//                $insertOrderData['order_status'] = 3;
+//                $insertOrderData['qr_url'] = "";
                 $db::rollback();
-                return modelReMsg(-5, '', '无可用订单-5！');
+                return apiJsonReturn(-5, "无可用订单-5！！");
             }
 
             var_dump($hxOrderData);exit;
@@ -132,7 +132,7 @@ class Orderinfo extends Controller
                     'updateMatchSuccessRes' => $updateHxOrderRes,
                 ]), 'updateMatchSuccessFail');
                 $db::rollback();
-                return modelReMsg(-5, '', '下单频繁，请稍后再下-5！');
+                return apiJsonReturn(-5, '', '下单频繁，请稍后再下-5！');
             }
             $insertOrderData['order_status'] = 0;
             //下单成功
