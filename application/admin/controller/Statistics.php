@@ -97,6 +97,7 @@ class Statistics extends Base
                     //总支付数量（每个金额）
                     $data[$key]['totalPayOrderAmountNum'] = $orderHxModel
                         ->where($where)
+                        ->where("pay_status", '=', 1)
                         ->where("order_amount", "=", $vo['order_amount'])
                         ->count();
                     $totalPayOrderAmountNum += $data[$key]['totalPayOrderAmountNum'];
