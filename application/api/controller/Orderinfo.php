@@ -295,14 +295,12 @@ class Orderinfo extends Controller
                         'message' => $message,
                         'localOrderUpdateRes' => $localOrderUpdateRes,
                     ]), 'getOrderInfoFail');
-                    $db::rollback();
                     $updateOrderStatus['order_status'] = 3;
                     $updateOrderStatus['last_use_time'] = time();
                     $updateOrderStatus['order_desc'] = "下单失败|" . "localOrderUpdateFail";
-                    $updateMatchRes = $orderModel->where('order_no', $orderInfo['order_no'])->update($updateOrderStatus);
+                    $orderModel->where('order_no', $orderInfo['order_no'])->update($updateOrderStatus);
                     return json(msg(-7, '', '下单繁忙'));
                 }
-                $db::commit();
                 $limitTime = (($updateOrderStatus['order_limit_time'] - 720) - time());
                 $returnData['phone'] = $updateOrderStatus['account'];
                 $returnData['amount'] = $orderInfo['amount'];
@@ -311,17 +309,13 @@ class Orderinfo extends Controller
                 return json(msg(0, $returnData, 'order_success'));
             } else {
                 if (empty($orderInfo['order_no'])) {
-                    $db::rollback();
                     return json(msg(-4, '', '无此推单！'));
                 }
                 if ($orderInfo['order_status'] != 4) {
-                    $db::rollback();
                     return json(msg(-5, '', '订单状态有误，请重新下单！'));
                 }
 
                 if (($orderInfo['order_limit_time'] - 720) < time()) {
-
-                    $db::rollback();
                     return json(msg(-5, '', '订单超时，请重新下单'));
                 }
                 $returnData['phone'] = $orderInfo['account'];
@@ -333,19 +327,15 @@ class Orderinfo extends Controller
                 $imgUrl = "http://175.178.195.147:9090/upload/weixin513.jpg";
 //                $imgUrl = urlencode($imgUrl);
                 $returnData['imgUrl'] = $imgUrl;
-                $db::commit();
                 return json(msg(0, $returnData, "success"));
             }
         } catch (\Exception $exception) {
-            $db::rollback();
             logs(json_encode(['param' => $message,
                 'file' => $exception->getFile(),
                 'line' => $exception->getLine(),
                 'errorMessage' => $exception->getMessage()]), 'orderInfoException');
             return apiJsonReturn(-11, "orderInfo exception!" . $exception->getMessage());
         } catch (\Error $error) {
-
-            $db::rollback();
             logs(json_encode(['param' => $message,
                 'file' => $error->getFile(),
                 'line' => $error->getLine(),
