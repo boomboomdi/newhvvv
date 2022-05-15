@@ -53,6 +53,7 @@ class Statistics extends Base
             $orderHxModel = new Orderhexiaomodel();
             $list = $orderHxModel->field("order_amount,write_off_sign")
                 ->where($where)
+                ->where("write_off_sign", '=', $writeOffSign)
                 ->group("order_amount")
                 ->order("order_amount desc")
 //                ->select();
@@ -99,7 +100,7 @@ class Statistics extends Base
                         ->where("order_amount", "=", $vo['order_amount'])
                         ->where("", "=", $vo['order_amount'])
                         ->find()['totalPayOrderAmount'];
-                    $totalPayOrderAmount +=  $data[$key]['totalPayOrderAmount'];
+                    $totalPayOrderAmount += $data[$key]['totalPayOrderAmount'];
 
                 }
                 $total['order_amount'] = '总统计';
