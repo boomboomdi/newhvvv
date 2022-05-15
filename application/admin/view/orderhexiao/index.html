@@ -45,7 +45,7 @@
                                class="layui-input">
                     </div>
                 </div>
-                 <div class="layui-inline">
+                <div class="layui-inline">
                     <label class="layui-form-label">账号</label>
                     <div class="layui-input-block">
                         <input type="text" name="account" placeholder="请输入" autocomplete="off"
@@ -62,7 +62,6 @@
 
         <div class="layui-card-body">
 
-            <table id="LAY-user-table" lay-filter="LAY-user-table"></table>
             <table id="LAY-user-table" lay-filter="LAY-user-table"></table>
             <script type="text/html" id="statusTpl">
                 {{#  if(d.status == 0){ }}
@@ -167,7 +166,7 @@
             }, {
                 field: "account",
                 title: "收款账号",
-            },{
+            }, {
                 field: "operator",
                 title: "运营商",
             }, {
@@ -182,6 +181,9 @@
             }, {
                 field: "limit_time",
                 title: "回调截至"
+            }, {
+                field: "last_check_amount",
+                title: "匹单金额"
             }, {
                 field: "use_time",
                 title: "匹配时间"

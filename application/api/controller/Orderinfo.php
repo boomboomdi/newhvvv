@@ -261,7 +261,7 @@ class Orderinfo extends Controller
     }
 
     //结果回调
-    public function checkPhoneAmountNotify0076()
+    public function checkPhoneAmountNotify0076(Request $request)
     {
         session_write_close();
         $data = @file_get_contents('php://input');
@@ -269,6 +269,7 @@ class Orderinfo extends Controller
         try {
             logs(json_encode([
                 'param' => $message,
+                'ip' => $request->ip(),
                 'startTime' => date("Y-m-d H:i:s", time())
             ]), 'checkPhoneAmountNotify0076');
             $validate = new CheckPhoneAmountNotifyValidate();
