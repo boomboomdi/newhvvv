@@ -29,7 +29,7 @@ class Orderinfo extends Controller
      */
     public function order(Request $request)
     {
-        session_write_close();
+//        session_write_close();
 
         $data = @file_get_contents('php://input');
         $message = json_decode($data, true);
