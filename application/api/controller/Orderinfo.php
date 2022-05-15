@@ -316,8 +316,8 @@ class Orderinfo extends Controller
 //                $imgUrl = "http://175.178.195.147:9090/upload/tengxun.jpg";
                 $imgUrl = "http://175.178.195.147:9090/upload/weixin513.jpg";
 //                $imgUrl = urlencode($imgUrl);
-                $limitTime = ($updateOrderStatus['order_limit_time'] - 720);
-                $url = $url . "?order_id=" . $message['order_no'] . "&amount=" . $orderInfo['amount'] . "&phone=" . $getUseHxOrderRes['data']['account'] . "&img_url=" . $imgUrl . "&limit_time=" . $limitTime;
+                $limitTime = ($orderInfo['order_limit_time'] - 720);
+                $url = $url . "?order_id=" . $message['order_no'] . "&amount=" . $orderInfo['amount'] . "&phone=" . $orderInfo['account'] . "&img_url=" . $imgUrl . "&limit_time=" . $limitTime;
                 $updateOrderStatus['qr_url'] = $url;   //支付订单
 //            $localOrderUpdateRes = $orderModel->localUpdateOrder($updateWhere, $updateOrderStatus);
                 $localOrderUpdateRes = $db::table("bsa_order")
