@@ -89,7 +89,7 @@ class Orderinfo extends Controller
                 ->lock(true)
                 ->find();
 //            var_dump($hxOrderData);exit;
-            if (!$hxOrderData || empty($hxOrderData)) {
+            if (!$hxOrderData) {
                 $insertOrderData['order_status'] = 3;
                 $insertOrderData['qr_url'] = "";
                 $db::rollback();
