@@ -53,7 +53,7 @@ class Orderinfo extends Controller
                 return apiJsonReturn(-3, "验签失败！");
             }
             $orderFind = $db::table('bsa_order')->where('order_no', '=', $message['order_no'])->count();
-            if ($orderFind > 0) {
+            if (count($orderFind) > 0) {
                 return apiJsonReturn(-4, "单号重复！");
             }
 
