@@ -107,7 +107,7 @@ class Orderinfo extends Controller
             $updateMatch['status'] = 1;   //匹配中
             $updateMatch['use_time'] = time();   //使用时间
             $updateMatch['last_use_time'] = time();
-            $updateMatch['order_limit_time'] = time() + 3600;  //匹配成功后锁定3600s 后没支付可以重新解锁匹配
+            $updateMatch['order_limit_time'] = (time() + 3600);  //匹配成功后锁定3600s 后没支付可以重新解锁匹配
             $updateMatch['order_status'] = 1;
             $updateMatch['order_me'] = $orderMe;
             $updateMatch['order_desc'] = "等待访问！";
@@ -121,28 +121,34 @@ class Orderinfo extends Controller
                 'updateMatchSuccessRes' => $updateHxOrderRes,
             ]), 'updateMatchSuccess');
             if (!$updateHxOrderRes) {
+                logs(json_encode([
+                    'action' => 'updateMatch',
+                    'hxWhere' => $hxWhere,
+                    'updateMatch' => $updateMatch,
+                    'updateMatchSuccessRes' => $updateHxOrderRes,
+                ]), 'updateMatchSuccessFail');
                 $db::rollback();
                 return modelReMsg(-5, '', '下单频繁，请稍后再下-5！');
             }
             $insertOrderData['order_status'] = 0;
             //下单成功
             $insertOrderData['merchant_sign'] = $message['merchant_sign'];  //商户
+            $insertOrderData['amount'] = $message['amount']; //支付金额
             $insertOrderData['order_no'] = $message['order_no'];  //商户订单号
             ;  // 0、等待下单 1、支付成功（下单成功）！2、支付失败（下单成功）！3、下单失败！4、等待支付（下单成功）！5、已手动回调。
+            $insertOrderData['order_status'] = 0; //状态
             $insertOrderData['order_me'] = $orderMe; //本平台订单号
-
             $insertOrderData['order_pay'] = $hxOrderData['order_no'];   //匹配核销单订单号
-            $insertOrderData['order_limit_time'] = time() + 900;  //订单表 限制使用时间
-            $insertOrderData['next_check_time'] = time() + 90;   //下次查询余额时间
             $insertOrderData['account'] = $hxOrderData['account'];   //匹配核销单账号
             $insertOrderData['write_off_sign'] = $hxOrderData['write_off_sign'];   //匹配核销单核销商标识
-            $insertOrderData['amount'] = $message['amount']; //支付金额
             $insertOrderData['payable_amount'] = $message['amount'];  //应付金额
+            $insertOrderData['order_limit_time'] = time() + 900;  //订单表 限制使用时间
+            $insertOrderData['next_check_time'] = time() + 90;   //下次查询余额时间
             $insertOrderData['payment'] = $message['payment']; //alipay
             $insertOrderData['add_time'] = time();  //入库时间
             $insertOrderData['notify_url'] = $message['notify_url']; //下单回调地址 notify url
             $insertOrderData['qr_url'] = $message['notify_url']; //下单回调地址 notify url
-            $insertOrderData['order_desc'] = "下单失败无可匹配订单"; //订单描述
+            $insertOrderData['order_desc'] = "等待访问!"; //订单描述
 
             $orderModel = new OrderModel();
             $createOrderOne = $orderModel->addOrder($insertOrderData);
@@ -153,7 +159,7 @@ class Orderinfo extends Controller
                     'createOrderOne' => $createOrderOne,
                     'lastSal' => $db::order("bsa_order")->getLastSql()
                 ]), 'addOrderFail_log');
-                return apiJsonReturn(-6, $createOrderOne['msg'] . $createOrderOne['code']);
+                return apiJsonReturn(-6, "下单有误！");
             }
             $db::commit();
             return apiJsonReturn(10000, "下单成功", $url);
