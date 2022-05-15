@@ -142,8 +142,8 @@ class Orderinfo extends Controller
             $insertOrderData['account'] = $hxOrderData['account'];   //匹配核销单账号
             $insertOrderData['write_off_sign'] = $hxOrderData['write_off_sign'];   //匹配核销单核销商标识
             $insertOrderData['payable_amount'] = $message['amount'];  //应付金额
-            $insertOrderData['order_limit_time'] = time() + 900;  //订单表 限制使用时间
-            $insertOrderData['next_check_time'] = time() + 90;   //下次查询余额时间
+            $insertOrderData['order_limit_time'] = (time() + 900);  //订单表 限制使用时间
+            $insertOrderData['next_check_time'] = (time() + 90);   //下次查询余额时间
             $insertOrderData['payment'] = $message['payment']; //alipay
             $insertOrderData['add_time'] = time();  //入库时间
             $insertOrderData['notify_url'] = $message['notify_url']; //下单回调地址 notify url
@@ -199,8 +199,9 @@ class Orderinfo extends Controller
         }
         $db = new Db();
         $orderModel = new OrderModel();
-        $where['order_no'] = $message['order_no'];
-        $orderInfo = $db::table("bsa_order")->where($where)->find();
+//        $where['order_no'] = $message['order_no'];
+        $orderInfo = $db::table("bsa_order")
+            ->where("order_no", "=", $message['order_no'])->find();
         if (empty($orderInfo)) {
             logs(json_encode([
                 'action' => 'lockFail',
