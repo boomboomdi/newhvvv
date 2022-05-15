@@ -39,8 +39,8 @@ class Statistics extends Base
                 $startTime = date("Y-m-d", time());
             }
             $where[] = ['write_off_sign', '=', $writeOffSign];
-            $where[] = ['pay_time', '>', strtotime($startTime)];
-            $where[] = ['pay_time', '<', (strtotime($startTime) + 86400)];
+            $where[] = ['add_time', '>', strtotime($startTime)];
+            $where[] = ['add_time', '<', (strtotime($startTime) + 86400)];
 //            if (!empty($writeOffSign)) {
 //                $where[] = ['write_off_sign', '=', $writeOffSign . '%'];
 //            }
@@ -77,15 +77,19 @@ class Statistics extends Base
 //                    $data[$key]['order_amount'] = $vo['order_amount'];
                     //推单数量（每个金额）
                     $data[$key]['orderTotalNum'] = $orderHxModel
-                        ->where($where)
+                        ->where('write_off_sign', "=", $writeOffSign)
+                        ->where('add_time', ">", strtotime($startTime))
+                        ->where('add_time', "<", (strtotime($startTime) + 86400))
                         ->where("order_amount", "=", $vo['order_amount'])
                         ->count();
                     $orderTotalNum += $data[$key]['orderTotalNum'];
 
                     //推单总额（每个金额）
                     $data[$key]['totalOrderAmount'] = $orderHxModel
-                        ->where($where)
                         ->field("SUM(order_amount) as totalOrderAmount")
+                        ->where('write_off_sign', "=", $writeOffSign)
+                        ->where('add_time', ">", strtotime($startTime))
+                        ->where('add_time', "<", (strtotime($startTime) + 86400))
                         ->where("order_amount", "=", $vo['order_amount'])
                         ->find()['totalOrderAmount'];
                     $totalOrderAmount += $data[$key]['totalOrderAmount'];
@@ -94,7 +98,6 @@ class Statistics extends Base
                     $data[$key]['totalPayOrderAmountNum'] = $orderHxModel
                         ->where($where)
                         ->where("order_amount", "=", $vo['order_amount'])
-                        ->where("", "=", $vo['order_amount'])
                         ->count();
                     $totalPayOrderAmountNum += $data[$key]['totalPayOrderAmountNum'];
                     //总支付金额（每个金额）
