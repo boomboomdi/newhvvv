@@ -96,7 +96,7 @@ class Orderinfo extends Controller
                 $insertOrderData['order_status'] = 3;
                 $insertOrderData['qr_url'] = "";
             }
-            //1、入库
+            //下单成功
             $insertOrderData['merchant_sign'] = $message['merchant_sign'];  //商户
             $insertOrderData['order_no'] = $message['order_no'];  //商户订单号
             ;  // 0、等待下单 1、支付成功（下单成功）！2、支付失败（下单成功）！3、下单失败！4、等待支付（下单成功）！5、已手动回调。
@@ -206,6 +206,7 @@ class Orderinfo extends Controller
 //            $localOrderUpdateRes = $orderModel->localUpdateOrder($updateWhere, $updateOrderStatus);
                 $localOrderUpdateRes = $db::table("bsa_order")
                     ->where('id', '=', $orderInfo['id'])
+                    ->where('order_no', '=', $orderInfo['order_no'])
                     ->update($updateOrderStatus);
                 logs(json_encode([
                     'getUseHxOrderRes' => $getUseHxOrderRes,
