@@ -209,8 +209,10 @@ class Orderinfo extends Controller
                 return json(msg(-9, "", "网络异常，请刷新页面"));
             }
             if ($orderInfo['order_status'] == 0) {
+                $db::startTrans();
                 $orderInfo = $db::table("bsa_order")
                     ->where("order_no", "=", $orderInfo['order_no'])
+                    ->where("order_status", "=", 0)
                     ->lock(true)
                     ->find();
                 if (!$orderInfo || $orderInfo['order_status'] > 0) {
