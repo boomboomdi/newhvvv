@@ -212,7 +212,13 @@ function guidForSelf()
 //    $yCode = array('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J');
 //    return $yCode[intval(date('Y')) - 2011] . $yCode[intval(date('Y')) - rand(2011, 2019)] . strtoupper(dechex(date('m'))) . date('YmdHi') . substr(implode(NULL, array_map('ord', str_split(substr(uniqid(), 7, 13), 1))), 0, 8);
 }
+function getMillisecond() {
 
+    list($s1, $s2) = explode(' ', microtime());
+
+    return (float)sprintf('%.0f', (floatval($s1) + floatval($s2)) * 1000);
+
+}
 function uuidA()
 {
     $chars = md5(uniqid(mt_rand(), true));
