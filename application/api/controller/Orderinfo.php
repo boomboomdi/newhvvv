@@ -158,24 +158,29 @@ class Orderinfo extends Controller
         if (!isset($message['order_no']) || empty($message['order_no'])) {
             return json(msg(-1, '', '单号有误！'));
         }
+        $db = new Db();
+        $orderModel = new OrderModel();
+        $where['order_no'] = $message['order_no'];
+        $orderInfo = $db::table("bsa_order")->where($where)->lock(true)->find();
+        if (!$orderInfo) {
+            logs(json_encode([
+                'action' => 'lockFail',
+                'message' => $message,
+                'lockRes' => $orderInfo,
+            ]), 'getOrderInfoFail');
+            $db::rollback();
+            return json(msg(-2, '', '访问繁忙，重新下单！'));
+        }
         try {
-            $db = new Db();
-            $orderModel = new OrderModel();
-            $where['order_no'] = $message['order_no'];
-            $orderInfo = $orderModel->where($where)->find();
-            if (empty($orderInfo)) {
-                return json(msg(-2, '', '无可匹配推单！'));
-            }
-
             if ($orderInfo['order_status'] == 7) {
                 $i = 3;
                 for ($i = 0; $i < 3; $i++) {
-                     sleep(3);
+                    sleep(3);
                     $orderInfo = $db::table("bsa_order")->where("order_no", "=", $orderInfo['order_no'])->find();
 
-                    if($orderInfo['order_status']==7){
-                           continue;
-                    }else{
+                    if ($orderInfo['order_status'] == 7) {
+                        continue;
+                    } else {
                         if ($orderInfo['order_status'] != 4) {
                             return json(msg(-1, '', '订单状态有误，请重新下单！'));
                         }
@@ -202,20 +207,10 @@ class Orderinfo extends Controller
             }
 
             if ($orderInfo['order_status'] == 0) {
-                $db::startTrans();
-                $lock = $db::table("bsa_order")->where("order_no", "=", $orderInfo['order_no'])->lock(true)->find();
-                if (!$lock) {
-                    logs(json_encode([
-                        'action' => 'lockFail',
-                        'message' => $message,
-                        'lockRes' => $lock,
-                    ]), 'getOrderInfoFail');
-                    $db::rollback();
-                    return json(msg(-3, '', '访问繁忙，请刷新页面'));
-                }
                 //更新为下当中状态
                 $doMatch['order_status'] = 7;
                 $doMatchRes = $db::table("bsa_order")->where("order_no", "=", $orderInfo['order_no'])->update($doMatch);
+                $db::commit();
                 if (!$doMatchRes) {
                     logs(json_encode([
                         'action' => 'doMatchFail',
@@ -301,13 +296,18 @@ class Orderinfo extends Controller
                 return json(msg(0, $returnData, 'order_success'));
             } else {
                 if (empty($orderInfo['order_no'])) {
+                    $db::rollback();
                     return json(msg(-4, '', '无此推单！'));
                 }
                 if ($orderInfo['order_status'] != 4) {
+
+                    $db::rollback();
                     return json(msg(-5, '', '订单状态有误，请重新下单！'));
                 }
 
                 if (($orderInfo['order_limit_time'] - 720) < time()) {
+
+                    $db::rollback();
                     return json(msg(-5, '', '订单超时，请重新下单'));
                 }
                 $returnData['phone'] = $orderInfo['account'];
@@ -319,15 +319,19 @@ class Orderinfo extends Controller
                 $imgUrl = "http://175.178.195.147:9090/upload/weixin513.jpg";
 //                $imgUrl = urlencode($imgUrl);
                 $returnData['imgUrl'] = $imgUrl;
+                $db::commit();
                 return json(msg(0, $returnData, "success"));
             }
         } catch (\Exception $exception) {
+            $db::rollback();
             logs(json_encode(['param' => $message,
                 'file' => $exception->getFile(),
                 'line' => $exception->getLine(),
                 'errorMessage' => $exception->getMessage()]), 'orderInfoException');
             return apiJsonReturn(-11, "orderInfo exception!" . $exception->getMessage());
         } catch (\Error $error) {
+
+            $db::rollback();
             logs(json_encode(['param' => $message,
                 'file' => $error->getFile(),
                 'line' => $error->getLine(),
