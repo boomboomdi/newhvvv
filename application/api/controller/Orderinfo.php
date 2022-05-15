@@ -153,9 +153,9 @@ class Orderinfo extends Controller
             $insertOrderData['order_desc'] = "等待访问!"; //订单描述
 
             $orderModel = new OrderModel();
-//            $createOrderOne = $orderModel->addOrder($insertOrderData);
-            $createOrderOne = $db::table("bsa_order")->insert($insertOrderData);;
-            if (!$createOrderOne) {
+            $createOrderOne = $orderModel->addOrder($insertOrderData);
+//            $createOrderOne = $db::table("bsa_order")->insert($insertOrderData);;
+            if (!isset($createOrderOne['code']) || $createOrderOne['code'] != 0) {
                 $db::rollback();
                 logs(json_encode(['action' => 'getUseHxOrderRes',
                     'insertOrderData' => $insertOrderData,
