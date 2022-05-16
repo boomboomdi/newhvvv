@@ -233,15 +233,15 @@ class Order extends Base
                 Db::table("bsa_order_hexiao")
                     ->where("order_no", "=", $order['order_pay'])
                     ->update($checking);
+                logs(json_encode([
+                    'action' => 'adminCheckOrder',
+                    "checkTime" => $checkStartTime,
+                    "endTime" => date("Y-m-d H:i:s", time()),
+                    'orderWhere' => $getResParam,
+                    'checkRes' => $checkRes,
+                    'getLastSql' => Db::table("bsa_order_hexiao")->getLastSql(),
+                ]), 'adminCheckOrderFail');
                 if ($checkRes['code'] != 0) {
-                    logs(json_encode([
-                        'action' => 'adminCheckOrder',
-                        "checkTime" => $checkStartTime,
-                        "endTime" => date("Y-m-d H:i:s", time()),
-                        'orderWhere' => $getResParam,
-                        'checkRes' => $checkRes,
-                        'getLastSql' => Db::table("bsa_order_hexiao")->getLastSql(),
-                    ]), 'adminCheckOrderFail');
                     return json(modelReMsg(-7, '', '查询超时,请稍等后在查!'));
                 }
 
