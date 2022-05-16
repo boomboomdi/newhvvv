@@ -53,6 +53,7 @@ class Timecheckorder extends Command
                             //修改订单查询状态为查询中
                             $updateCheckData['check_status'] = 1;
                             $updateCheckData['last_use_time'] = time();
+                            $updateCheckData['next_check_time'] = time() + 90;
                             $db::table("bsa_order")->where($updateCheckWhere)
                                 ->update($updateCheckData);
                             //修改订单查询状态为查询中 end

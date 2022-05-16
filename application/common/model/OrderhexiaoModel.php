@@ -58,7 +58,7 @@ class OrderhexiaoModel extends Model
 //            $notifyResult = curlPostJson("http://www.baidu.com", $checkParam);
 
             logs(json_encode([
-                'writeOrderNo' => $orderNo,  //核销order_no
+                'writeOrderNo' => $orderNo,  //四方订单 order_no
                 'param' => $checkParam,
                 "startTime" => $checkStartTime,
                 "endTime" => date("Y-m-d H:i:s", time()),
@@ -100,7 +100,7 @@ class OrderhexiaoModel extends Model
 //            $notifyResult = curlPostJson("http://www.baidu.com", $checkParam);
 
             logs(json_encode([
-                'writeOrderNo' => $orderNo,  //核销order_no
+                'writeOrderNo' => $orderNo,  //order_no
                 'param' => $checkParam,
                 "startTime" => $checkStartTime,
                 "endTime" => date("Y-m-d H:i:s", time()),
@@ -152,8 +152,8 @@ class OrderhexiaoModel extends Model
         $db::startTrans();
         try {
             if ($orderStatus == 2) {
-                $updateHXData['check_result'] = "手动回调" . session('admin_user_name');
-                $updateOrderData['check_result'] = "手动回调" . session('admin_user_name');
+                $updateHXData['check_result'] = "查单回调" . session('admin_user_name');
+                $updateOrderData['check_result'] = "查单回调" . session('admin_user_name');
             }
             //更新核销表  start
             $orderWhere['order_me'] = $orderDataNo['order_me'];
@@ -414,7 +414,7 @@ class OrderhexiaoModel extends Model
             }
             $orderWhere['id'] = $hxOrderInfo['id'];
             $checkParam['phone'] = $hxOrderInfo['account'];
-            $checkParam['order_no'] = $hxOrderInfo['account'];
+            $checkParam['order_no'] = $order['order_no'];
             $checkParam['action'] = 'first';
             $db::commit();  //表事务结束
             $checkRes = $this->checkPhoneAmountNew($checkParam, $hxOrderInfo['order_no']);

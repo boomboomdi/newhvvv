@@ -30,7 +30,7 @@ class Order extends Base
             if (isset($searchParam['order_no']) && !empty($searchParam['order_no'])) {
                 $where[] = ['order_no', 'like', $searchParam['order_no'] . '%'];
             }
-             if (isset($searchParam['account']) && !empty($searchParam['account'])) {
+            if (isset($searchParam['account']) && !empty($searchParam['account'])) {
                 $where[] = ['account', '=', $searchParam['account']];
             }
             if (isset($searchParam['order_me']) && !empty($searchParam['order_me'])) {
@@ -97,7 +97,6 @@ class Order extends Base
         return $this->fetch();
     }
 
-
     /**
      * 手动回调
      * @return void
@@ -153,9 +152,136 @@ class Order extends Base
         } catch (\Error $error) {
             logs(json_encode(['id' => $id, 'file' => $error->getFile(), 'line' => $error->getLine(), 'errorMessage' => $error->getMessage()]), 'order_notify_error');
             return json(modelReMsg(-22, '', '通道异常'));
-
         }
+    }
 
+    /**
+     * @return \think\response\Json
+     */
+    public function check()
+    {
+        try {
+            if (request()->isAjax()) {
+                $id = input('param.id');
+                if (empty($id)) {
+                    return json(modelReMsg(-1, '', '参数错误!'));
+                }
+
+                logs(json_encode([
+                    'check' => "check",
+                    'id' => input('param.id')
+                ]), 'checkNotifyOrder_log');
+                //查询订单
+                $order = Db::table("bsa_order")->where("id", $id)->find();
+                if (empty($order)) {
+                    return json(modelReMsg(-2, '', '回调订单有误!'));
+                }
+
+                if ($order['order_status'] == 1) {
+                    return json(modelReMsg(-3, '', '此订单已支付!'));
+                }
+                if (empty($order['order_me']) || empty($order['account']) || empty($order['order_pay'])) {
+                    return json(modelReMsg(-4, '', '此订单不可查单回调!'));
+                }
+                if ((time() - $order['add_time']) < 600) {
+                    return json(modelReMsg(-5, '', '请于' . (time() - $order['add_time']) . "秒后查询！"));
+                }
+                //已存在支付的
+                $hasPayOrder = Db::table("bsa_order")->where("order_pay", $order['order_pay'])
+                    ->where("pay_status", "=", 1)->find();
+                if (!empty($hasPayOrder)) {
+                    return json(modelReMsg(-6, '', '此单已被匹配支付，不可查单回调!'));
+                }
+                //已存在重新匹配的
+                $hasOrder = Db::table("bsa_order")
+                    ->where("order_pay", $order['order_pay'])
+                    ->where("order_me", "<>", $order['order_me'])
+                    ->find();
+                if (!empty($hasOrder)) {
+                    return json(modelReMsg(-7, '', '查询超时，此单已被重复匹配!'));
+                }
+
+                Db::startTrans();
+                //查询核销 并加行锁
+                $hxOrderData = Db::table("bsa_order_hexiao")
+                    ->where("order_no", "=", $order['order_pay'])
+                    ->where("check_status", "=", 0)
+                    ->lock(true)->find();
+                if (!$hxOrderData) {
+                    Db::startTrans();
+                    return json(modelReMsg(-8, '', '查单频繁，稍后再查!'));
+                }
+                $checking['check_status'] = 1;   //查询余额中
+                $checking['last_check_time'] = time();   //查询上次查询时间
+                Db::table("bsa_order_hexiao")
+                    ->where("order_no", "=", $order['order_pay'])
+                    ->where("check_status", "=", 0)->update($checking);
+                Db::commit();
+                $getResParam['action'] = 'first';
+                $getResParam['order_no'] = $order['order_no'];
+                $getResParam['phone'] = $order['account'];
+                $checkStartTime = date("Y-m-d H:i:s", time());
+                $orderHXModel = new OrderhexiaoModel();
+                $checkRes = $orderHXModel->checkPhoneAmountNew($getResParam, $order['order_no']);
+                $checking['check_status'] = 0;   //查询余额中
+                $checking['last_check_time'] = time();   //查询上次查询时间
+                Db::table("bsa_order_hexiao")
+                    ->where("order_no", "=", $order['order_pay'])
+                    ->where("check_status", "=", 0)->update($checking);
+                if ($checkRes['code'] != 0) {
+                    logs(json_encode([
+                        'action' => 'adminCheckOrder',
+                        "checkTime" => $checkStartTime,
+                        "endTime" => date("Y-m-d H:i:s", time()),
+                        'orderWhere' => $getResParam,
+                        'checkRes' => $checkRes,
+                        'getLastSql' => Db::table("bsa_order_hexiao")->getLastSql(),
+                    ]), 'adminCheckOrderFail');
+                    return json(modelReMsg(-7, '', '查询超时,请稍等后在查!'));
+                }
+
+                //查询成功-更新余额
+                $updateCheckData['last_check_amount'] = $checkRes['data']['amount'];
+                $updateCheckData['last_check_time'] = time();
+                $updateCheckData['check_result'] = "手动查寻余额|" . $checkRes['data']['amount'] . $checkStartTime;
+                $updateCheckData['check_status'] = 0;
+                Db::table("bsa_order")
+                    ->where('id', '=', $order['id'])
+                    ->where('order_no', '=', $order['order_no'])
+                    ->update($updateCheckData);
+
+
+                //支付成功，正在补单
+                if ($checkRes['data']['amount'] > ($order['end_check_amount'] - 5)) {
+                    //本地更新
+                    $orderHXModel = new OrderhexiaoModel();
+                    $updateOrderWhere['order_no'] = $order['order_no'];
+                    $updateOrderWhere['account'] = $order['account'];
+
+                    $localUpdateRes = $orderHXModel->orderLocalUpdate($order, 2);
+                    logs(json_encode(["time" => date("Y-m-d H:i:s", time()),
+                        'updateOrderWhere' => $updateOrderWhere,
+                        'account' => $hxOrderData['account'],
+                        'localUpdateRes' => $localUpdateRes
+                    ]), 'orderCheckLocalUpdateLog');
+                    if (!isset($localUpdate['code']) || $localUpdate['code'] != 0) {
+                        return json(msg(1, '', '支付成功，更新失败！'));
+                    }
+                    return json(msg(0, '', '查询成功，正在补单！'));
+                } else {
+                    return json(msg(1, '', '查询成功，订单未支付'));
+                }
+
+            } else {
+                return json(modelReMsg(-99, '', '访问错误'));
+            }
+        } catch (\Exception $exception) {
+            logs(json_encode(['id' => $id, 'file' => $exception->getFile(), 'line' => $exception->getLine(), 'errorMessage' => $exception->getMessage()]), 'order_notify_exception');
+            return json(modelReMsg(-11, '', '通道异常'));
+        } catch (\Error $error) {
+            logs(json_encode(['id' => $id, 'file' => $error->getFile(), 'line' => $error->getLine(), 'errorMessage' => $error->getMessage()]), 'order_notify_error');
+            return json(modelReMsg(-22, '', '通道异常'));
+        }
     }
 
     /**
