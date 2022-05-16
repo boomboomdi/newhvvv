@@ -411,9 +411,9 @@ class Orderinfo extends Controller
             }
             $db = new Db();
             $checkResult = "第" . ($orderInfo['check_times'] + 1) . "次查询结果" . $message['amount'] . "(" . date("Y-m-d H:i:s") . ")";
-            $nextCheckTime = time() + 90;
+            $nextCheckTime = time() + 390;  //第一次 ，当前第二次，设置，第三次
             if ($orderInfo['check_times'] > 3) {
-                $nextCheckTime = time() + 90;
+                $nextCheckTime = time() + 180;
             }
             if ($message['check_status'] != 1) {
                 $updateCheckTimesRes = $db::table("bsa_order")->where($orderWhere)

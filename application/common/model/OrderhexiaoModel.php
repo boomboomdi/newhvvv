@@ -530,6 +530,9 @@ class OrderhexiaoModel extends Model
             $notifyParam['order_amount'] = $orderHXData['order_amount'];
             $notifyParam['pay_amount'] = $orderHXData['pay_amount'];
             $notifyParam['pay_status'] = $orderHXData['pay_status'];
+            if ($notifyParam['pay_status'] != 1) {
+                $notifyParam['pay_status'] = 2;
+            }
             if ($orderHXData['pay_time'] != 0) {
                 $notifyParam['time'] = $orderHXData['pay_time'];
             } else {

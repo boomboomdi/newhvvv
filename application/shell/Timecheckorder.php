@@ -38,7 +38,7 @@ class Timecheckorder extends Command
                 ->where('next_check_time', '<', time())
 //                ->where('order_limit_time', '>', time())
 //                ->where('check_status', '=', 0)
-                ->where('check_times', '<', 5)
+                ->where('check_times', '<', 3)
                 ->select();
 
             $totalNum = count($orderData);
