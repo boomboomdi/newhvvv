@@ -248,13 +248,12 @@ class Order extends Base
                 //查询成功-更新余额
                 $updateCheckData['last_check_amount'] = $checkRes['data'];
                 $updateCheckData['last_check_time'] = time();
-                $updateCheckData['check_result'] = "手动查寻余额|" . $checkRes['data'] . $checkStartTime;
+                $updateCheckData['check_result'] = "手动查寻余额|" . $checkRes['data'] . "|" . $checkStartTime;
                 $updateCheckData['check_status'] = 0;
                 Db::table("bsa_order")
                     ->where('id', '=', $order['id'])
                     ->where('order_no', '=', $order['order_no'])
                     ->update($updateCheckData);
-
 
                 //支付成功，正在补单
                 if ($checkRes['data'] > ($order['end_check_amount'] - 5)) {
