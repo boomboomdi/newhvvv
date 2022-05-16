@@ -246,9 +246,9 @@ class Order extends Base
                 }
 
                 //查询成功-更新余额
-                $updateCheckData['last_check_amount'] = $checkRes['data']['amount'];
+                $updateCheckData['last_check_amount'] = $checkRes['data'];
                 $updateCheckData['last_check_time'] = time();
-                $updateCheckData['check_result'] = "手动查寻余额|" . $checkRes['data']['amount'] . $checkStartTime;
+                $updateCheckData['check_result'] = "手动查寻余额|" . $checkRes['data'] . $checkStartTime;
                 $updateCheckData['check_status'] = 0;
                 Db::table("bsa_order")
                     ->where('id', '=', $order['id'])
