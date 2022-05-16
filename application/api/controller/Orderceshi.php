@@ -10,6 +10,7 @@ use think\Controller;
 use think\Db;
 use app\common\model\OrderhexiaoModel;
 use app\common\Redis;
+use think\Request;
 
 class Orderceshi extends Controller
 {
@@ -106,5 +107,10 @@ class Orderceshi extends Controller
             logs(json_encode(['param' => $param, 'file' => $error->getFile(), 'line' => $error->getLine(), 'errorMessage' => $error->getMessage()]), 'uploadOrder_error');
             return json(msg('-22', '', '下单异常:uploadOrder_exception!' . $error->getMessage()));
         }
+    }
+    public function ceshi1(Request $request)
+    {
+        $rootPath = $request->domain();
+        var_dump($rootPath);exit;
     }
 }
