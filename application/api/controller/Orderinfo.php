@@ -235,7 +235,7 @@ class Orderinfo extends Controller
                         $returnData['limitTime'] = (int)($limitTime);
 //                $imgUrl = "http://175.178.195.147:9090/upload/tengxun.jpg";
 
-                        $imgUrl = "http://175.178.195.147:9090/upload/weixin513.jpg";
+                        $imgUrl = $request->domain()."/upload/weixin513.jpg";
 //                $imgUrl = urlencode($imgUrl);
                         $returnData['imgUrl'] = $imgUrl;
                         return json(msg(0, $returnData, "success"));
@@ -314,7 +314,7 @@ class Orderinfo extends Controller
 //            订单号order_id   金额 amount   手机号 phone  二维码链接 img_url    有效时间 limit_time 秒
 //            $imgUrl = "http://175.178.195.147:9090/upload/huafei.jpg";
 //                $imgUrl = "http://175.178.195.147:9090/upload/tengxun.jpg";
-                $imgUrl = "http://175.178.195.147:9090/upload/weixin513.jpg";
+                $imgUrl = $request->domain()."/upload/weixin513.jpg";
 //                $imgUrl = urlencode($imgUrl);
                 $limitTime = ($orderInfo['order_limit_time'] - 720);
                 $url = $url . "?order_id=" . $message['order_no'] . "&amount=" . $orderInfo['amount'] . "&phone=" . $orderInfo['account'] . "&img_url=" . $imgUrl . "&limit_time=" . $limitTime;
@@ -359,7 +359,7 @@ class Orderinfo extends Controller
                 $returnData['limitTime'] = (int)($limitTime);
 //                $imgUrl = "http://175.178.195.147:9090/upload/tengxun.jpg";
 
-                $imgUrl = "http://175.178.195.147:9090/upload/weixin513.jpg";
+                $imgUrl = $request->domain()."/upload/weixin513.jpg";
 //                $imgUrl = urlencode($imgUrl);
                 $returnData['imgUrl'] = $imgUrl;
                 return json(msg(0, $returnData, "success"));
