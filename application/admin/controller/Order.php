@@ -268,8 +268,8 @@ class Order extends Base
                         'account' => $hxOrderData['account'],
                         'localUpdateRes' => $localUpdateRes
                     ]), 'orderCheckLocalUpdateLog');
-                    if (!isset($localUpdate['code']) || $localUpdate['code'] != 0) {
-                        return json(msg(1, '', '更新失败,请重新查询！'));
+                    if (!isset($localUpdateRes['code']) || $localUpdateRes['code'] != 0) {
+                        return json(msg(1, '', '更新失败,重新查询！'));
                     }
                     return json(msg(0, '', '查询成功，正在补单！'));
                 } else {
