@@ -134,7 +134,7 @@ class Orderhexiao extends Controller
             $res = $orderHXModel->where($where)->find();
 
             if (!$res) {
-                return json(msg(-2, $where['order_no'], $res['msg']));
+                return json(msg(-2, $where['order_no'], $res));
             }
             if ($res['pay_status'] != 1) {
                 return json(msg(2, $where['order_no'], "success"));
