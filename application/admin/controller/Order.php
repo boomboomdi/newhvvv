@@ -187,9 +187,9 @@ class Order extends Base
                 if (empty($order['order_me']) || empty($order['account']) || empty($order['order_pay'])) {
                     return json(modelReMsg(-4, '', '此订单不可查单回调-4!'));
                 }
-                if ((time() - $order['add_time']) < 600) {
-                    return json(modelReMsg(-5, '', '请于' . (600 - (time() - $order['add_time'])) . "秒后查询！"));
-                }
+//                if ((time() - $order['add_time']) < 600) {
+//                    return json(modelReMsg(-5, '', '请于' . (600 - (time() - $order['add_time'])) . "秒后查询！"));
+//                }
                 //已存在支付的
                 $hasPayOrder = Db::table("bsa_order")->where("order_pay", $order['order_pay'])
                     ->where("pay_status", "=", 1)->find();
