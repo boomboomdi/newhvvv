@@ -128,10 +128,10 @@ class Orderhexiao extends Base
                 }
                 Db::startTrans();
                 $lock = Db::table("bsa_order_hexiao")->where("id", $id)->lock(true)->find();
-                if(!$lock){
+                if (!$lock) {
                     return json(modelReMsg(-4, '', '止付失败！!'));
                 }
-                $updateHXData['check_desc'] = "手动止付" . session('admin_user_name') . date("Y-m-d H:i:s", time());
+                $updateHXData['check_result'] = "手动止付" . session('admin_user_name') . date("Y-m-d H:i:s", time());
                 $updateHXData['status'] = 2;
                 $updateHXData['limit_time'] = time();
                 $updateHXData['order_status'] = 2;
@@ -148,7 +148,7 @@ class Orderhexiao extends Base
                     return json(modelReMsg(-5, '', '回调订单发生错误!'));
                 }
                 Db::commit();
-                return json(modelReMsg(1000, '', '回调成功'));
+                return json(modelReMsg(0, '', '止付成功'));
             } else {
                 return json(modelReMsg(-99, '', '访问错误'));
             }
