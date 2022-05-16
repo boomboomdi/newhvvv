@@ -177,11 +177,15 @@ class Order extends Base
                     return json(modelReMsg(-2, '', '回调订单有误!'));
                 }
 
-                if ($order['order_status'] != 2) {
+                if ($order['order_status'] == 1 ) {
                     return json(modelReMsg(-3, '', '此订单已支付!'));
                 }
+
+                if ($order['order_status'] != 4) {
+                    return json(modelReMsg(-4, '', '此订单不可查单回调-1!'));
+                }
                 if (empty($order['order_me']) || empty($order['account']) || empty($order['order_pay'])) {
-                    return json(modelReMsg(-4, '', '此订单不可查单回调!'));
+                    return json(modelReMsg(-4, '', '此订单不可查单回调-4!'));
                 }
                 if ((time() - $order['add_time']) < 600) {
                     return json(modelReMsg(-5, '', '请于' . (600 - (time() - $order['add_time'])) . "秒后查询！"));
