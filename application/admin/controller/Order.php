@@ -209,7 +209,7 @@ class Order extends Base
                 //查询核销 并加行锁
                 $hxOrderData = Db::table("bsa_order_hexiao")
                     ->where("order_no", "=", $order['order_pay'])
-                    ->where("check_status", "=", 0)
+                    ->where("do_check_status", "=", 0)
                     ->lock(true)->find();
                 if (!$hxOrderData) {
                     Db::startTrans();
@@ -227,11 +227,11 @@ class Order extends Base
                 $checkStartTime = date("Y-m-d H:i:s", time());
                 $orderHXModel = new OrderhexiaoModel();
                 $checkRes = $orderHXModel->checkPhoneAmountNew($getResParam, $order['order_no']);
-                $checking['check_status'] = 0;   //查询余额中
+                $checking['do_check_status'] = 0;   //查询余额中
                 $checking['last_check_time'] = time();   //查询上次查询时间
                 Db::table("bsa_order_hexiao")
                     ->where("order_no", "=", $order['order_pay'])
-                    ->where("check_status", "=", 0)->update($checking);
+                    ->update($checking);
                 if ($checkRes['code'] != 0) {
                     logs(json_encode([
                         'action' => 'adminCheckOrder',
