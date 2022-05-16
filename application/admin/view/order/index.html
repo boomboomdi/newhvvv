@@ -74,6 +74,11 @@
                 {{#  } }}
             </script>
             <script type="text/html" id="table-seller-admin">
+
+                {if (buttonAuth('order/check'))}
+                <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="notify"><i
+                        class="layui-icon layui-icon-edit"></i>查单</a>
+                {/if}
                 {if (buttonAuth('order/notify'))}
                 {{#  if(d.admin_id == '1'){ }}
                 <a class="layui-btn layui-btn-disabled layui-btn-xs" style="color: blue"><i
@@ -227,9 +232,32 @@
 
                             });
                         });
-                    } else if ("edit" === e.event) {
+                    } else if ("check" === e.event) {
 
-                        layTool.open("/admin/manager/editAdmin/admin_id/" + e.data.admin_id, "编辑管理员", '50%', '50%');
+                        layer.ready(function () {
+                            var index = layer.confirm('查询此订单？', {
+                                title: '友情提示',
+                                icon: 3,
+                                btn: ['确定', '取消']
+                            }, function () {
+
+                                $.getJSON('{:url("order/check")}', {id: e.data.id}, function (res) {
+
+                                    if (0 == res.code) {
+                                        layer.msg(res.msg);
+                                        setTimeout(function () {
+                                            renderTable();
+                                        }, 300);
+                                    }else if (1 == res.code) {
+                                        layer.msg(res.msg);
+                                    } else {
+                                        layer.alert(res.msg);
+                                    }
+                                });
+                            }, function () {
+
+                            });
+                        });
                     }
                 });
         });

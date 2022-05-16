@@ -265,7 +265,7 @@ class Order extends Base
                         'localUpdateRes' => $localUpdateRes
                     ]), 'orderCheckLocalUpdateLog');
                     if (!isset($localUpdate['code']) || $localUpdate['code'] != 0) {
-                        return json(msg(1, '', '支付成功，更新失败！'));
+                        return json(msg(1, '', '更新失败,请重新查询！'));
                     }
                     return json(msg(0, '', '查询成功，正在补单！'));
                 } else {
