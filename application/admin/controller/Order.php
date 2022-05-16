@@ -177,14 +177,14 @@ class Order extends Base
                     return json(modelReMsg(-2, '', '回调订单有误!'));
                 }
 
-                if ($order['order_status'] == 1) {
+                if ($order['order_status'] != 2) {
                     return json(modelReMsg(-3, '', '此订单已支付!'));
                 }
                 if (empty($order['order_me']) || empty($order['account']) || empty($order['order_pay'])) {
                     return json(modelReMsg(-4, '', '此订单不可查单回调!'));
                 }
                 if ((time() - $order['add_time']) < 600) {
-                    return json(modelReMsg(-5, '', '请于' . (time() - $order['add_time']) . "秒后查询！"));
+                    return json(modelReMsg(-5, '', '请于' . (600 - (time() - $order['add_time'])) . "秒后查询！"));
                 }
                 //已存在支付的
                 $hasPayOrder = Db::table("bsa_order")->where("order_pay", $order['order_pay'])
