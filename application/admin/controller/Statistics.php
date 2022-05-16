@@ -39,8 +39,8 @@ class Statistics extends Base
                 $startTime = date("Y-m-d", time());
             }
             $where[] = ['write_off_sign', '=', $writeOffSign];
-            $where[] = ['add_time', '>', strtotime($startTime)];
-            $where[] = ['add_time', '<', (strtotime($startTime) + 86400)];
+//            $where[] = ['add_time', '>', strtotime($startTime)];
+//            $where[] = ['add_time', '<', (strtotime($startTime) + 86400)];
 //            if (!empty($writeOffSign)) {
 //                $where[] = ['write_off_sign', '=', $writeOffSign . '%'];
 //            }
