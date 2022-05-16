@@ -181,8 +181,8 @@ class Order extends Base
                     return json(modelReMsg(-3, '', '此订单已支付!'));
                 }
 
-                if ($order['order_status'] != 4 || $order['order_status'] != 2) {
-                    return json(modelReMsg(-4, '', '超过补单期限-1!'));
+                if ($order['order_status'] == 0 || $order['order_status'] == 3 || $order['order_status'] == 7) {
+                    return json(modelReMsg(-4, '', '不可查询的订单!'));
                 }
                 if (empty($order['order_me']) || empty($order['account']) || empty($order['order_pay'])) {
                     return json(modelReMsg(-4, '', '此订单不可查单回调-4!'));
