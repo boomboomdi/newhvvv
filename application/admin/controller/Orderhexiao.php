@@ -105,42 +105,65 @@ class Orderhexiao extends Base
         }
     }
 
-    /**
-     * 修改设备状态
-     */
-    public function changestatus()
+    //回调核销
+    public function notify()
     {
-        $t_id = input('param.t_id');
-        $TorderModel = new TorderModel();
+        $id = input('param.id');
         try {
-            $list = $TorderModel
-                ->where('t_id', '=', $t_id)->find();
-            $torder = session('username');
-            //在线设备可以修改启用与否
-            if ($list['status'] != '4') {
-                return json(msg(0, '', '已使用订单无法操作！'));
-            }
-            if ($list['status'] == '1') {
-                $updateData['status'] = 2;
-                $result = $TorderModel
-                    ->where('t_id', '=', $t_id)
-                    ->update($updateData);
-                if ($result) {
-                    return json(msg(0, '', '修改成功！,已禁用'));
-                }
-            } else {
-                $updateData['status'] = 1;
-                $result = $TorderModel
-                    ->where('t_id', '=', $t_id)
-                    ->update($updateData);
-                if ($result) {
-                    return json(msg(0, '', '修改成功！,已启用'));
-                }
-            }
-        } catch (\Exception $e) {
-            return json(msg(-2, '', $e->getMessage()));
-        }
-    }
+            if (request()->isAjax()) {
 
+                if (empty($id)) {
+                    return json(modelReMsg(-1, '', '参数错误!'));
+                }
+                //查询订单
+                $orderHxData = Db::table("bsa_order_hexiao")->where("id", $id)->find();
+                if (empty($orderHxData)) {
+                    return json(modelReMsg(-2, '', '无此核销单!'));
+                }
+                //查询是否有匹配订单
+                $orderHXModel = new OrderhexiaoModel();
+                $orderData = Db::table("bsa_order")->where("account", '=', $orderHxData['account'])->find();
+                if (!empty($orderHxData['order_me']) || !empty($orderData)) {
+                    return json(modelReMsg(-3, '', '已使用核销单不可止付!'));
+                }
+                Db::startTrans();
+                $lock = Db::table("bsa_order_hexiao")->where("id", $id)->lock(true)->find();
+                if(!$lock){
+                    return json(modelReMsg(-4, '', '止付失败！!'));
+                }
+                $updateHXData['check_desc'] = "手动止付" . session('admin_user_name') . date("Y-m-d H:i:s", time());
+                $updateHXData['status'] = 2;
+                $updateHXData['limit_time'] = time();
+                $updateHXData['order_status'] = 2;
+                $updateHXData['check_status'] = 0;
+                $updateHXData['pay_status'] = 2;
+                $localUpdate = Db::table("bsa_order_hexiao")->where("id", $id)->update($updateHXData);
+                if (!$localUpdate) {
+                    Db::rollback();
+                    logs(json_encode(["time" => date("Y-m-d H:i:s", time()),
+                        'order_no' => $orderData['order_no'],
+                        'phone' => $orderData['account'],
+                        "localUpdateFail" => json_encode($localUpdate)
+                    ]), 'orderHXNotify');
+                    return json(modelReMsg(-5, '', '回调订单发生错误!'));
+                }
+                Db::commit();
+                return json(modelReMsg(1000, '', '回调成功'));
+            } else {
+                return json(modelReMsg(-99, '', '访问错误'));
+            }
+        } catch (\Exception $exception) {
+            logs(json_encode(['id' => $id, 'file' => $exception->getFile(), 'line' => $exception->getLine(),
+                'errorMessage' => $exception->getMessage()]), 'orderHXNotifyException');
+            return json(modelReMsg(-11, '', '止付异常'));
+        } catch (\Error $error) {
+            logs(json_encode(['id' => $id, 'file' => $error->getFile(), 'line' => $error->getLine(),
+                'errorMessage' => $error->getMessage()]), 'orderHXNotifyError');
+            return json(modelReMsg(-22, '', '止付错误'));
+
+        }
+
+
+    }
 
 }

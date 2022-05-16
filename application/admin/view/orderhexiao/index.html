@@ -101,15 +101,11 @@
             </script>
 
             <script type="text/html" id="table-seller-admin">
-
-                {if (buttonAuth('orderdouyin/deltorder'))}
-                {{#  if(d.admin_id == '1'){ }}
-                <a class="layui-btn layui-btn-disabled layui-btn-xs"><i class="layui-icon layui-icon-delete"></i>删除</a>
-                {{#  } else { }}
-                <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i
-                        class="layui-icon layui-icon-delete"></i>删除</a>
-                {{#  } }}
+                {if (buttonAuth('orderhexiao/notify'))}
+                <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="notify"><i
+                        class="layui-icon layui-icon-edit"></i>编辑</a>
                 {/if}
+
             </script>
         </div>
     </div>
@@ -236,15 +232,15 @@
 
             table.on("tool(LAY-user-table)",
                 function (e) {
-                    if ("del" === e.event) {
+                    if ("notify" === e.event) {
                         layer.ready(function () {
-                            var index = layer.confirm('您确定要删除该推单？', {
+                            var index = layer.confirm('是否确定撤单？', {
                                 title: '友情提示',
                                 icon: 3,
                                 btn: ['确定', '取消']
                             }, function () {
 
-                                $.getJSON('{:url("orderdouyin/delTorder")}', {t_id: e.data.t_id}, function (res) {
+                                $.getJSON('{:url("orderhexiao/notify")}', {id: e.data.id}, function (res) {
 
                                     if (0 == res.code) {
 
