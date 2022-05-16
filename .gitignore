@@ -7,4 +7,7 @@ config
 runtime/*
 vendor
 thinkphp
+.user.ini
+.gitattributes
+.travis.yml
 
