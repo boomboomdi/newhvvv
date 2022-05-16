@@ -113,7 +113,8 @@ class Orderhexiao extends Controller
         $param = $request->param();
         $data = @file_get_contents('php://input');
         $param = json_decode($data, true);
-        Log::info('douyin orderInfo first!', $param);
+        logs(json_encode(['message' => $param, "time" => date("Y-m-d H:i:s", time())]), 'orderInfoHxOrder_log');
+
         try {
             $validate = new OrderhexiaoValidate();
             if (!$validate->scene("orderInfo")->check($param)) {
@@ -134,7 +135,7 @@ class Orderhexiao extends Controller
             $res = $orderHXModel->where($where)->find();
 
             if (!$res) {
-                return json(msg(-2, $where['order_no'], $res));
+                return json(msg(-2, $where['order_no'], ""));
             }
             if ($res['pay_status'] != 1) {
                 return json(msg(2, $where['order_no'], "success"));
