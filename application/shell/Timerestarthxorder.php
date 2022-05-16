@@ -37,6 +37,11 @@ class Timerestarthxorder extends Command
                 ->where('order_limit_time', '<', time())
                 ->where('limit_time', '>', time() + 3600)     //当前时间> limit_time+3600 才重新启用
                 ->select();
+            logs(json_encode([
+
+                "time" => date("Y-m-d H:i:s", time()),
+                "updateHXOrderRes" => Db::table("bsa_order_hexiao")->getLastSql(),
+            ]), 'Timerestarthxorder_log');
             $totalNum = count($orderHXData);
             if ($totalNum > 0) {
                 foreach ($orderHXData as $k => $v) {
