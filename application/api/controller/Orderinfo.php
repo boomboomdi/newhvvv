@@ -218,10 +218,14 @@ class Orderinfo extends Controller
         }
         try {
             if ($orderInfo['order_status'] == 7) {
+
                 logs(json_encode([
                     'action' => 'doMatching',
                     'message' => $message,
                 ]), 'getOrderInfodoMatching');
+                if (($orderInfo['order_limit_time'] - 720) < time()) {
+                    return json(msg(-5, '', '订单超时，请重新下单'));
+                }
                 for ($i = 0; $i < 5; $i++) {
                     sleep(3);
                     $orderInfo = $db::table("bsa_order")->where("order_no", "=", $orderInfo['order_no'])->find();
@@ -248,6 +252,9 @@ class Orderinfo extends Controller
                 return json(msg(-9, "", "网络异常，请刷新页面"));
             }
             if ($orderInfo['order_status'] == 0) {
+                if (($orderInfo['order_limit_time'] - 720) < time()) {
+                    return json(msg(-5, '', '订单超时，请重新下单'));
+                }
                 $db::startTrans();
                 $orderInfo = $db::table("bsa_order")
                     ->where("order_no", "=", $orderInfo['order_no'])
@@ -343,16 +350,14 @@ class Orderinfo extends Controller
                 $returnData['imgUrl'] = $imgUrl;
                 return json(msg(0, $returnData, 'order_success'));
             } else {
-                if (empty($orderInfo['order_no'])) {
-                    return json(msg(-4, '', '无此推单！'));
+                if (($orderInfo['order_limit_time'] - 720) < time()) {
+                    return json(msg(-5, '', '订单超时，请重新下单'));
                 }
                 if ($orderInfo['order_status'] != 4) {
                     return json(msg(-5, '', '订单状态有误，请重新下单！'));
                 }
 
-                if (($orderInfo['order_limit_time'] - 720) < time()) {
-                    return json(msg(-5, '', '订单超时，请重新下单'));
-                }
+
                 $returnData['phone'] = $orderInfo['account'];
                 $returnData['amount'] = $orderInfo['amount'];
                 $limitTime = (($orderInfo['order_limit_time'] - 720) - time());
