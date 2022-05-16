@@ -177,7 +177,7 @@ class Order extends Base
                     return json(modelReMsg(-2, '', '回调订单有误!'));
                 }
 
-                if ($order['order_status'] == 1 ) {
+                if ($order['order_status'] == 1) {
                     return json(modelReMsg(-3, '', '此订单已支付!'));
                 }
 
@@ -200,9 +200,10 @@ class Order extends Base
                 $hasOrder = Db::table("bsa_order")
                     ->where("order_pay", $order['order_pay'])
                     ->where("order_me", "<>", $order['order_me'])
+                    ->where("add_time", ">", $order['add_time'])
                     ->find();
                 if (!empty($hasOrder)) {
-                    return json(modelReMsg(-7, '', '查询超时，此单已被重复匹配!'));
+                    return json(modelReMsg(-7, '', '此单已被重复匹配!'));
                 }
 
                 Db::startTrans();
