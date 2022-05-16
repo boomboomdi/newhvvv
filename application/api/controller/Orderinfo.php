@@ -103,7 +103,7 @@ class Orderinfo extends Controller
 //                $url = "http://175.178.241.238/pay/#/huafeiZfb";
                 $url = "http://175.178.241.238/pay/#/huafeiNewZfb";
             }
-            $apiUrl = $request->domain() . "api/orderinfo/getorderinfo";
+            $apiUrl = $request->domain() . "/api/orderinfo/getorderinfo";
             $url = $url . "?order_id=" . $message['order_no'] . "&amount=" . $message['amount'] . "&apiUrl=" . $apiUrl;
 
             $hxWhere['id'] = $hxOrderData['id'];
