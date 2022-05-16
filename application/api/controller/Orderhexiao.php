@@ -137,10 +137,10 @@ class Orderhexiao extends Controller
                 return json(msg(-2, $where['order_no'], $res['msg']));
             }
             if ($res['pay_status'] != 1) {
-                return json(msg($res['pay_status'], $where['order_no'], "success"));
+                return json(msg(2, $where['order_no'], "success"));
 
             }
-            return json(msg($res['pay_status'], $where['order_no'], "success"));
+            return json(msg(1, $where['order_no'], "success"));
 
         } catch (\Exception $exception) {
             logs(json_encode(['param' => $param, 'file' => $exception->getFile(), 'line' => $exception->getLine(), 'errorMessage' => $exception->getMessage()]), 'orderInfo_exception');
