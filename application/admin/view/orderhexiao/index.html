@@ -92,11 +92,17 @@
             </script>
             <script type="text/html" id="notifyStatusTpl">
                 {{#  if(d.notify_status == 1){ }}
-                <span class="layui-badge-dot green"></span>回调成功
+
+                <button class="layui-btn layui-btn-success layui-btn-xs">回调成功</button>
+<!--                <span class="layui-badge-dot green"></span>回调成功-->
                 {{#  } else if(d.notify_status == 2){ }}
-                <span class="layui-badge-dot gray"></span>回调失败
+
+                <button class="layui-btn layui-btn-danger layui-btn-xs">回调失败</button>
+<!--                <span class="layui-badge-dot gray"></span>回调失败-->
                 {{#  } else if(d.notify_status == 0){ }}
-                <span class="layui-badge-dot gray"></span>未回调
+
+                <button class="layui-btn layui-btn-primary layui-btn-xs">未回调</button>
+<!--                <span class="layui-badge-dot gray"></span>未回调-->
                 {{#  } }}
             </script>
 
