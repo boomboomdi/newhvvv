@@ -74,7 +74,7 @@
             </script>
             <script type="text/html" id="orderStatusTpl">
                 {{#  if(d.order_status == 0){ }}
-                <button class="layui-btn layui-btn-primary layui-btn-xs">还未支付</button>
+                <button class="layui-btn layui-btn-primary layui-btn-xs">等待匹配</button>
                 {{#  } else if(d.order_status == 1) { }}
                 <button class="layui-btn layui-btn-success layui-btn-xs">匹配成功</button>
                 {{#  } else if(d.order_status == 2) { }}
