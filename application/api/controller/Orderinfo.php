@@ -12,11 +12,11 @@ use app\api\validate\CheckPhoneAmountNotifyValidate;
 use think\Request;
 use think\Validate;
 use app\common\Redis;
-
-header('Access-Control-Allow-Origin:*');
-header("Access-Control-Allow-Credentials:true");
-header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept,Authorization");
-header('Access-Control-Allow-Methods:GET,POST,PUT,DELETE,OPTIONS,PATCH');
+//
+//header('Access-Control-Allow-Origin:*');
+//header("Access-Control-Allow-Credentials:true");
+//header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept,Authorization");
+//header('Access-Control-Allow-Methods:GET,POST,PUT,DELETE,OPTIONS,PATCH');
 
 class Orderinfo extends Controller
 {
@@ -192,7 +192,10 @@ class Orderinfo extends Controller
      */
     public function getOrderInfo(Request $request)
     {
-
+        header('Access-Control-Allow-Origin:*');
+        header("Access-Control-Allow-Credentials:true");
+        header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept,Authorization");
+        header('Access-Control-Allow-Methods:GET,POST,PUT,DELETE,OPTIONS,PATCH');
         $data = @file_get_contents('php://input');
         $message = json_decode($data, true);
 
