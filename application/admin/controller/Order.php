@@ -78,7 +78,7 @@ class Order extends Base
                 if (!empty($data[$key]['order_status']) && $data[$key]['order_status'] == '4') {
                     $data[$key]['order_status'] = '<button class="layui-btn layui-btn-warm layui-btn-xs">等待支付</button>';
                 }
-                if (!empty($data[$key]['order_status']) && $data[$key]['order_status'] <= 0) {
+                if (!empty($data[$key]['order_status']) && $data[$key]['order_status'] === 0) {
                     $data[$key]['order_status'] = '<button class="layui-btn layui-btn-primary layui-btn-xs">下单中···</button>';
                 }
                 if (!empty($data[$key]['order_status']) && $data[$key]['order_status'] == '5') {
