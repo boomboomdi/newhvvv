@@ -170,7 +170,7 @@ class OrderModel extends Model
             if ($handTotalAmount) {
                 $info = $info + $handTotalAmount['totalAmount'];
             }
-            $where['status'] = 1;
+            $where['order_status'] = 1;
             $totalAmount = $this->field('sum(actual_amount) as totalAmount')->where($where)->find();
 //
             if ($totalAmount) {
@@ -208,7 +208,7 @@ class OrderModel extends Model
             $postingNum = $this->where($where)->where("status", 6)->count();
             $info = $info + $postingNum;
 
-            $where['status'] = 1;
+            $where['order_status'] = 1;
             if (!empty($this->where($where)->count()) || is_int($this->where($where)->count())) {
                 $info = $info + $this->where($where)->count();
             }
