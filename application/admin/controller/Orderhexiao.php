@@ -122,8 +122,11 @@ class Orderhexiao extends Base
                 }
                 //查询是否有匹配订单
                 $orderHXModel = new OrderhexiaoModel();
-                $orderData = Db::table("bsa_order")->where("account", '=', $orderHxData['account'])->find();
-                if (!empty($orderHxData['order_me']) || !empty($orderData)) {
+                $orderData = Db::table("bsa_order")
+                    ->where("account", '=', $orderHxData['account'])
+                    ->where("order_pay", '=', $orderHxData['order_no'])
+                    ->find();
+                if (!empty($orderData) || !empty($orderHxData['order_me'])) {
                     return json(modelReMsg(-3, '', '已使用核销单不可止付!'));
                 }
                 Db::startTrans();
