@@ -105,7 +105,7 @@ class Orderhexiao extends Base
         }
     }
 
-    //回调核销
+    //止付
     public function notify()
     {
         $id = input('param.id');
