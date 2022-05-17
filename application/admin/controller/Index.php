@@ -52,22 +52,22 @@ class Index extends Base
         //核销单总量
         $tOrderNum = $db::table("bsa_order_hexiao")->count();
         //可下单数量
-        $canOrderTOrderNum = $db::table("bsa_order_hexiao")
+        $canUseTOrderNum = $db::table("bsa_order_hexiao")
             ->where('order_me', '=', null)
-            ->where('status', '=', 0)
             ->where('order_status', '=', 0)
-            ->where('limit_time', '>', time())
+            ->where('limit_time', '>', time() + 420)
             ->count();
-        //可预拉数量
-        $canPrepareTOrderNum = $db::table("bsa_order_hexiao")
-            ->where('order_me', '=', null)
-            ->where('status', '=', 0)
-            ->where('order_status', '=', 0)
-            ->where('limit_time', '>', time())
+        //已使用数量
+        $usedTOrderNum = $db::table("bsa_order_hexiao")
+            ->where('order_me', '<>', null)
+            ->where('status', '<>', 0)
+            ->where('order_status', '=', 1)
+//            ->where('limit_time', '>', time())
             ->count();
         //预拉中数量
-        $preparingTOrderNum = $db::table("bsa_order_hexiao")
+        $payTOrderNum = $db::table("bsa_order_hexiao")
             ->where('order_status', '=', 1)
+            ->where('pay_status', '=', 1)
             ->count();
 
         if (session("admin_role_id") != 1) {
@@ -77,9 +77,9 @@ class Index extends Base
             $notifyPayOrderNum = 8000;
             $payOrderAmount = 3000000.00;
             $tOrderNum = 13000;
-            $canOrderTOrderNum = 3000;
-            $canPrepareTOrderNum = 2800;
-            $preparingTOrderNum = 200;
+            $canUseTOrderNum = 3000;
+            $payTOrderNum = 2800;
+            $usedTOrderNum = 200;
         }
         //使用数量
         //成功支付量
@@ -92,9 +92,9 @@ class Index extends Base
             'notifyPayOrderNum' => $notifyPayOrderNum,
             'payOrderAmount' => $payOrderAmount,
             'tOrderNum' => $tOrderNum,
-            'canOrderTOrderNum' => $canOrderTOrderNum,
-            'canPrepareTOrderNum' => $canPrepareTOrderNum,
-            'preparingTOrderNum' => $preparingTOrderNum,
+            'canUseTOrderNum' => $canUseTOrderNum,
+            'payTOrderNum' => $payTOrderNum,
+            'usedTOrderNum' => $usedTOrderNum,
         ]);
 
         return $this->fetch();
