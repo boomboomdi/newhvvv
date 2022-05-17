@@ -238,7 +238,7 @@ class Orderinfo extends Controller
                         $returnData['limitTime'] = (int)($limitTime);
 //                $imgUrl = "http://175.178.195.147:9090/upload/tengxun.jpg";
 
-                        $imgUrl = $request->domain()."/upload/weixin517.jpg";
+                        $imgUrl = $request->domain() . "/upload/weixin517.jpg";
 //                $imgUrl = urlencode($imgUrl);
                         $returnData['imgUrl'] = $imgUrl;
                         return json(msg(0, $returnData, "success"));
@@ -283,19 +283,20 @@ class Orderinfo extends Controller
 //                    $db::rollback();
 //                    return json(msg(-7, '', '匹配繁忙-5'));
 //                }
-                //2、分配核销单
+                //2、请求核销单
                 $orderHXModel = new OrderhexiaoModel();
                 $getUseHxOrderRes = $orderHXModel->getUseHxOrderNew($orderInfo);
                 if (!isset($getUseHxOrderRes['code']) || $getUseHxOrderRes['code'] != 0) {
                     logs(json_encode([
-                        'action' => 'getUseHxOrderfail',
+                        'action' => 'getUseHxOrderFail',
                         'insertOrderData' => $orderInfo,
                         'getUseHxOrderRes' => $getUseHxOrderRes
-                    ]), 'getUseHxOrder_log');
+                    ]), 'getOrderInfoAmount_log');
                     //修改订单为下单失败状态。
                     $updateOrderStatus['order_status'] = 3;
                     $updateOrderStatus['last_use_time'] = time();
-                    $updateOrderStatus['order_desc'] = "下单失败|" . $getUseHxOrderRes['msg'];
+                    $updateOrderStatus['check_result'] = json_encode($getUseHxOrderRes['data']);
+                    $updateOrderStatus['order_desc'] = "下单失败|-|" . $getUseHxOrderRes['msg'];
                     $updateMatchRes = $orderModel->where('order_no', $orderInfo['order_no'])->update($updateOrderStatus);
                     if (!$updateMatchRes) {
                         logs(json_encode([
@@ -320,7 +321,7 @@ class Orderinfo extends Controller
 //            订单号order_id   金额 amount   手机号 phone  二维码链接 img_url    有效时间 limit_time 秒
 //            $imgUrl = "http://175.178.195.147:9090/upload/huafei.jpg";
 //                $imgUrl = "http://175.178.195.147:9090/upload/tengxun.jpg";
-                $imgUrl = $request->domain()."/upload/weixin517.jpg";
+                $imgUrl = $request->domain() . "/upload/weixin517.jpg";
 //                $imgUrl = urlencode($imgUrl);
                 $limitTime = ($orderInfo['order_limit_time'] - 720);
                 $url = $url . "?order_id=" . $message['order_no'] . "&amount=" . $orderInfo['amount'] . "&phone=" . $orderInfo['account'] . "&img_url=" . $imgUrl . "&limit_time=" . $limitTime;
@@ -363,7 +364,7 @@ class Orderinfo extends Controller
                 $returnData['limitTime'] = (int)($limitTime);
 //                $imgUrl = "http://175.178.195.147:9090/upload/tengxun.jpg";
 
-                $imgUrl = $request->domain()."/upload/weixin517.jpg";
+                $imgUrl = $request->domain() . "/upload/weixin517.jpg";
 //                $imgUrl = urlencode($imgUrl);
                 $returnData['imgUrl'] = $imgUrl;
                 return json(msg(0, $returnData, "success"));

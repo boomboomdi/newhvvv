@@ -115,7 +115,7 @@ class OrderhexiaoModel extends Model
 //            $notifyResultData = json_decode($notifyResult['data'], true);
             //{"code":0,"msg":"SUCCESS","data":{"phone":"13333338889","amount":469.19},"sign":"488864C0AB51AEA0AF551074446FBCEC"}
             if (!isset($notifyResult['code']) || $notifyResult['code'] != 0) {
-                return modelReMsg(-1, "", $notifyResult['msg']);
+                return modelReMsg(-1, json_encode($notifyResult), $notifyResult['msg']);
             }
             return modelReMsg(0, $notifyResult['data']['amount'], '查询成功！');
         } catch (\Exception $exception) {
@@ -299,6 +299,7 @@ class OrderhexiaoModel extends Model
                 $updateHxDataForStop['last_use_time'] = time();
                 $updateHxDataForStop['order_status'] = 2;
                 $updateHxDataForStop['check_status'] = 0;
+                $updateHxDataForStop['check_result'] = $checkRes['data'];
                 $updateHxDataForStop['order_desc'] = "不可查单，立即回调" . json_encode($checkRes);
                 $updateHxDataForStopRes = $db::table("bsa_order_hexiao")->where($updateHxWhereForStop)->update($updateHxDataForStop);
                 logs(json_encode([
@@ -391,15 +392,15 @@ class OrderhexiaoModel extends Model
                 ->where("account", "=", $order['account'])
                 ->lock(true)
                 ->find();
-            logs(json_encode(['action' => 'getUseHxOrder',
-                'orderNo' => $order['order_no'],
-                'hxOrderInfo' => $hxOrderInfo,
-                'lastSql' => $db::table("bsa_order_hexiao")->getLastSql(),
-            ]), 'getUseHxOrder_log');
+//            logs(json_encode(['action' => 'getUseHxOrder',
+//                'orderNo' => $order['order_no'],
+//                'hxOrderInfo' => $hxOrderInfo,
+//                'lastSql' => $db::table("bsa_order_hexiao")->getLastSql(),
+//            ]), 'getUseHxOrder_log');
 
             if (!$hxOrderInfo || $hxOrderInfo['order_me'] == null) {
                 $db::rollback();
-                return modelReMsg(-1, '', '无可用下单！-1');
+                return modelReMsg(-3, '', '无可用下单！-3');
             }
 
             $orderWhere['id'] = $hxOrderInfo['id'];
@@ -410,7 +411,7 @@ class OrderhexiaoModel extends Model
             $checkRes = $db::table("bsa_order_hexiao")->where($orderWhere)->update($checking);
             if (!$checkRes) {
                 $db::rollback();
-                return modelReMsg(-1, '', '无可用下单！-1');
+                return modelReMsg(-4, '', '无可用下单！-1');
             }
             $orderWhere['id'] = $hxOrderInfo['id'];
             $checkParam['phone'] = $hxOrderInfo['account'];
@@ -427,7 +428,8 @@ class OrderhexiaoModel extends Model
                 $updateHxDataForStop['last_use_time'] = time();
                 $updateHxDataForStop['order_status'] = 2;
                 $updateHxDataForStop['check_status'] = 0;
-                $updateHxDataForStop['order_desc'] = "不可查单，立即回调" . json_encode($checkRes);
+                $updateHxDataForStop['check_result'] = "查询失败，立即回调" . $checkRes['data'];
+                $updateHxDataForStop['order_desc'] = "查询失败，立即回调|" . json_encode($checkRes);
                 $updateHxDataForStopRes = $db::table("bsa_order_hexiao")->where($updateHxWhereForStop)->update($updateHxDataForStop);
                 logs(json_encode([
                     'action' => 'updateHxWhereForStop',
@@ -440,7 +442,7 @@ class OrderhexiaoModel extends Model
 //                if (!$updateHxDataForStopRes) {
 //                    $db::rollback();
 //                }
-                return modelReMsg(-4, '', '下单频繁，请稍后再下-4！');
+                return modelReMsg(-5, "查询失败，立即回调" . $checkRes['data'], '查询余额失败-5！');
             }
             //查询成功更新余额order_hexiao $order order_hexiao
             $orderWhere['id'] = $hxOrderInfo['id'];
@@ -465,7 +467,7 @@ class OrderhexiaoModel extends Model
                 'updateMatchSuccessRes' => $updateMatchSuccessRes,
             ]), 'AAAMatchSuccessRes');
             if (!$updateMatchSuccessRes) {
-                return modelReMsg(-5, '', '下单频繁，请稍后再下-5！');
+                return modelReMsg(-6, '', '下单频繁，请稍后再下-6！');
             }
             $hxOrderInfo = $db::table("bsa_order_hexiao")->where($orderWhere)->find();
             return modelReMsg(0, $hxOrderInfo, "匹配成功！");
