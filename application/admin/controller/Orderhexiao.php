@@ -122,12 +122,16 @@ class Orderhexiao extends Base
                 }
                 //查询是否有匹配订单
                 $orderHXModel = new OrderhexiaoModel();
-                $orderData = Db::table("bsa_order")
-                    ->where("account", '=', $orderHxData['account'])
-                    ->where("order_pay", '=', $orderHxData['order_no'])
-                    ->find();
-                if (!empty($orderData) || !empty($orderHxData['order_me'])) {
-                    return json(modelReMsg(-3, '', '已使用核销单不可止付!'));
+//                $orderData = Db::table("bsa_order")
+//                    ->where("account", '=', $orderHxData['account'])
+//                    ->where("order_pay", '=', $orderHxData['order_no'])
+//                    ->where("order_status", '=', $orderHxData['order_no'])
+//                    ->find();
+//                if (!empty($orderData) || !empty($orderHxData['order_me'])) {
+//                    return json(modelReMsg(-3, '', '已使用核销单不可止付!'));
+//                }
+                if ($orderHxData['order_limit_time'] != 0) {
+                    return json(modelReMsg(-3, '', '匹配订单冻结期间不可止付!'));
                 }
                 Db::startTrans();
                 $lock = Db::table("bsa_order_hexiao")->where("id", $id)->lock(true)->find();
