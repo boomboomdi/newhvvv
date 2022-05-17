@@ -83,13 +83,18 @@
 
             </script>
             <script type="text/html" id="payStatusTpl">
-                {{#  if(d.pay_status == 0){ }}
-                <button class="layui-btn layui-btn-primary layui-btn-xs">还未支付</button>
-                {{#  } else if(d.pay_status == 1) { }}
-                <button class="layui-btn layui-btn-success layui-btn-xs">支付成功</button>
-                {{#  } else if(d.pay_status == 2) { }}
+                {{#  if(d.pay_status == 1){ }}
+                <button class="layui-btn layui-btn-primary layui-btn-xs">支付成功</button>
+                {{#  } else  { }}
                 <button class="layui-btn layui-btn-danger layui-btn-xs">支付失败</button>
                 {{#  } }}
+<!--                {{#  if(d.pay_status == 0){ }}-->
+<!--                <button class="layui-btn layui-btn-primary layui-btn-xs">等待支付</button>-->
+<!--                {{#  } else if(d.pay_status == 1) { }}-->
+<!--                <button class="layui-btn layui-btn-success layui-btn-xs">支付成功</button>-->
+<!--                {{#  } else if(d.pay_status == 2) { }}-->
+<!--                <button class="layui-btn layui-btn-danger layui-btn-xs">支付失败</button>-->
+<!--                {{#  } }}-->
             </script>
             <script type="text/html" id="notifyStatusTpl">
                 {{#  if(d.notify_status == 1){ }}
