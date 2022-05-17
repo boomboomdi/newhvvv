@@ -201,10 +201,10 @@ class OrderhexiaoModel extends Model
             $updateOrderData['pay_time'] = $payTime;
             $updateOrderData['order_status'] = 1;
             $updateOrderData['check_status'] = 2;
-            $updateOrderRes = $db::table('bsa_order')->where($orderWhere)
+            $updateOrderRes = $db::table('bsa_order')->where($updateOrderWhere)
                 ->update($updateOrderData);
             logs(json_encode([
-                'orderWhere' => $orderWhere,
+                'orderWhere' => $updateOrderWhere,
                 'updateOrderData' => $updateOrderData,
                 'updateOrderRes' => $updateOrderRes,
                 'sql' => $db::table('bsa_order')->getLastSql()
