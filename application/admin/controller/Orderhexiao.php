@@ -148,8 +148,8 @@ class Orderhexiao extends Base
                 if (!$localUpdate) {
                     Db::rollback();
                     logs(json_encode(["time" => date("Y-m-d H:i:s", time()),
-                        'order_no' => $orderData['order_no'],
-                        'phone' => $orderData['account'],
+                        'order_no' => $orderHxData['order_no'],
+                        'phone' => $orderHxData['account'],
                         "localUpdateFail" => json_encode($localUpdate)
                     ]), 'orderHXNotify');
                     return json(modelReMsg(-5, '', '回调订单发生错误!'));
