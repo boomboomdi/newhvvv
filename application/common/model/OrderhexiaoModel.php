@@ -156,12 +156,12 @@ class OrderhexiaoModel extends Model
                 $updateOrderData['check_result'] = "查单回调" . session('admin_user_name');
             }
             //更新核销表  start
-            $orderWhere['order_me'] = $orderDataNo['order_me'];
-            $orderWhere['account'] = $orderDataNo['account'];
-            $orderWhere['pay_status'] = 0;
+            $orderHxWhere['order_no'] = $orderDataNo['order_pay'];
+            $orderHxWhere['account'] = $orderDataNo['account'];
+            $orderHxWhere['pay_status'] = 0;
 //            $orderWhere['account'] = $orderHxData['account'];
             $payTime = time();
-            $lockHxOrderRes = $db::table("bsa_order_hexiao")->where($orderWhere)->lock(true)->find();
+            $lockHxOrderRes = $db::table("bsa_order_hexiao")->where($orderHxWhere)->lock(true)->find();
             if (!$lockHxOrderRes) {
                 $db::rollback();
                 logs(json_encode(['file' => $orderDataNo,
@@ -176,7 +176,7 @@ class OrderhexiaoModel extends Model
             $updateHXData['pay_time'] = $payTime;
             $updateHXData['status'] = 2;
             $updateHXData['pay_status'] = 1;
-            $updateHXRes = $db::table("bsa_order_hexiao")->where($orderWhere)
+            $updateHXRes = $db::table("bsa_order_hexiao")->where($orderHxWhere)
                 ->update($updateHXData);
             if (!$updateHXRes) {
                 $db::rollback();
