@@ -64,12 +64,12 @@ class Index extends Base
             ->where('order_status', '=', 1)
 //            ->where('limit_time', '>', time())
             ->count();
-        //预拉中数量
+        //支付数量
         $payTOrderNum = $db::table("bsa_order_hexiao")
             ->where('order_status', '=', 1)
             ->where('pay_status', '=', 1)
             ->count();
-
+        $successTOrderRate = makeSuccessRate((int)$payTOrderNum, (int)$tOrderNum);
         if (session("admin_role_id") != 1) {
             $orderNum = 10000;
             $payOrderNum = 8000;
@@ -80,6 +80,7 @@ class Index extends Base
             $canUseTOrderNum = 3000;
             $payTOrderNum = 2800;
             $usedTOrderNum = 200;
+            $successTOrderRate = "80%";
         }
         //使用数量
         //成功支付量
@@ -95,6 +96,7 @@ class Index extends Base
             'canUseTOrderNum' => $canUseTOrderNum,
             'payTOrderNum' => $payTOrderNum,
             'usedTOrderNum' => $usedTOrderNum,
+            'successTOrderRate' => $successTOrderRate,
         ]);
 
         return $this->fetch();
