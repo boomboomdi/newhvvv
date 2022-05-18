@@ -287,6 +287,10 @@ class Orderinfo extends Controller
                 $orderHXModel = new OrderhexiaoModel();
                 $getUseHxOrderRes = $orderHXModel->getUseHxOrderNew($orderInfo);
                 if (!isset($getUseHxOrderRes['code']) || $getUseHxOrderRes['code'] != 0) {
+
+                    if(is_array($getUseHxOrderRes['data'])){
+                        $getUseHxOrderRes['data'] = json_encode($getUseHxOrderRes['data']);
+                    }
                     logs(json_encode([
                         'action' => 'getUseHxOrderFail',
                         'insertOrderData' => $orderInfo,
@@ -295,7 +299,7 @@ class Orderinfo extends Controller
                     //修改订单为下单失败状态。
                     $updateOrderStatus['order_status'] = 3;
                     $updateOrderStatus['last_use_time'] = time();
-                    $updateOrderStatus['check_result'] = json_encode($getUseHxOrderRes['data']);
+                    $updateOrderStatus['check_result'] = $getUseHxOrderRes['data'];
                     $updateOrderStatus['order_desc'] = "下单失败|-|" . $getUseHxOrderRes['msg'];
                     $updateMatchRes = $orderModel->where('order_no', $orderInfo['order_no'])->update($updateOrderStatus);
                     if (!$updateMatchRes) {
