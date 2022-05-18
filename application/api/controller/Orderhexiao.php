@@ -71,7 +71,10 @@ class Orderhexiao extends Controller
             if (!empty($isHas)) {
                 return json(msg(-4, '', '该账号有未回调订单!'));
             }
-
+            $isHasOrder = $orderHeXModel->where('order_no','=',$param['order_no'])->find();
+            if (!empty($isHasOrder)) {
+                return json(msg(-5, '', '订单已存在!'));
+            }
             $addParam = $param;
             unset($addParam['sign']);
             $addParam['add_time'] = time();
@@ -88,7 +91,7 @@ class Orderhexiao extends Controller
                 $exception['desc'] = "上传签名有误！";
                 $orderExceptionModel->addLog($param['write_off_sign'], 'uploadOrder', $exception);
 //                logs(json_encode(['addParam' => $addParam, 'addRes' => $res, "time" => date("Y-m-d H:i:s", time())]), 'uploadOrder_log');
-                return json(msg(-5, '', $res['msg']));
+                return json(msg(-6, '', $res['msg']));
             }
 ////            $returnData['code'] = 1;
 //            $returnData['order_no'] = $param['order_no'];
