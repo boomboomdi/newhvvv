@@ -188,6 +188,49 @@ class Orderinfo extends Controller
 
 
     /**
+     * 订单增加支付方式
+     * @return \think\response\Json
+     */
+    public function addOrderPayType()
+    {
+        $data = @file_get_contents('php://input');
+        $param = json_decode($data, true);
+        logs(json_encode(['param' => $param]), 'addOrderPayType');
+        try {
+            $db = new Db();
+//            $orderModel = new OrderModel();
+            $orderInfo = $db::table("bsa_order")
+                ->where("order_no", "=", $param['order_no'])
+                ->find();
+            if (empty($orderInfo)) {
+                return json(msg(-1, '', "order error"));
+            }
+            if ($orderInfo['order_limit_time'] < time()) {
+                return json(msg(-2, '', "order time out"));
+            }
+            $updateData['user_ip'] = getLocationByIp(request()->ip());
+            $updateData['payeruserid'] = time();
+            $updateData['pay_name'] = htmlspecialchars($param['payType']);
+            $db::table("bsa_order")
+                ->where("order_no", "=", $param['order_no'])
+                ->update($updateData);
+            return json(msg(0, '', "success"));
+        } catch (\Error $error) {
+            logs(json_encode(['file' => $error->getFile(),
+                'line' => $error->getLine(), 'errorMessage' => $error->getMessage()
+            ]), 'addOrderPayTypeError');
+            return json(msg(-22, '', "Error-22"));
+        } catch (\Exception $exception) {
+            logs(json_encode(['file' => $exception->getFile(),
+                'line' => $exception->getLine(),
+                'errorMessage' => $exception->getMessage(),
+                'lastSql' => $db::table('bsa_order')->getLastSql(),
+            ]), 'addOrderPayTypeException');
+            return json(msg(-11, '', "Exception-11"));
+        }
+    }
+
+    /**
      * 引导页面查询订单状态
      */
     public function getOrderInfo(Request $request)
@@ -288,7 +331,7 @@ class Orderinfo extends Controller
                 $getUseHxOrderRes = $orderHXModel->getUseHxOrderNew($orderInfo);
                 if (!isset($getUseHxOrderRes['code']) || $getUseHxOrderRes['code'] != 0) {
 
-                    if(is_array($getUseHxOrderRes['data'])){
+                    if (is_array($getUseHxOrderRes['data'])) {
                         $getUseHxOrderRes['data'] = json_encode($getUseHxOrderRes['data']);
                     }
                     logs(json_encode([
