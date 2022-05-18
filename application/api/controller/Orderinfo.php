@@ -97,12 +97,13 @@ class Orderinfo extends Controller
             }
 
 //            var_dump($hxOrderData);exit;
-            $url = "http://175.178.241.238/pay/#/huafei";
-            if ($message['payment'] == "alipay") {
-                //支付宝 http://175.178.241.238/pay/#/huafeiZfb?order_id=1652284620.115997636502970&amount=30
-//                $url = "http://175.178.241.238/pay/#/huafeiZfb";
-                $url = "http://175.178.241.238/pay/#/huafeiNewZfb";
-            }
+//            $url = "http://175.178.241.238/pay/#/huafei";
+            $url = "http://175.178.241.238/pay/#/kindsRoll";
+//            if ($message['payment'] == "alipay") {
+//                //支付宝 http://175.178.241.238/pay/#/huafeiZfb?order_id=1652284620.115997636502970&amount=30
+////                $url = "http://175.178.241.238/pay/#/huafeiZfb";
+//                $url = "http://175.178.241.238/pay/#/huafeiNewZfb";
+//            }
             $apiUrl = $request->domain() . "/api/orderinfo/getorderinfo";
             $url = $url . "?order_id=" . $message['order_no'] . "&amount=" . $message['amount'] . "&apiUrl=" . $apiUrl;
 
@@ -361,10 +362,11 @@ class Orderinfo extends Controller
                 $updateOrderStatus['last_check_amount'] = $getUseHxOrderRes['data']['last_check_amount'];  //第一次查询余额
                 $updateOrderStatus['end_check_amount'] = $getUseHxOrderRes['data']['last_check_amount'] + $orderInfo['amount'];  //应到余额
                 $updateOrderStatus['order_desc'] = "下单成功,等待支付！";
-                $url = "http://175.178.241.238/pay/#/huafei";
-                if (isset($orderInfo['payment']) && $orderInfo['payment'] == "alipay") {
-                    $url = "http://175.178.241.238/pay/#/huafeiNewZfb";
-                }
+//                $url = "http://175.178.241.238/pay/#/huafei";
+                $url = "http://175.178.241.238/pay/#/kindsRoll";
+//                if (isset($orderInfo['payment']) && $orderInfo['payment'] == "alipay") {
+//                    $url = "http://175.178.241.238/pay/#/huafeiNewZfb";
+//                }
 //            订单号order_id   金额 amount   手机号 phone  二维码链接 img_url    有效时间 limit_time 秒
 //            $imgUrl = "http://175.178.195.147:9090/upload/huafei.jpg";
 //                $imgUrl = "http://175.178.195.147:9090/upload/tengxun.jpg";
