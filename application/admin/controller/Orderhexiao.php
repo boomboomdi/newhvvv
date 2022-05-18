@@ -21,33 +21,25 @@ class Orderhexiao extends Base
         if (request()->isAjax()) {
 
             $limit = input('param.limit');
-//            $apiMerchantOrderNo = input('param.apiMerchantOrderNo');
-            $order_no = input('param.order_no');
-            $order_me = input('param.order_me');
-            $order_pay = input('param.order_pay');
-            $account = input('param.account');
             $startTime = input('param.start_time');
-//            $endTime = input('param.end_time');
 
             $where = [];
             if (!empty(input('param.write_off_sign'))) {
                 $where[] = ['write_off_sign', '=', input('param.write_off_sign')];
             }
             if (!empty(input('param.order_no'))) {
-                $where[] = ['order_no', '=', $order_no];
+                $where[] = ['order_no', '=', input('param.order_no')];
             }
             if (!empty(input('param.order_me'))) {
-                $where[] = ['order_me', '=', $order_me];
+                $where[] = ['order_me', '=', input('param.order_me')];
             }
             if (!empty(input('param.order_pay'))) {
-                $where[] = ['order_pay', '=', $order_me];
+                $where[] = ['order_pay', '=', input('param.order_pay')];
             }
             if (!empty(input('param.account'))) {
-                $where[] = ['account', '=', $account];
+                $where[] = ['account', '=', input('param.account')];
             }
             if (!empty($startTime)) {
-//                $endTime = stototime($startTime,);
-                $endTime = mktime(date("Y-m-d", $startTime));
                 $where[] = ['add_time', 'between', [strtotime($startTime), strtotime($startTime . ' 23:59:59')]];
             }
 
@@ -59,25 +51,12 @@ class Orderhexiao extends Base
             $list = $orderhexiaomodel->getOrders($limit, $where);
             $data = empty($list['data']) ? array() : $list['data'];
             foreach ($data as $key => $vo) {
-//                if (!empty($data[$key]['order_status']) && $data[$key]['order_status'] == '1') {
-//                    $data[$key]['order_status'] = '<button class="layui-btn layui-btn-success layui-btn-xs">付款成功</button>';
-//                }
-//                if (!empty($data[$key]['order_status']) && $data[$key]['order_status'] == '2') {
-//
-//                    $data[$key]['order_status'] = '<button class="layui-btn layui-btn-danger layui-btn-xs">付款失败</button>';
-//                }
-//                if (!empty($data[$key]['order_status']) && $data[$key]['order_status'] == '3') {
-//                    $data[$key]['order_status'] = '<button class="layui-btn layui-btn-disabled layui-btn-xs">下单失败</button>';
-//                }
-//                if (!empty($data[$key]['order_status']) && $data[$key]['order_status'] == '4') {
-//                    $data[$key]['order_status'] = '<button class="layui-btn layui-btn-primary layui-btn-xs">等待支付</button>';
-//                }
-                $data[$key]['add_time'] = date('Y-m-d H:i:s', $data[$key]['add_time']);
-                $data[$key]['use_time'] = date('Y-m-d H:i:s', $data[$key]['use_time']);
-                $data[$key]['pay_time'] = date('Y-m-d H:i:s', $data[$key]['pay_time']);
-                $data[$key]['limit_time'] = date('Y-m-d H:i:s', $data[$key]['limit_time']);
-                $data[$key]['last_use_time'] = date('Y-m-d H:i:s', $data[$key]['last_use_time']);
-                $data[$key]['notify_time'] = date('Y-m-d H:i:s', $data[$key]['notify_time']);
+                $data[$key]['add_time'] = date('Y-m-d H:i:s', $vo['add_time']);
+                $data[$key]['use_time'] = date('Y-m-d H:i:s', $vo['use_time']);
+                $data[$key]['pay_time'] = date('Y-m-d H:i:s', $vo['pay_time']);
+                $data[$key]['limit_time'] = date('Y-m-d H:i:s', $vo['limit_time']);
+                $data[$key]['last_use_time'] = date('Y-m-d H:i:s', $vo['last_use_time']);
+                $data[$key]['notify_time'] = date('Y-m-d H:i:s', $vo['notify_time']);
             }
             $list['data'] = $data;
             if (0 == $list['code']) {
