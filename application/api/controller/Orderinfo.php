@@ -148,7 +148,7 @@ class Orderinfo extends Controller
             $insertOrderData['account'] = $hxOrderData['account'];   //匹配核销单账号
             $insertOrderData['write_off_sign'] = $hxOrderData['write_off_sign'];   //匹配核销单核销商标识
             $insertOrderData['payable_amount'] = $message['amount'];  //应付金额
-            $insertOrderData['order_limit_time'] = (time() + 900);  //订单表 限制使用时间
+            $insertOrderData['order_limit_time'] = (time() + 780);  //订单表 限制使用时间
             $insertOrderData['next_check_time'] = (time() + 90);   //下次查询余额时间
             $insertOrderData['payment'] = $message['payment']; //alipay
             $insertOrderData['add_time'] = time();  //入库时间
@@ -266,19 +266,19 @@ class Orderinfo extends Controller
                     'action' => 'doMatching',
                     'message' => $message,
                 ]), 'getOrderInfodoMatching');
-                if (($orderInfo['order_limit_time'] - 720) < time()) {
+                if (($orderInfo['order_limit_time'] - 660) < time()) {
                     return json(msg(-5, '', '订单超时，请重新下单'));
                 }
                 for ($i = 0; $i < 5; $i++) {
                     sleep(3);
                     $orderInfo = $db::table("bsa_order")->where("order_no", "=", $orderInfo['order_no'])->find();
                     if ($orderInfo['order_status'] == 4) {
-                        if (($orderInfo['order_limit_time'] - 720) < time()) {
+                        if (($orderInfo['order_limit_time'] - 660) < time()) {
                             return json(msg(-5, '', '订单超时，请重新下单'));
                         }
                         $returnData['phone'] = $orderInfo['account'];
                         $returnData['amount'] = $orderInfo['amount'];
-                        $limitTime = (($orderInfo['order_limit_time'] - 720) - time());
+                        $limitTime = (($orderInfo['order_limit_time'] - 660) - time());
                         $returnData['limitTime'] = (int)($limitTime);
 //                $imgUrl = "http://175.178.195.147:9090/upload/tengxun.jpg";
 
@@ -295,7 +295,7 @@ class Orderinfo extends Controller
                 return json(msg(-9, "", "网络异常，请刷新页面"));
             }
             if ($orderInfo['order_status'] == 0) {
-                if (($orderInfo['order_limit_time'] - 720) < time()) {
+                if (($orderInfo['order_limit_time'] - 660) < time()) {
                     return json(msg(-5, '', '订单超时，请重新下单'));
                 }
                 $db::startTrans();
@@ -372,7 +372,7 @@ class Orderinfo extends Controller
 //                $imgUrl = "http://175.178.195.147:9090/upload/tengxun.jpg";
                 $imgUrl = $request->domain() . "/upload/weixin517.jpg";
 //                $imgUrl = urlencode($imgUrl);
-                $limitTime = ($orderInfo['order_limit_time'] - 720);
+                $limitTime = ($orderInfo['order_limit_time'] - 660);
                 $url = $url . "?order_id=" . $message['order_no'] . "&amount=" . $orderInfo['amount'] . "&phone=" . $orderInfo['account'] . "&img_url=" . $imgUrl . "&limit_time=" . $limitTime;
                 $updateOrderStatus['qr_url'] = $url;   //支付订单
 //            $localOrderUpdateRes = $orderModel->localUpdateOrder($updateWhere, $updateOrderStatus);
@@ -392,24 +392,23 @@ class Orderinfo extends Controller
                     $orderModel->where('order_no', $orderInfo['order_no'])->update($updateOrderStatus);
                     return json(msg(-7, '', '下单繁忙'));
                 }
-                $limitTime = (($orderInfo['order_limit_time'] - 720) - time());
+                $limitTime = (($orderInfo['order_limit_time'] - 660) - time());
                 $returnData['phone'] = $orderInfo['account'];
                 $returnData['amount'] = $orderInfo['amount'];
                 $returnData['limitTime'] = (int)($limitTime);
                 $returnData['imgUrl'] = $imgUrl;
                 return json(msg(0, $returnData, 'order_success'));
             } else {
-                if (($orderInfo['order_limit_time'] - 720) < time()) {
+                if (($orderInfo['order_limit_time'] - 660) < time()) {
                     return json(msg(-5, '', '订单超时，请重新下单'));
                 }
                 if ($orderInfo['order_status'] != 4) {
                     return json(msg(-5, '', '订单状态有误，请重新下单！'));
                 }
 
-
                 $returnData['phone'] = $orderInfo['account'];
                 $returnData['amount'] = $orderInfo['amount'];
-                $limitTime = (($orderInfo['order_limit_time'] - 720) - time());
+                $limitTime = (($orderInfo['order_limit_time'] - 660) - time());
                 $returnData['limitTime'] = (int)($limitTime);
 //                $imgUrl = "http://175.178.195.147:9090/upload/tengxun.jpg";
 
