@@ -59,10 +59,13 @@ class Order extends Base
                 if (!empty($data[$key]['pay_time']) && $data[$key]['pay_time'] != 0) {
                     $data[$key]['pay_time'] = date('Y-m-d H:i:s', $vo['pay_time']);
                 }
-                $data[$key]['check_amount'] = $data[$key]['start_check_amount']."-".$data[$key]['end_check_amount']."-".$data[$key]['last_check_amount'];
+                $data[$key]['check_amount'] = $data[$key]['start_check_amount'] . "-" . $data[$key]['end_check_amount'] . "-" . $data[$key]['last_check_amount'];
                 $data[$key]['order_limit_time'] = date('Y-m-d H:i:s', $data[$key]['order_limit_time']);
                 $data[$key]['notify_time'] = date('Y-m-d H:i:s', $data[$key]['notify_time']);
                 $data[$key]['add_time'] = date('Y-m-d H:i:s', $vo['add_time']);
+                if ($data[$key]['order_status'] == 0) {
+                    $data[$key]['order_status'] = '<button class="layui-btn layui-btn-primary layui-btn-xs">下单中···</button>';
+                }
                 if (!empty($data[$key]['order_status']) && $data[$key]['order_status'] == '7') {
                     $data[$key]['order_status'] = '<button class="layui-btn layui-btn-disabled layui-btn-xs">匹配中···</button>';
                 }
@@ -78,12 +81,11 @@ class Order extends Base
                 if (!empty($data[$key]['order_status']) && $data[$key]['order_status'] == '4') {
                     $data[$key]['order_status'] = '<button class="layui-btn layui-btn-warm layui-btn-xs">等待支付</button>';
                 }
-                if (!empty($data[$key]['order_status']) && $data[$key]['order_status'] === 0) {
-                    $data[$key]['order_status'] = '<button class="layui-btn layui-btn-primary layui-btn-xs">下单中···</button>';
-                }
+
                 if (!empty($data[$key]['order_status']) && $data[$key]['order_status'] == '5') {
                     $data[$key]['order_status'] = '<button class="layui-btn label-important layui-btn-xs">手动回调</button>';
                 }
+
 //                $data[$key]['apiMerchantOrderDate'] = date('Y-m-d H:i:s', $data[$key]['apiMerchantOrderDate']);
 //                $data[$key]['pay_time'] = date('Y-m-d H:i:s', $data[$key]['pay_time']);
             }
