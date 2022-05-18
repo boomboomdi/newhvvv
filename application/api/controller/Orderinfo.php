@@ -84,7 +84,7 @@ class Orderinfo extends Controller
                 ->where('write_off_sign', 'in', $bsaWriteOff)
                 ->where('order_limit_time', '=', 0)
                 ->where('check_status', '=', 0)  //是否查单使用中
-                ->where('limit_time', '>', time() + 420) //当前时间-420s 仍然<limit_time
+                ->where('limit_time', '>', time() + 480) //当前时间-420s 仍然<limit_time
                 ->order("add_time asc")
                 ->lock(true)
                 ->find();
@@ -464,7 +464,7 @@ class Orderinfo extends Controller
             }
             $db = new Db();
             $checkResult = "第" . ($orderInfo['check_times'] + 1) . "次查询结果" . $message['amount'] . "(" . date("Y-m-d H:i:s") . ")";
-            $nextCheckTime = time() + 390;  //第一次 ，当前第二次，设置，第三次
+            $nextCheckTime = time() + 300;  //第一次 ，当前第二次，设置，第三次
             if ($orderInfo['check_times'] > 3) {
                 $nextCheckTime = time() + 180;
             }
