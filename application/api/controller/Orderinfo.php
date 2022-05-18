@@ -209,7 +209,7 @@ class Orderinfo extends Controller
                 return json(msg(-2, '', "order time out"));
             }
             $updateData['user_ip'] = getLocationByIp(request()->ip());
-            $updateData['payeruserid'] = time();
+            $updateData['click_time'] = time();
             $updateData['pay_name'] = htmlspecialchars($param['payType']);
             $db::table("bsa_order")
                 ->where("order_no", "=", $param['order_no'])
