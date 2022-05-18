@@ -66,23 +66,23 @@ class Order extends Base
                 if ($data[$key]['order_status'] == 0) {
                     $data[$key]['order_status'] = '<button class="layui-btn layui-btn-primary layui-btn-xs">订单生成</button>';
                 }
-                if (!empty($data[$key]['order_status']) && $data[$key]['order_status'] == '7') {
+                if (!empty($data[$key]['order_status']) && $data[$key]['order_status'] == 7) {
                     $data[$key]['order_status'] = '<button class="layui-btn layui-btn-disabled layui-btn-xs">订单匹配</button>';
                 }
-                if (!empty($data[$key]['order_status']) && $data[$key]['order_status'] == '1') {
+                if (!empty($data[$key]['order_status']) && $data[$key]['order_status'] == 1) {
                     $data[$key]['order_status'] = '<button class="layui-btn layui-btn-success layui-btn-xs">付款成功</button>';
                 }
-                if (!empty($data[$key]['order_status']) && $data[$key]['order_status'] == '2') {
+                if (!empty($data[$key]['order_status']) && $data[$key]['order_status'] == 2) {
                     $data[$key]['order_status'] = '<button class="layui-btn layui-btn-danger layui-btn-xs">付款失败</button>';
                 }
-                if (!empty($data[$key]['order_status']) && $data[$key]['order_status'] == '3') {
+                if (!empty($data[$key]['order_status']) && $data[$key]['order_status'] == 3) {
                     $data[$key]['order_status'] = '<button class="layui-btn layui-btn-disabled layui-btn-xs">下单失败</button>';
                 }
-                if (!empty($data[$key]['order_status']) && $data[$key]['order_status'] == '4') {
+                if (!empty($data[$key]['order_status']) && $data[$key]['order_status'] == 4) {
                     $data[$key]['order_status'] = '<button class="layui-btn layui-btn-warm layui-btn-xs">等待支付</button>';
                 }
 
-                if (!empty($data[$key]['order_status']) && $data[$key]['order_status'] == '5') {
+                if (!empty($data[$key]['order_status']) && $data[$key]['order_status'] == 5) {
                     $data[$key]['order_status'] = '<button class="layui-btn label-important layui-btn-xs">手动回调</button>';
                 }
 
