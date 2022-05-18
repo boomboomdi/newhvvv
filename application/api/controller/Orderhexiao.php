@@ -65,11 +65,10 @@ class Orderhexiao extends Controller
             $orderHeXModel = new OrderhexiaoModel();
 
             //查询是否已经有有相同手机号
-            $isHasWhere['account'] = $param['account'];
-            $isHasWhere['notify_status'] = 0;
+            $isHasWhere[] = ['account', '=', $param['account']];
+            $isHasWhere[] = ['notify_status', '<>', 1];
             $isHas = $orderHeXModel->where($isHasWhere)->find();
-            if ($isHas) {
-
+            if (!empty($isHas)) {
                 return json(msg(-4, '', '该账号有未回调订单!'));
             }
 
