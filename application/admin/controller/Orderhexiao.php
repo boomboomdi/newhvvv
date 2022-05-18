@@ -33,16 +33,16 @@ class Orderhexiao extends Base
             if (!empty(input('param.write_off_sign'))) {
                 $where[] = ['write_off_sign', '=', input('param.write_off_sign')];
             }
-            if (!empty($order_no)) {
+            if (!empty(input('param.order_no'))) {
                 $where[] = ['order_no', '=', $order_no];
             }
-            if (!empty($order_me)) {
+            if (!empty(input('param.order_me'))) {
                 $where[] = ['order_me', '=', $order_me];
             }
-            if (!empty($order_pay)) {
+            if (!empty(input('param.order_pay'))) {
                 $where[] = ['order_pay', '=', $order_me];
             }
-            if (!empty($account)) {
+            if (!empty(input('param.account'))) {
                 $where[] = ['account', '=', $account];
             }
             if (!empty($startTime)) {
@@ -53,7 +53,7 @@ class Orderhexiao extends Base
 
             $writeOffNodeId = session("admin_role_id");
             if ($writeOffNodeId == 8) {
-                $where['write_off_sign'] = ['=', session("admin_user_name")];   //默认情况下 登录名就是
+                $where[] = ['write_off_sign', '=', session("admin_user_name")];   //默认情况下 登录名就是
             }
             $orderhexiaomodel = new Orderhexiaomodel();
             $list = $orderhexiaomodel->getOrders($limit, $where);
