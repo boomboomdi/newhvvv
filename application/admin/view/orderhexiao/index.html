@@ -23,6 +23,21 @@
                 <!--                               id="operate_time">-->
                 <!--                    </div>-->
                 <!--                </div>-->
+
+                <div class="layui-inline">
+                    <label class="layui-form-label">开始时间</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="startTime" placeholder="时间(上传)" autocomplete="off"
+                               class="layui-input" id="startTime">
+                    </div>
+                </div>
+                 <div class="layui-inline">
+                    <label class="layui-form-label">时间截至</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="endTime" placeholder="时间截至" autocomplete="off"
+                               class="layui-input" id="endTime">
+                    </div>
+                </div>
                 <div class="layui-inline">
                     <label class="layui-form-label">核销单号</label>
                     <div class="layui-input-block">
@@ -46,7 +61,7 @@
                     </div>
                 </div>
                 <div class="layui-inline">
-                    <label class="layui-form-label">账号</label>
+                    <label class="layui-form-label">充值账号</label>
                     <div class="layui-input-block">
                         <input type="text" name="account" placeholder="请输入" autocomplete="off"
                                class="layui-input">
@@ -273,7 +288,8 @@
         });
     }
 
-    layTool.layDate('#start_time')
+    layTool.layDate('#startTime');
+    layTool.layDate('#endTime');
 </script>
 </body>
 </html>

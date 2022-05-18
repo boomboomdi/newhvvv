@@ -21,7 +21,8 @@ class Orderhexiao extends Base
         if (request()->isAjax()) {
 
             $limit = input('param.limit');
-            $startTime = input('param.start_time');
+            $startTime = input('param.startTime');
+            $endTime = input('param.endTime');
 
             $where = [];
             if (!empty(input('param.write_off_sign'))) {
@@ -40,7 +41,10 @@ class Orderhexiao extends Base
                 $where[] = ['account', '=', input('param.account')];
             }
             if (!empty($startTime)) {
-                $where[] = ['add_time', 'between', [strtotime($startTime), strtotime($startTime . ' 23:59:59')]];
+                $where[] = ['add_time', '>', strtotime($startTime)];
+            }
+            if (!empty($endTime)) {
+                $where[] = ['add_time', '<', strtotime($endTime)];
             }
 
             $writeOffNodeId = session("admin_role_id");

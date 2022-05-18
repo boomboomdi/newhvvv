@@ -188,7 +188,7 @@ class Orderinfo extends Controller
 
 
     /**
-     * 订单增加支付方式
+     * 玩家点击支付方式
      * @return \think\response\Json
      */
     public function addOrderPayType()
