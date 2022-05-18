@@ -71,7 +71,7 @@ class Statistics extends Base
                 $totalOrderAmount = 0; //推单总额
                 $totalPayOrderAmount = 0; //总支付金额
                 $totalPayOrderAmountNum = 0; //总支付数量
-                $canOrderAmount = 0; //可以下单数量
+                $canOrderAmountNum = 0; //可以下单数量
                 $k = 0;
                 foreach ($data as $key => $vo) {
                     $k++;
@@ -124,7 +124,7 @@ class Statistics extends Base
                         ->where("order_amount", "=", $vo['order_amount'])
                         ->where('limit_time', '>', time() + 420)
                         ->count();
-                    $canOrderAmount += $data[$key]['canOrderAmountNum'];
+                    $canOrderAmountNum += $data[$key]['canOrderAmountNum'];
 
                 }
                 $total['order_amount'] = '总统计';
@@ -133,7 +133,7 @@ class Statistics extends Base
                 $total['totalOrderAmount'] = $totalOrderAmount;
                 $total['totalPayOrderAmount'] = $totalPayOrderAmount;
                 $total['totalPayOrderAmountNum'] = $totalPayOrderAmountNum;
-                $total['canOrderAmount'] = $canOrderAmount;
+                $total['canOrderAmountNum'] = $canOrderAmountNum;
 
                 $data[] = $total;
                 $list = $data;
