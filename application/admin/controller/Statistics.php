@@ -71,6 +71,7 @@ class Statistics extends Base
                 $totalOrderAmount = 0; //推单总额
                 $totalPayOrderAmount = 0; //总支付金额
                 $totalPayOrderAmountNum = 0; //总支付数量
+                $canOrderAmount = 0; //可以下单数量
                 $k = 0;
                 foreach ($data as $key => $vo) {
                     $k++;
@@ -114,6 +115,17 @@ class Statistics extends Base
                         ->find()['totalPayOrderAmount'];
                     $totalPayOrderAmount += $data[$key]['totalPayOrderAmount'];
 
+                    //剩余可用单量
+                    $data[$key]['canOrderAmountNum'] = $orderHxModel
+                        ->where('write_off_sign', "=", $writeOffSign)
+                        ->where("pay_status", '=', 0)
+                        ->where("order_status", '=', 0)
+                        ->where("status", '=', 0)
+                        ->where("order_amount", "=", $vo['order_amount'])
+                        ->where('limit_time', '>', time() + 420)
+                        ->count();
+                    $canOrderAmount += $data[$key]['canOrderAmountNum'];
+
                 }
                 $total['order_amount'] = '总统计';
                 $total['write_off_sign'] = $writeOffSign;
@@ -121,6 +133,7 @@ class Statistics extends Base
                 $total['totalOrderAmount'] = $totalOrderAmount;
                 $total['totalPayOrderAmount'] = $totalPayOrderAmount;
                 $total['totalPayOrderAmountNum'] = $totalPayOrderAmountNum;
+                $total['canOrderAmount'] = $canOrderAmount;
 
                 $data[] = $total;
                 $list = $data;
