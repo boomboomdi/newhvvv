@@ -144,6 +144,7 @@ class Orderhexiao extends Base
                 $updateHXData['order_status'] = 2;
                 $updateHXData['check_status'] = 0;
                 $updateHXData['pay_status'] = 2;
+                $updateHXData['notify_times'] = 4;
                 $localUpdate = Db::table("bsa_order_hexiao")->where("id", $id)->update($updateHXData);
                 if (!$localUpdate) {
                     Db::rollback();
