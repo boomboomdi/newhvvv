@@ -10,6 +10,7 @@ use app\common\model\OrderModel;
 use app\api\validate\OrderinfoValidate;
 use app\api\validate\CheckPhoneAmountNotifyValidate;
 use think\Request;
+use app\common\model\SystemConfigModel;
 use think\Validate;
 use app\common\Redis;
 
@@ -61,7 +62,6 @@ class Orderinfo extends Controller
             // 根据user_id  未付款次数 限制下单 end
 
             $orderMe = md5(uniqid() . getMillisecond());
-
             $orderFind = $db::table('bsa_order')->where('order_me', '=', $orderMe)->find();
             if (!empty($orderFind)) {
                 $orderMe = md5(uniqid() . getMillisecond());
@@ -74,6 +74,7 @@ class Orderinfo extends Controller
             if (empty($bsaWriteOff)) {
                 return apiJsonReturn(-6, "无可匹配订单！");
             }
+            $orderLimitTime = SystemConfigModel::getOrderLockTime();
             $db::startTrans();
             $hxOrderData = $db::table("bsa_order_hexiao")
                 ->field("bsa_order_hexiao.*")
@@ -84,14 +85,11 @@ class Orderinfo extends Controller
                 ->where('write_off_sign', 'in', $bsaWriteOff)
                 ->where('order_limit_time', '=', 0)
                 ->where('check_status', '=', 0)  //是否查单使用中
-                ->where('limit_time', '>', time() + 480) //当前时间-420s 仍然<limit_time
+                ->where('limit_time', '>', time() + $orderLimitTime) //  匹配当前时间在 核销限制回调时间480s之前的核销单
                 ->order("add_time asc")
                 ->lock(true)
                 ->find();
-//            var_dump($hxOrderData);exit;
             if (!$hxOrderData) {
-//                $insertOrderData['order_status'] = 3;
-//                $insertOrderData['qr_url'] = "";
                 $db::rollback();
                 return apiJsonReturn(-5, "无可用订单-5！！");
             }
@@ -148,12 +146,12 @@ class Orderinfo extends Controller
             $insertOrderData['account'] = $hxOrderData['account'];   //匹配核销单账号
             $insertOrderData['write_off_sign'] = $hxOrderData['write_off_sign'];   //匹配核销单核销商标识
             $insertOrderData['payable_amount'] = $message['amount'];  //应付金额
-            $insertOrderData['order_limit_time'] = (time() + 780);  //订单表 限制使用时间
-            $insertOrderData['next_check_time'] = (time() + 90);   //下次查询余额时间
+            $insertOrderData['order_limit_time'] = (time() + $orderLimitTime);  //订单表 $orderLimitTime
+            $insertOrderData['next_check_time'] = (time() + 90);   //下次查询余额时间（第二次）
             $insertOrderData['payment'] = $message['payment']; //alipay
             $insertOrderData['add_time'] = time();  //入库时间
             $insertOrderData['notify_url'] = $message['notify_url']; //下单回调地址 notify url
-            $insertOrderData['qr_url'] = $message['notify_url']; //下单回调地址 notify url
+            $insertOrderData['qr_url'] = $url; //支付订单
             $insertOrderData['order_desc'] = "等待访问!"; //订单描述
 
             $orderModel = new OrderModel();
@@ -204,6 +202,8 @@ class Orderinfo extends Controller
             return json(msg(-1, '', "order_no error"));
         }
         try {
+
+            $orderShowTime = SystemConfigModel::getOrderShowTime();
             $db = new Db();
 //            $orderModel = new OrderModel();
             $orderInfo = $db::table("bsa_order")
@@ -212,7 +212,7 @@ class Orderinfo extends Controller
             if (empty($orderInfo)) {
                 return json(msg(-1, '', "order error"));
             }
-            if ($orderInfo['order_limit_time'] < time()) {
+            if (($orderInfo['add_time'] + $orderShowTime) < time()) {
                 return json(msg(-2, '', "order time out"));
             }
             $updateData['user_ip'] = getLocationByIp(request()->ip());
@@ -245,6 +245,8 @@ class Orderinfo extends Controller
         $data = @file_get_contents('php://input');
         $message = json_decode($data, true);
 
+        $orderLockTime = SystemConfigModel::getOrderLockTime();
+        $orderShowTime = SystemConfigModel::getOrderShowTime();
         logs(json_encode([
             'action' => 'getOrderInfo',
             'message' => $message
@@ -272,19 +274,17 @@ class Orderinfo extends Controller
                     'action' => 'doMatching',
                     'message' => $message,
                 ]), 'getOrderInfodoMatching');
-                if (($orderInfo['order_limit_time'] - 660) < time()) {
-                    return json(msg(-5, '', '订单超时，请重新下单'));
-                }
                 for ($i = 0; $i < 5; $i++) {
                     sleep(3);
                     $orderInfo = $db::table("bsa_order")->where("order_no", "=", $orderInfo['order_no'])->find();
                     if ($orderInfo['order_status'] == 4) {
-                        if (($orderInfo['order_limit_time'] - 660) < time()) {
+                        if (($orderInfo['add_time'] + $orderShowTime) < time()) {
                             return json(msg(-5, '', '订单超时，请重新下单'));
+                            break;
                         }
                         $returnData['phone'] = $orderInfo['account'];
                         $returnData['amount'] = $orderInfo['amount'];
-                        $limitTime = (($orderInfo['order_limit_time'] - 660) - time());
+                        $limitTime = (($orderInfo['add_time'] + $orderShowTime) - time());
                         $returnData['limitTime'] = (int)($limitTime);
 //                $imgUrl = "http://175.178.195.147:9090/upload/tengxun.jpg";
 
@@ -301,7 +301,9 @@ class Orderinfo extends Controller
                 return json(msg(-9, "", "网络异常，请刷新页面"));
             }
             if ($orderInfo['order_status'] == 0) {
-                if (($orderInfo['order_limit_time'] - 660) < time()) {
+
+                //展示时间 getOrderShowTime    getAutoCheckOrderTime
+                if (time() > ($orderInfo['add_time'] + $orderShowTime)) {
                     return json(msg(-5, '', '订单超时，请重新下单'));
                 }
                 $db::startTrans();
@@ -323,16 +325,6 @@ class Orderinfo extends Controller
                 $doMatch['order_status'] = 7;
                 $db::table("bsa_order")->where("order_no", "=", $orderInfo['order_no'])->update($doMatch);
                 $db::commit();
-//                if (!$doMatchRes) {
-//                    logs(json_encode([
-//                        'action' => 'doMatchFail',
-//                        'message' => $message,
-//                        'doMatchRes' => $doMatchRes,
-//                        'getLastSql' => $db::table("bsa_order")->getLastSql(),
-//                    ]), 'getOrderInfoFail');
-//                    $db::rollback();
-//                    return json(msg(-7, '', '匹配繁忙-5'));
-//                }
                 //2、请求核销单
                 $orderHXModel = new OrderhexiaoModel();
                 $getUseHxOrderRes = $orderHXModel->getUseHxOrderNew($orderInfo);
@@ -378,7 +370,8 @@ class Orderinfo extends Controller
 //                $imgUrl = "http://175.178.195.147:9090/upload/tengxun.jpg";
                 $imgUrl = $request->domain() . "/upload/weixin517.jpg";
 //                $imgUrl = urlencode($imgUrl);
-                $limitTime = ($orderInfo['order_limit_time'] - 660);
+
+                $limitTime = (($orderInfo['add_time'] + $orderShowTime) - time());
                 $url = $url . "?order_id=" . $message['order_no'] . "&amount=" . $orderInfo['amount'] . "&phone=" . $orderInfo['account'] . "&img_url=" . $imgUrl . "&limit_time=" . $limitTime;
                 $updateOrderStatus['qr_url'] = $url;   //支付订单
 //            $localOrderUpdateRes = $orderModel->localUpdateOrder($updateWhere, $updateOrderStatus);
@@ -398,14 +391,13 @@ class Orderinfo extends Controller
                     $orderModel->where('order_no', $orderInfo['order_no'])->update($updateOrderStatus);
                     return json(msg(-7, '', '下单繁忙'));
                 }
-                $limitTime = (($orderInfo['order_limit_time'] - 660) - time());
                 $returnData['phone'] = $orderInfo['account'];
                 $returnData['amount'] = $orderInfo['amount'];
                 $returnData['limitTime'] = (int)($limitTime);
                 $returnData['imgUrl'] = $imgUrl;
                 return json(msg(0, $returnData, 'order_success'));
             } else {
-                if (($orderInfo['order_limit_time'] - 660) < time()) {
+                if (time() > ($orderInfo['add_time'] + $orderShowTime)) {
                     return json(msg(-5, '', '订单超时，请重新下单'));
                 }
                 if ($orderInfo['order_status'] != 4) {
@@ -414,7 +406,7 @@ class Orderinfo extends Controller
 
                 $returnData['phone'] = $orderInfo['account'];
                 $returnData['amount'] = $orderInfo['amount'];
-                $limitTime = (($orderInfo['order_limit_time'] - 660) - time());
+                $limitTime = (($orderInfo['add_time'] + $orderShowTime) - time());
                 $returnData['limitTime'] = (int)($limitTime);
 //                $imgUrl = "http://175.178.195.147:9090/upload/tengxun.jpg";
 
@@ -471,9 +463,11 @@ class Orderinfo extends Controller
             }
             $db = new Db();
             $checkResult = "第" . ($orderInfo['check_times'] + 1) . "次查询结果" . $message['amount'] . "(" . date("Y-m-d H:i:s") . ")";
-            $nextCheckTime = time() + 300;  //第一次 ，当前第二次，设置，第三次
-            if ($orderInfo['check_times'] > 3) {
-                $nextCheckTime = time() + 180;
+
+            $nextCheckTime = time() + 300;  //设置第三次往后的查询时间
+            $autoCheckOrderTime = SystemConfigModel::getAutoCheckOrderTime();
+            if (is_int($autoCheckOrderTime)) {
+                $nextCheckTime = time() + $autoCheckOrderTime;
             }
             if ($message['check_status'] != 1) {
                 $updateCheckTimesRes = $db::table("bsa_order")->where($orderWhere)

@@ -6,6 +6,7 @@ namespace app\api\controller;
 use app\admin\model\WriteoffModel;
 use app\api\validate\OrderhexiaoValidate;
 use app\common\model\OrderexceptionModel;
+use app\common\model\SystemConfigModel;
 use think\Controller;
 use think\Db;
 use app\common\model\OrderhexiaoModel;
@@ -110,6 +111,8 @@ class Orderceshi extends Controller
     }
     public function ceshi1(Request $request)
     {
+        $autoCheckOrderTime = SystemConfigModel::getAutoCheckOrderTime();
+        var_dump($autoCheckOrderTime);exit;
 //        $rootPath = $request->domain();
 //        var_dump($rootPath);exit;
     }
