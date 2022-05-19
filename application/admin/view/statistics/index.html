@@ -24,6 +24,18 @@
                                class="layui-input">
                     </div>
                 </div>
+
+                <div class="layui-inline">
+                    <label class="layui-form-label">运营商</label>
+                    <div class="layui-input-block">
+                        <select name="operator">
+                            <option value="">三网</option>
+                            <option value="联通">联通</option>
+                            <option value="电信">电信</option>
+                            <option value="移动">移动</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="layui-inline">
                     <label class="layui-form-label">操作日期</label>
                     <div class="layui-input-block">
@@ -109,6 +121,9 @@
             [{
                 field: "order_amount",
                 title: "金额",
+            }, {
+                field: "operator",
+                title: "运营商"
             }, {
                 field: "write_off_sign",
                 title: "核销商"
