@@ -352,7 +352,7 @@ class Orderinfo extends Controller
                         ]), 'getOrderInfoFail');
                         return json(msg(-5, '', '下单繁忙'));
                     }
-                    return json(msg(-6, '', $getUseHxOrderRes['msg']));
+                    return json(msg(-5, '', "下单繁忙，可重新下单！"));
                 }
                 $updateOrderStatus['order_status'] = 4;   //等待支付状态
                 $updateOrderStatus['check_times'] = 1;   //下单成功就查询一次
