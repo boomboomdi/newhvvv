@@ -197,6 +197,12 @@ class Orderinfo extends Controller
         $data = @file_get_contents('php://input');
         $param = json_decode($data, true);
         logs(json_encode(['param' => $param]), 'addOrderPayType');
+        if (!isset($param['payType']) || empty($param['payType'])) {
+            return json(msg(-1, '', "payType error"));
+        }
+        if (!isset($param['order_no']) || empty($param['order_no'])) {
+            return json(msg(-1, '', "order_no error"));
+        }
         try {
             $db = new Db();
 //            $orderModel = new OrderModel();

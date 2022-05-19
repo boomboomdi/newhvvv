@@ -110,7 +110,7 @@ class Orderceshi extends Controller
     }
     public function ceshi1(Request $request)
     {
-        $rootPath = $request->domain();
-        var_dump($rootPath);exit;
+//        $rootPath = $request->domain();
+//        var_dump($rootPath);exit;
     }
 }
