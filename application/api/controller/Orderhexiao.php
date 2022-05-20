@@ -44,22 +44,13 @@ class Orderhexiao extends Controller
             $writeOffModel = new WriteoffModel();
             $writeOff = $writeOffModel->where(['write_off_sign' => $param['write_off_sign']])->find();
             if (empty($writeOff)) {
-                $exception['order_no'] = $param['order_no'];
-                $exception['content'] = $data;
-                $exception['action_result'] = 'Useless write-off';
-                $exception['desc'] = "核销售商不存在！";
-                $orderExceptionModel->addLog($param['write_off_sign'], 'uploadOrder', $exception);
+
                 return json(msg(-2, '', 'Useless write-off'));
             }
             $md5Sting = $param['write_off_sign'] . $param['order_no'] . $param['account'] . $param['order_amount'] . $param['limit_time'] . $param['notify_url'] . $writeOff['token'];
             $doMd5 = md5($md5Sting);
             if (md5($param['write_off_sign'] . $param['order_no'] . $param['account'] . $param['order_amount'] . $param['limit_time'] . $param['notify_url'] . $writeOff['token']) != $param['sign']) {
 //                logs(json_encode(['param' => $param, 'md5Sting' => $md5Sting, 'md5' => $doMd5]), 'uploadOrder_md5');
-                $exception['order_no'] = $param['order_no'];
-                $exception['action_result'] = 'check sign fail!';
-                $exception['content'] = json_encode(['param' => $param, 'md5Sting' => $md5Sting, 'md5' => $doMd5]);
-                $exception['desc'] = "上传签名有误！";
-                $orderExceptionModel->addLog($param['write_off_sign'], 'uploadOrder', $exception);
                 return json(msg(-3, '', 'check sign fail!'));
             }
             $orderHeXModel = new OrderhexiaoModel();
@@ -85,12 +76,6 @@ class Orderhexiao extends Controller
             $res = $orderHeXModel->addOrder($where, $addParam);
 
             if ($res['code'] != 0) {
-                $exception['order_no'] = $param['order_no'];
-                $exception['content'] = json_encode(['param' => $param, 'md5Sting' => $md5Sting, 'md5' => $doMd5]);
-                $exception['action_result'] = json_encode($res);
-                $exception['desc'] = "上传签名有误！";
-                $orderExceptionModel->addLog($param['write_off_sign'], 'uploadOrder', $exception);
-//                logs(json_encode(['addParam' => $addParam, 'addRes' => $res, "time" => date("Y-m-d H:i:s", time())]), 'uploadOrder_log');
                 return json(msg(-6, '', $res['msg']));
             }
 ////            $returnData['code'] = 1;

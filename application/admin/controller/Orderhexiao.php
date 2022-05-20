@@ -23,7 +23,9 @@ class Orderhexiao extends Base
             $limit = input('param.limit');
             $startTime = input('param.startTime');
             $endTime = input('param.endTime');
-
+            $payStatus = input('param.pay_status');
+            $orderStatus = input('param.order_status');
+            $param = input('param.');
             $where = [];
             if (!empty(input('param.write_off_sign'))) {
                 $where[] = ['write_off_sign', '=', input('param.write_off_sign')];
@@ -40,6 +42,33 @@ class Orderhexiao extends Base
             if (!empty(input('param.account'))) {
                 $where[] = ['account', '=', input('param.account')];
             }
+            if (!empty(input('param.operator'))) {
+                $where[] = ['operator', '=', input('param.operator')];
+            }
+//            if (!empty($param['order_status'])) {
+//                $where[] = ['order_status', '=', $param['order_status']];
+//            }
+            if (isset($param['order_status']) && $param['order_status'] >= 0) {
+                $where[] = ['order_status', '=', $param['order_status']];
+//                var_dump($param);
+//                exit;
+//                if (input('param.order_status') === 0) {
+//                    $where[] = ['order_status', '=', 0];
+//                } else {
+//                    $where[] = ['order_status', '=', input('param.order_status')];
+//                }
+            }
+//            var_dump($where);
+//            var_dump("pppp");
+//            exit;
+            if (isset($param['pay_status']) && $param['pay_status'] >= 0) {
+                $where[] = ['pay_status', '=', $param['pay_status']];
+            }
+            if (isset($param['notify_status']) && $param['notify_status'] >= 0) {
+                $where[] = ['notify_status', '=', $param['notify_status']];
+            }
+//            var_dump($where);
+//            exit;
             if (!empty($startTime)) {
                 $where[] = ['add_time', '>', strtotime($startTime)];
             }
@@ -53,6 +82,8 @@ class Orderhexiao extends Base
             }
             $orderhexiaomodel = new Orderhexiaomodel();
             $list = $orderhexiaomodel->getOrders($limit, $where);
+//            var_dump(Db::table("bsa_order_hexiao")->getLastSql());
+//            exit;
             $data = empty($list['data']) ? array() : $list['data'];
             foreach ($data as $key => $vo) {
                 $data[$key]['add_time'] = date('Y-m-d H:i:s', $vo['add_time']);

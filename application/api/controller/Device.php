@@ -16,6 +16,44 @@ use Zxing\QrReader;
 class Device extends Controller
 {
 
+    public function queryBalance(Request $request)
+    {
+        $data = @file_get_contents('php://input');
+        $param = json_decode($data, true);
+        logs(json_encode([
+            'param' => $param,
+            'ip' => $request->ip(),
+            'startTime' => date("Y-m-d H:i:s", time())
+        ]), 'queryBalance');
+        try {
+            $validate = new DeviceapiValidate();
+            if (!$validate->scene('ping')->check($param)) {
+                return json(msg(-1, '', $validate->getError()));
+            }
+            if (isset($param['type'])) {
+                unset($param['type']);
+            }
+            $deviceModel = new DeviceModel();
+            $updateParam['account'] = $param['account'];
+            $updateParam['heart_time'] = time();
+            $updateParam['device_status'] = 1;
+//            $updateParam['studio'] = $param['studio'];
+            $where['account'] = $param['account'];
+            $where['studio'] = $param['studio'];
+
+            $res = $deviceModel->devicePing($where, $updateParam);
+
+            if ($res['code'] != 0) {
+                return json(msg('-2', '', $res['msg']));
+            }
+            return json(msg('1', '', "ping success"));
+
+        } catch (\Exception $e) {
+            Log::error('ping error!', $param);
+            return json(msg('-11', '', 'saveBase64toImg error!' . $e->getMessage()));
+        }
+    }
+
     /**
      * 心跳
      * @param Request $request

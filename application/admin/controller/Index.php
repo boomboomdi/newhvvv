@@ -10,6 +10,7 @@
 namespace app\admin\controller;
 
 use app\admin\model\Admin;
+use app\common\model\SystemConfigModel;
 use think\App;
 use think\Db;
 use tool\Auth;
@@ -40,6 +41,7 @@ class Index extends Base
     public function home()
     {
         $db = new Db();
+        $orderLimitTime = SystemConfigModel::getOrderLockTime();
         //订单数量   //
         $orderNum = $db::table("bsa_order")->count();
         //回调数量
@@ -52,15 +54,23 @@ class Index extends Base
         //核销单总量
         $tOrderNum = $db::table("bsa_order_hexiao")->count();
         //可下单数量
+        $noUseTOrderNum = $db::table("bsa_order_hexiao")
+            ->where("pay_status", '=', 0)
+            ->where("order_status", '=', 0)
+            ->where("status", '=', 0)
+            ->where('limit_time', '>', time() + $orderLimitTime)
+            ->count();
+        //可下单数量
         $canUseTOrderNum = $db::table("bsa_order_hexiao")
-            ->where('order_me', '=', null)
-            ->where('order_status', '=', 0)
-            ->where('limit_time', '>', time() + 420)
+            ->where("pay_status", '=', 0)
+            ->where("order_status", '=', 0)
+            ->where("status", '=', 0)
+            ->where('limit_time', '>', time() + $orderLimitTime)
             ->count();
         //已使用数量
         $usedTOrderNum = $db::table("bsa_order_hexiao")
-            ->where('order_me', '<>', null)
-            ->where('status', '<>', 0)
+//            ->where('order_me', '<>', null)
+            ->where('status', '<>', 1)
             ->where('order_status', '=', 1)
 //            ->where('limit_time', '>', time())
             ->count();
@@ -78,6 +88,7 @@ class Index extends Base
             $payOrderAmount = 3000000.00;
             $tOrderNum = 13000;
             $canUseTOrderNum = 3000;
+            $noUseTOrderNum = 3000;
             $payTOrderNum = 2800;
             $usedTOrderNum = 200;
             $successTOrderRate = "80%";
@@ -93,6 +104,7 @@ class Index extends Base
             'notifyPayOrderNum' => $notifyPayOrderNum,
             'payOrderAmount' => $payOrderAmount,
             'tOrderNum' => $tOrderNum,
+            'noUseTOrderNum' => $noUseTOrderNum,
             'canUseTOrderNum' => $canUseTOrderNum,
             'payTOrderNum' => $payTOrderNum,
             'usedTOrderNum' => $usedTOrderNum,
