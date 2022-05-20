@@ -473,8 +473,8 @@ class Orderinfo extends Controller
                 $updateCheckTimesRes = $db::table("bsa_order")->where($orderWhere)
                     ->update([
                         "check_status" => 0,  //查询结束
-                        "check_times" => $orderInfo['check_times'] + 1,
-                        "next_check_time" => $nextCheckTime,
+//                        "check_times" => $orderInfo['check_times'] + 1,
+                        "next_check_time" => time()+3,
                         "order_desc" => $checkResult,
                         "check_result" => $checkResult,
                     ]);
