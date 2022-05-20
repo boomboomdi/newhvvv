@@ -63,6 +63,7 @@ class Order extends Base
                 $data[$key]['order_limit_time'] = date('Y-m-d H:i:s', $data[$key]['order_limit_time']);
                 $data[$key]['notify_time'] = date('Y-m-d H:i:s', $data[$key]['notify_time']);
                 $data[$key]['add_time'] = date('Y-m-d H:i:s', $vo['add_time']);
+                $data[$key]['click_time'] = date('Y-m-d H:i:s', $vo['click_time']);
                 if ($data[$key]['order_status'] == 0) {
                     $data[$key]['order_status'] = '<button class="layui-btn layui-btn-primary layui-btn-xs">订单生成</button>';
                 }
