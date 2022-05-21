@@ -253,6 +253,104 @@ class OrderhexiaoModel extends Model
         }
     }
 
+
+    /**
+     * 重新匹配的时候 使用
+     * 本地更新  bsa_order    bsa_order_hexiao
+     * @param $orderDataNo
+     * @param $amount
+     * @param $orderStatus
+     * @return array
+     */
+    public function loseOrderLocalUpdateNew($orderDataNo, $orderStatus = 1)
+    {
+
+        $db = new Db();
+        $db::startTrans();
+        try {
+            if ($orderStatus != 3) {
+                return modelReMsg(-1, "", "update fail rollback");
+            }
+            $updateHXData['check_result'] = "发现调单：" . $orderDataNo['order_no'];
+            $updateOrderData['check_result'] = "发现调单：" . $orderDataNo['order_no'];
+            //更新核销表  start
+            $orderHxWhere['order_no'] = $orderDataNo['order_pay'];
+            $orderHxWhere['account'] = $orderDataNo['account'];
+            $orderHxWhere['pay_status'] = 0;
+//            $orderWhere['account'] = $orderHxData['account'];
+            $payTime = time();
+            $lockHxOrderRes = $db::table("bsa_order_hexiao")->where($orderHxWhere)->lock(true)->find();
+            if (!$lockHxOrderRes) {
+                $db::rollback();
+                logs(json_encode(['file' => $orderDataNo,
+                    'time' => date("Y-m-d H:i:s", time()),
+                    'lockHxOrderRes' => $lockHxOrderRes,
+                    'lastSql' => $db::table("bsa_order_hexiao")->getLastSql(),
+                ]), 'orderLocalUpdate');
+                return modelReMsg(-1, "", "update fail rollback");
+            }
+            $amount = $orderDataNo['amount'];
+            $updateHXData['pay_amount'] = (float)$amount;
+            $updateHXData['order_me'] = $orderDataNo['order_me'];
+            $updateHXData['pay_time'] = $payTime;
+            $updateHXData['status'] = 2;
+            $updateHXData['pay_status'] = 1;
+            $updateHXRes = $db::table("bsa_order_hexiao")->where($orderHxWhere)
+                ->update($updateHXData);
+            if (!$updateHXRes) {
+                $db::rollback();
+                return modelReMsg(-2, "", "update fail rollback");
+            }
+            //更新核销表  end
+
+            //更新订单表
+            $updateOrderWhere['order_no'] = $orderDataNo['order_no'];
+            $updateOrderWhere['order_me'] = $orderDataNo['order_me'];
+            $orderData = $db::table('bsa_order')->where($updateOrderWhere)->find();   //订单
+            $lockOrderRes = $db::table('bsa_order')
+                ->where('id', '=', $orderData['id'])
+                ->lock(true)->find();
+            if (!$lockOrderRes) {
+                $db::rollback();
+                return modelReMsg(-3, "", "update lock order fail rollback");
+            }
+
+            $updateOrderData['actual_amount'] = (float)$amount;
+            $updateOrderData['pay_status'] = 1;
+            $updateOrderData['pay_time'] = $payTime;
+            $updateOrderData['order_status'] = 1;
+            $updateOrderData['check_status'] = 2;
+            $updateOrderRes = $db::table('bsa_order')->where($updateOrderWhere)
+                ->update($updateOrderData);
+            logs(json_encode([
+                'orderWhere' => $updateOrderWhere,
+                'updateOrderData' => $updateOrderData,
+                'updateOrderRes' => $updateOrderRes,
+                'sql' => $db::table('bsa_order')->getLastSql()
+            ]), 'updateOrderRes');
+            if (!$updateOrderRes) {
+                $db::rollback();
+                return modelReMsg(-4, "", "update order fail rollback");
+            }
+            $db::commit();
+            return modelReMsg(0, "", "更新成功");
+        } catch (\Exception $exception) {
+            $db::rollback();
+            logs(json_encode(['file' => $exception->getFile(),
+                'line' => $exception->getLine(),
+                'errorMessage' => $exception->getMessage()
+            ]), 'orderLocalUpdateException');
+            return modelReMsg(-11, "", "回调失败" . $exception->getMessage());
+        } catch (\Error $error) {
+            $db::rollback();
+            logs(json_encode(['file' => $error->getFile(),
+                'line' => $error->getLine(),
+                'errorMessage' => $error->getMessage()
+            ]), 'orderLocalUpdateError');
+            return modelReMsg(-22, "", "回调失败" . $error->getMessage());
+        }
+    }
+
     /**
      *
      * 获取可用付款抖音话单支付链接
@@ -618,14 +716,14 @@ class OrderhexiaoModel extends Model
         }
     }
 
+
     /**
      * 支付超时订单修改
      * @param $where
      * @param $updateData
      * @return array
      */
-    public
-    function localUpdateHXOrder($where, $updateData)
+    public function localUpdateHXOrder($where, $updateData)
     {
         $db = new Db();
         $db::startTrans();
