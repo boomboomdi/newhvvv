@@ -212,13 +212,67 @@ function guidForSelf()
 //    $yCode = array('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J');
 //    return $yCode[intval(date('Y')) - 2011] . $yCode[intval(date('Y')) - rand(2011, 2019)] . strtoupper(dechex(date('m'))) . date('YmdHi') . substr(implode(NULL, array_map('ord', str_split(substr(uniqid(), 7, 13), 1))), 0, 8);
 }
-function getMillisecond() {
+
+/**
+ *
+ * @param $what 1:数字|2:字母
+ * @param $number
+ * @return string
+ */
+function getRandString($what, $number)
+{
+    $string = '';
+    for ($i = 1; $i <= $number; $i++) {
+        $panduan = 1;
+        if ($what == 3) {
+            if (rand(1, 2) == 1) {
+                $what = 1;
+            } else {
+                $what = 2;
+            }
+            $panduan = 2;
+        }
+        if ($what == 1) {
+            $string .= rand(0, 9);
+        } elseif ($what == 2) {
+            $rand = rand(0, 24);
+            $b = 'a';
+            for ($a = 0; $a <= $rand; $a++) {
+                $b++;
+            }
+            $string .= $b;
+        }
+        if ($panduan == 2) $what = 3;
+    }
+    return $string;
+}
+
+function createRandNum($length)
+{
+    $chars = array(
+        "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
+    );
+    $charsLen = count($chars) - 1;
+
+    shuffle($chars); // 将数组打乱
+
+    $output = "";
+    for ($i = 0; $i < $length; $i++) {
+        $output .= $chars [mt_rand(0, $charsLen)];
+
+    }
+    return $output;
+}
+
+function getMillisecond()
+{
 
     list($s1, $s2) = explode(' ', microtime());
 
     return (float)sprintf('%.0f', (floatval($s1) + floatval($s2)) * 1000);
 
 }
+
 function uuidA()
 {
     $chars = md5(uniqid(mt_rand(), true));
@@ -376,7 +430,9 @@ function curlPostJson($url = '', $postData = '', $options = array())
     curl_close($ch);
     return $data;
 }
-function doSocket($url, $data = '', $timeout = 20) {
+
+function doSocket($url, $data = '', $timeout = 20)
+{
     $urls = parse_url($url);
     if (!$urls) {
         return "-500";
@@ -397,7 +453,7 @@ function doSocket($url, $data = '', $timeout = 20) {
         . "Content-Type:application/x-www-form-urlencoded" . "\r\n"
         . "User-Agent:Mozilla/4.0(compatible;MSIE 7.0;Windows NT 5.1)" . "\r\n"
         . "Host:" . $host . "\r\n"
-        . "Content-Type: application/json"."\r\n"
+        . "Content-Type: application/json" . "\r\n"
         . "Content-Length:" . strlen($data) . "\r\n" . "\r\n" . $data;
     $fd = fsockopen($host, $port);
     if (!is_resource($fd)) {
@@ -426,8 +482,6 @@ function doSocket($url, $data = '', $timeout = 20) {
         return trim($contentInfo[1]);
     }
 }
-
-
 
 
 //成功率
@@ -511,3 +565,4 @@ function validateURL($URL)
         return false;
     }
 }
+

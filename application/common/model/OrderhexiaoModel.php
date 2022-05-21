@@ -14,6 +14,27 @@ class OrderhexiaoModel extends Model
 {
     protected $table = 'bsa_order_hexiao';
 
+    //** 156975286加十位时间戳
+    //** 156+3位随机字符串+加13位时间戳
+
+    /**
+     * 生成一个流水号
+     * @return string
+     */
+    public function createOrderSerial()
+    {
+        $where = [];
+//        $orderSerial = "156" . getRandString(1, 3) . getMillisecond();
+        $orderSerial = "156" . createRandNum(3) . getMillisecond();
+        $where[] = ['order_serial', "=", $orderSerial];
+        $isHas = $this->where($where)->find();
+        if (!empty($isHas)) {
+            return createOrderSerial();
+        }
+        return $orderSerial;
+
+    }
+
 
     /**
      * 增加推单
@@ -532,6 +553,7 @@ class OrderhexiaoModel extends Model
             $notifyParam['order_amount'] = $orderHXData['order_amount'];
             $notifyParam['pay_amount'] = $orderHXData['pay_amount'];
             $notifyParam['pay_status'] = $orderHXData['pay_status'];
+            $notifyParam['order_serial'] = $orderHXData['order_serial'];  //流水号
             if ($notifyParam['pay_status'] != 1) {
                 $notifyParam['pay_status'] = 2;
             }

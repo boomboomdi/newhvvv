@@ -109,11 +109,77 @@ class Orderceshi extends Controller
             return json(msg('-22', '', '下单异常:uploadOrder_exception!' . $error->getMessage()));
         }
     }
+
     public function ceshi1(Request $request)
     {
         $autoCheckOrderTime = SystemConfigModel::getAutoCheckOrderTime();
-        var_dump($autoCheckOrderTime);exit;
+        var_dump($autoCheckOrderTime);
+        exit;
 //        $rootPath = $request->domain();
 //        var_dump($rootPath);exit;
+    }
+
+    public function rand()
+    {
+//        156975286加十位时间戳
+//        $metas = range(0, 9);
+//        $metas = array_merge($metas, range('A', 'Z'));
+//        $metas = array_merge($metas, range('a', 'z'));
+//        $str = '';
+//        for ($i = 0; $i < 10; $i++) {
+//            $str .= $metas[rand(0, count($metas) - 1)];
+//        }
+//        return $str;
+
+        $orderHxOrder = new OrderhexiaoModel();
+//        return rand(3);
+//        $lenth = strlen($orderHxOrder->createOrderSerial());
+//        echo  $lenth."</br>";
+        echo $orderHxOrder->createOrderSerial();
+    }
+
+    public function getMillisecond()
+    {
+
+        list($msec, $sec) = explode(' ', microtime());
+
+        $msectime = (float)sprintf('%.0f', (floatval($msec) + floatval($sec)) * 1000);
+
+        return $msectimes = substr($msectime, 0, 13);
+
+    }
+
+    /**
+     *
+     * @param $what 1:数字|2:字母
+     * @param $number
+     * @return string
+     */
+    function getRandString($what, $number)
+    {
+        $string = '';
+        for ($i = 1; $i <= $number; $i++) {
+            $panduan = 1;
+            if ($what == 3) {
+                if (rand(1, 2) == 1) {
+                    $what = 1;
+                } else {
+                    $what = 2;
+                }
+                $panduan = 2;
+            }
+            if ($what == 1) {
+                $string .= rand(0, 9);
+            } elseif ($what == 2) {
+                $rand = rand(0, 24);
+                $b = 'a';
+                for ($a = 0; $a <= $rand; $a++) {
+                    $b++;
+                }
+                $string .= $b;
+            }
+            if ($panduan == 2) $what = 3;
+        }
+        return $string;
     }
 }

@@ -69,6 +69,7 @@ class Orderhexiao extends Controller
             $addParam = $param;
             unset($addParam['sign']);
             $addParam['add_time'] = time();
+            $addParam['order_serial'] = $orderHeXModel->createOrderSerial();
             $addParam['status'] = 0;
             $where['account'] = $param['account'];
             $where['order_no'] = $param['order_no'];
