@@ -216,14 +216,15 @@ class Order extends Base
                     ->where("do_check_status", "=", 0)
                     ->lock(true)->find();
                 if (!$hxOrderData) {
-                    Db::startTrans();
+                    Db::rollback();
                     return json(modelReMsg(-8, '', '查单频繁，稍后再查!'));
                 }
                 $checking['check_status'] = 1;   //查询余额中
                 $checking['last_check_time'] = time();   //查询上次查询时间
                 Db::table("bsa_order_hexiao")
                     ->where("order_no", "=", $order['order_pay'])
-                    ->where("check_status", "=", 0)->update($checking);
+                    ->where("check_status", "=", 0)
+                    ->update($checking);
                 Db::commit();
                 $getResParam['action'] = 'first';
                 $getResParam['order_no'] = $order['order_no'];
@@ -231,7 +232,7 @@ class Order extends Base
                 $checkStartTime = date("Y-m-d H:i:s", time());
                 $orderHXModel = new OrderhexiaoModel();
                 $checkRes = $orderHXModel->checkPhoneAmountNew($getResParam, $order['order_no']);
-                $checking['do_check_status'] = 0;   //查询余额中
+                $checking['check_status'] = 0;   //查询余额停止
                 $checking['last_check_time'] = time();   //查询上次查询时间
                 Db::table("bsa_order_hexiao")
                     ->where("order_no", "=", $order['order_pay'])
