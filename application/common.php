@@ -213,40 +213,6 @@ function guidForSelf()
 //    return $yCode[intval(date('Y')) - 2011] . $yCode[intval(date('Y')) - rand(2011, 2019)] . strtoupper(dechex(date('m'))) . date('YmdHi') . substr(implode(NULL, array_map('ord', str_split(substr(uniqid(), 7, 13), 1))), 0, 8);
 }
 
-/**
- *
- * @param $what 1:数字|2:字母
- * @param $number
- * @return string
- */
-function getRandString($what, $number)
-{
-    $string = '';
-    for ($i = 1; $i <= $number; $i++) {
-        $panduan = 1;
-        if ($what == 3) {
-            if (rand(1, 2) == 1) {
-                $what = 1;
-            } else {
-                $what = 2;
-            }
-            $panduan = 2;
-        }
-        if ($what == 1) {
-            $string .= rand(0, 9);
-        } elseif ($what == 2) {
-            $rand = rand(0, 24);
-            $b = 'a';
-            for ($a = 0; $a <= $rand; $a++) {
-                $b++;
-            }
-            $string .= $b;
-        }
-        if ($panduan == 2) $what = 3;
-    }
-    return $string;
-}
-
 function createRandNum($length)
 {
     $chars = array(

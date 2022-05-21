@@ -195,6 +195,7 @@ class OrderModel extends Model
                 $db::table('bsa_order')->where('order_no', '=', $callbackData['order_no'])
                     ->update([
                         'notify_time' => time(),
+                        'notify_status' => 2,
                         'notify_times' => $data['notify_times'] + 1,
                         'notify_result' => $notifyResultLog,
                         'order_desc' => "回调失败:" . $notifyResult
@@ -205,7 +206,7 @@ class OrderModel extends Model
             $db::table('bsa_order')->where('order_no', '=', $callbackData['order_no'])
                 ->update([
                     'notify_time' => time(),
-                    'notify_status' => 1,
+                    'notify_status' => 2,
                     'notify_times' => $data['notify_times'] + 1,
                     'notify_result' => $notifyResultLog,
                     'order_desc' => "回调成功:" . $notifyResult
