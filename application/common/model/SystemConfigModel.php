@@ -39,6 +39,29 @@ class SystemConfigModel extends Model
     }
 
     /**
+     * 订单冻结期
+     * @return int
+     */
+    public static function getOrderHxLockTime()
+    {
+        try {
+            $where[] = ["configName", "=", "orderHxLockTime"];
+            $where[] = ["status", "=", 1];
+            $config = Db::table('bsa_system_config')
+                ->where($where)
+                ->find();
+            if (isset($config['configContent']) && !empty($config['configContent'])) {
+                return (int)$config['configContent'];
+            }
+            return 14400;
+        } catch (\Exception $exception) {
+            return 14400;
+        } catch (\Error $error) {
+            return 14400;
+        }
+    }
+
+    /**
      * 获取订单自动查询时间(第三次-第二次间隔)
      * @return int
      */
@@ -60,7 +83,9 @@ class SystemConfigModel extends Model
         } catch (\Error $error) {
             return 300;
         }
-    }    /**
+    }
+
+    /**
      * 获取订单自动查询时间(第三次-第二次间隔)
      * @return int
      */

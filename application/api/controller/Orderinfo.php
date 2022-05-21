@@ -75,6 +75,7 @@ class Orderinfo extends Controller
                 return apiJsonReturn(-6, "无可匹配订单！");
             }
             $orderLimitTime = SystemConfigModel::getOrderLockTime();
+            $orderHxLockTime = SystemConfigModel::getOrderHxLockTime();
             $db::startTrans();
             $hxOrderData = $db::table("bsa_order_hexiao")
                 ->field("bsa_order_hexiao.*")
@@ -111,7 +112,7 @@ class Orderinfo extends Controller
             $updateMatch['status'] = 1;   //匹配中
             $updateMatch['use_time'] = time();   //使用时间
             $updateMatch['last_use_time'] = time();
-            $updateMatch['order_limit_time'] = (time() + 3600);  //匹配成功后锁定3600s 后没支付可以重新解锁匹配
+            $updateMatch['order_limit_time'] = (time() + $orderHxLockTime);  //匹配成功后锁定3600s 后没支付可以重新解锁匹配
             $updateMatch['order_status'] = 1;
             $updateMatch['order_me'] = $orderMe;
             $updateMatch['order_desc'] = "等待访问！";
@@ -474,7 +475,7 @@ class Orderinfo extends Controller
                     ->update([
                         "check_status" => 0,  //查询结束
 //                        "check_times" => $orderInfo['check_times'] + 1,
-                        "next_check_time" => time()+3,
+                        "next_check_time" => time() + 3,
                         "order_desc" => $checkResult,
                         "check_result" => $checkResult,
                     ]);
