@@ -49,7 +49,7 @@ class Timeoutorder extends Command
                     //处理对应order_hexiao表
                     $updateHXOrderData['order_status'] = 2;
                     $updateHXOrderData['last_use_time'] = time();
-                    $updateHXOrderData['order_limit_time'] = time() + 2700;
+//                    $updateHXOrderData['order_limit_time'] = time() + 2700;
                     $updateHXOrderData['order_desc'] = "核销单冻结中!";
                     $updateHXOrderRes = $orderHXModel->localUpdateHXOrder($orderWhere, $updateHXOrderData);
                     logs(json_encode(['order_no' => $v['order_no'],

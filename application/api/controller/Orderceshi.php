@@ -17,6 +17,12 @@ use think\Validate;
 class Orderceshi extends Controller
 {
 
+    public function getOrderHxLockTime()
+    {
+
+        $orderHxLockTime = SystemConfigModel::getOrderHxLockTime();
+        var_dump($orderHxLockTime);exit;
+    }
 
     public function ceshiAdd()
     {
