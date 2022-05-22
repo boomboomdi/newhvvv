@@ -79,6 +79,19 @@ class Redis
         if ($timeOut > 0) $this->redisObj[$this->sn]->expire($key, $timeOut);
         return $setRes;
     }
+    /**
+     * 增，设置值  构建一个字符串
+     * @param string $key KEY名称
+     * @param string $value 设置值
+     * @param int $timeOut 时间  0表示无过期时间
+     * @return true【总是返回true】
+     */
+    public function setnx($key, $value, $timeOut = 0)
+    {
+        $setRes = $this->redisObj[$this->sn]->setnx($key, $value);
+        if ($timeOut > 0) $this->redisObj[$this->sn]->expire($key, $timeOut);
+        return $setRes;
+    }
 
     /**
      * 查，获取 某键对应的值，不存在返回false

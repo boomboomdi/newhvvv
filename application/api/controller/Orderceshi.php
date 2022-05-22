@@ -49,18 +49,22 @@ class Orderceshi extends Controller
     {
 
         $redis = new Redis();
-//        var_dump($redis);exit;
-        $account = "ces1i";
-        $ishas = $redis->get($account);
-        echo $ishas;
+//        $redis->set('test',"1111111111111");
+        $res = $redis->setnx('test1', "bbb", 10);
+        var_dump($res);exit;
+        echo $redis->get('test1');  //2结果：1111111111111
+//        var_dump($res);  //结果：
     }
 
     public function deleteCeShi()
     {
 
         $redis = new Redis();
+        $res = $redis->get('test1');  //2结果：1111111111111
+        var_dump($res);exit;  //结果：
         $account = "first";
         $setRes = $redis->set($account, $account, 180);
+        $setRes = $redis->setnx($account, $account, 180);
         var_dump($setRes);
         exit;
         $redis->delete($account);

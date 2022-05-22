@@ -59,13 +59,11 @@ class Orderhexiao extends Controller
             $orderHeXModel = new OrderhexiaoModel();
 
             $redis = new Redis();
-            $isHas = $redis->get($param['account']);
-            if (!empty($isHas)) {
+            $setRes = $redis->setnx($param['account'], $param['order_no'], 30);
+            if (!$setRes) {
                 return json(msg(-6, '', "请勿重新上传"));
             }
-
-            $redis->set($param['account'], $param['order_no'], 180);
-            //开始事务
+            //开始插入
             $isHasOrder = Db::table("bsa_order_hexiao")
                 ->where('order_no', '=', $param['order_no'])
                 ->find();
@@ -105,15 +103,6 @@ class Orderhexiao extends Controller
                 $redis->delete($param['account']);
                 return json(msg(-6, $addParam['account'], "上传失败，重复上传"));
             }
-//            $insertRes = Db::table("bsa_order_hexiao")->insert($addParam);
-//
-//            if (!$insertRes) {
-//                Db::rollback();
-//                return json(msg(-6, '', "添加失败"));
-//            }
-//
-////            $returnData['code'] = 1;
-//            $returnData['order_no'] = $param['order_no'];
 
             return json(msg(1, '', "success"));
 
