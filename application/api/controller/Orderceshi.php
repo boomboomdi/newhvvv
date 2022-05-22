@@ -15,6 +15,39 @@ use think\Request;
 
 class Orderceshi extends Controller
 {
+
+
+    public function ceshiAdd()
+    {
+
+        $redis = new Redis();
+//        var_dump($redis);exit;
+        $account = "123123123";
+        $redis->set($account, $account);
+        $isHas = $redis->get($account);
+//        var_dump($isHas);
+//        exit;
+    }
+
+    public function ceshiAdd2()
+    {
+
+        $redis = new Redis();
+//        var_dump($redis);exit;
+        $account = "123123123";
+        $ishas = $redis->get($account);
+        if($ishas){
+            echo "已存在";
+        }
+
+        $redis->set($account, $account);
+        $ishas = $redis->get($account);
+//        $isHas = $redis->get($account);
+//        var_dump($isHas);
+//        exit;
+    }
+
+
     /**
      * 核销商上传推单
      * @return \think\response\Json
