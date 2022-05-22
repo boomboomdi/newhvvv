@@ -14,12 +14,13 @@ class Redis
     {
         $host = trim(isset($options["host"]) ? $options["host"] : '127.0.0.1');
         $port = trim(isset($options["port"]) ? $options["port"] : 6379);
-//        $auth = trim(isset($options["auth"]) ? $options["auth"] : "password");
-        $auth = ' ';
+        $auth = trim(isset($options["auth"]) ? $options["auth"] : "password");
         $index = trim(isset($options["index"]) ? $options["index"] : 0);
         if (!is_integer($index) && $index > 16) {
             $index = 0;
         }
+
+//        var_dump($host.$port.$auth);exit;
         $sn = md5("{$host}{$port}{$auth}{$index}");
         $this->sn = $sn;
         if (!isset($this->redisObj[$this->sn])) {
