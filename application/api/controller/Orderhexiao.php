@@ -86,17 +86,17 @@ class Orderhexiao extends Controller
             $where['account'] = $param['account'];
             $where['order_no'] = $param['order_no'];
             Db::commit();
-//            $res = $orderHeXModel->addOrder($where, $addParam);
+            $res = $orderHeXModel->addOrder($where, $addParam);
 //
-//            if ($res['code'] != 0) {
-//                Db::rollback();
-//                return json(msg(-6, '', $res['msg']));
-//            }
+            if ($res['code'] != 0) {
+                Db::rollback();
+                return json(msg(-6, '', $res['msg']));
+            }
             $res = Db::table("bsa_order_hexiao")->insert($addParam);
 
-            if (!$res) {
-                return json(msg(-6, '', "添加失败"));
-            }
+//            if (!$res) {
+//                return json(msg(-6, '', "添加失败"));
+//            }
 ////            $returnData['code'] = 1;
 //            $returnData['order_no'] = $param['order_no'];
 
