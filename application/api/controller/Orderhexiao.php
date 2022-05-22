@@ -92,7 +92,7 @@ class Orderhexiao extends Controller
 //                Db::rollback();
 //                return json(msg(-6, '', $res['msg']));
 //            }
-            $res = Db::table("bsa_order_hexiao")->insert($where, $addParam);
+            $res = Db::table("bsa_order_hexiao")->insert($addParam);
 
             if (!$res) {
                 Db::rollback();
