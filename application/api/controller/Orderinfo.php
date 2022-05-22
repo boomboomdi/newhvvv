@@ -360,12 +360,22 @@ class Orderinfo extends Controller
                 //有没有之前没有支付的订单匹配的上金额
                 $hasPayOrderData = $orderModel
                     ->where("account", '=', $orderInfo['account'])
+                    ->where("order_pay", '=', $orderInfo['order_pay'])
+                    ->where("order_no", '<>', $orderInfo['order_no'])
                     ->where("order_status", '<>', 1)
                     ->where("pay_status", '<>', 1)
                     ->where("end_check_amount", '<', $getUseHxOrderRes['data']['last_check_amount'] + 10)
+                    ->where("add_time", '>', time() - 14400)
                     ->order('add_time desc')
                     ->find();
                 if (!empty($hasPayOrderData)) {
+                    logs(json_encode([
+                        "nowTime" => date("Y-m-d H:i:s", time()),
+                        'findLoseOrder' => $hasPayOrderData['order_no'],
+                        'add_time' => $hasPayOrderData['add_time'],
+                        'account' => $hasPayOrderData['account'],
+
+                    ]), 'AfindHasPayOrderAndNotify');
                     //当前订单更改为下单失败状态
                     $updateOrderStatus['order_status'] = 3;
                     $updateOrderStatus['last_use_time'] = time();
