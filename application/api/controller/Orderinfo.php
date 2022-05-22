@@ -368,7 +368,7 @@ class Orderinfo extends Controller
                     //当前订单更改为下单失败状态
                     $updateOrderStatus['order_status'] = 3;
                     $updateOrderStatus['last_use_time'] = time();
-                    $updateOrderStatus['check_result'] = "发现调单此单失败" . $getUseHxOrderRes['data'];
+                    $updateOrderStatus['check_result'] = "发现调单此单失败" . json_encode($hasPayOrderData['order_no']);
                     $updateOrderStatus['order_desc'] = "发现有调单|此单下单失败！";
                     $updateMatchRes = $orderModel->where('order_no', $orderInfo['order_no'])->update($updateOrderStatus);
                     if (!$updateMatchRes) {
@@ -376,7 +376,7 @@ class Orderinfo extends Controller
                             'action' => 'updateMatchRes',
                             'message' => $message,
                             'updateMatchRes' => $updateMatchRes,
-                        ]), 'getOrderInfoFail');
+                        ]), 'hasPayOrderUpdateFail');
                         return json(msg(-31, '', '下单失败,请重新下单！-31'));
                     }
                     //修改订单为下单失败状态。  end
@@ -385,7 +385,7 @@ class Orderinfo extends Controller
                     $orderHXModel = new OrderhexiaoModel();
                     $updateOrderWhere['order_no'] = $hasPayOrderData['order_no'];
                     $updateOrderWhere['account'] = $hasPayOrderData['account'];
-                    //传递订单表
+                    //订单表
                     $localUpdateRes = $orderHXModel->loseOrderLocalUpdateNew($hasPayOrderData, 3);
                     logs(json_encode([
                         "time" => date("Y-m-d H:i:s", time()),
