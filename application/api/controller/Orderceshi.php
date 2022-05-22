@@ -12,6 +12,7 @@ use think\Db;
 use app\common\model\OrderhexiaoModel;
 use app\common\Redis;
 use think\Request;
+use think\Validate;
 
 class Orderceshi extends Controller
 {
@@ -23,7 +24,7 @@ class Orderceshi extends Controller
         $redis = new Redis();
 //        var_dump($redis);exit;
         $account = "123123123";
-        $redis->set($account, $account);
+        $redis->set($account, $account, 180);
         $isHas = $redis->get($account);
         var_dump($isHas);
 //        exit;
@@ -34,19 +35,56 @@ class Orderceshi extends Controller
 
         $redis = new Redis();
 //        var_dump($redis);exit;
-        $account = "123123123";
+        $account = "ces1i";
         $ishas = $redis->get($account);
-        if($ishas){
-            echo "已存在";
+        if (empty($ishas)) {
+            echo "重新设置";
+            $redis->set($account, $account, 180);
+        } else {
+            echo($redis->get($account));
         }
-
-        $redis->set($account, $account);
-        $ishas = $redis->get($account);
-//        $isHas = $redis->get($account);
-//        var_dump($isHas);
-//        exit;
     }
 
+    public function getCeshi()
+    {
+
+        $redis = new Redis();
+//        var_dump($redis);exit;
+        $account = "ces1i";
+        $ishas = $redis->get($account);
+        echo $ishas;
+    }
+
+    public function deleteCeShi()
+    {
+
+        $redis = new Redis();
+        $account = "first";
+        $setRes = $redis->set($account, $account, 180);
+        var_dump($setRes);
+        exit;
+        $redis->delete($account);
+        $ishas = $redis->get($account);
+        echo $ishas;
+    }
+
+    public function deleteCeShi1()
+    {
+
+        $redis = new Redis();
+        $account = "first";
+        $redis->delete($account);
+
+    }
+
+    public function deletedd()
+    {
+
+        $redis = new Redis();
+        $account = "first";
+        $ishas = $redis->get($account);
+        echo $ishas;
+    }
 
     /**
      * 核销商上传推单

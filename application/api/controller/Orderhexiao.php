@@ -7,6 +7,7 @@ use app\admin\model\WriteoffModel;
 use app\common\model\OrderhexiaoModel;
 use app\common\model\OrderexceptionModel;
 
+use app\common\Redis;
 use think\Db;
 use think\facade\Log;
 use think\Request;
@@ -56,16 +57,21 @@ class Orderhexiao extends Controller
                 return json(msg(-3, '', 'check sign fail!'));
             }
             $orderHeXModel = new OrderhexiaoModel();
+
+            $redis = new Redis();
+            $isHas = $redis->get($param['account']);
+            if (!empty($isHas)) {
+                return json(msg(-6, '', "请勿重新上传"));
+            }
+
+            $redis->set($param['account'], $param['order_no'], 180);
             //开始事务
-            Db::startTrans();
             $isHasOrder = Db::table("bsa_order_hexiao")
                 ->where('order_no', '=', $param['order_no'])
-                ->lock(true)
                 ->find();
 
             //存在相同单号回滚返回
             if ($isHasOrder) {
-                Db::rollback();
                 return json(msg(-5, '', '订单号已存在!'));
             }
 
@@ -74,13 +80,11 @@ class Orderhexiao extends Controller
             //是否存在未支付相同手机号订单号 回滚返回
             $isHas = Db::table("bsa_order_hexiao")
                 ->where($isHasWhere)
-                ->lock(true)
                 ->select();
 
             if (!empty($isHas)) {
                 foreach ($isHas as $k => $v) {
                     if ($v['notify_status'] <> 1) {
-                        Db::rollback();
                         return json(msg(-4, '', '该账号有未回调订单!'));
                     }
                 }
@@ -98,7 +102,7 @@ class Orderhexiao extends Controller
             $res = $orderHeXModel->addOrder($where, $addParam);
 //
             if ($res['code'] != 0) {
-                Db::rollback();
+                $redis->delete($param['account']);
                 return json(msg(-6, $addParam['account'], "上传失败，重复上传"));
             }
 //            $insertRes = Db::table("bsa_order_hexiao")->insert($addParam);
@@ -107,7 +111,6 @@ class Orderhexiao extends Controller
 //                Db::rollback();
 //                return json(msg(-6, '', "添加失败"));
 //            }
-            Db::commit();
 //
 ////            $returnData['code'] = 1;
 //            $returnData['order_no'] = $param['order_no'];
