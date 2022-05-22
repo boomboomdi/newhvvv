@@ -294,6 +294,8 @@ class Orderinfo extends Controller
                         $returnData['imgUrl'] = $imgUrl;
                         return json(msg(0, $returnData, "success"));
 
+                    } else if ($orderInfo['order_status'] == 3) {
+                        return json(msg(-3, '', '匹配繁忙，重新下单！'));
                     } else {
                         sleep(1);
                         continue;
@@ -503,7 +505,7 @@ class Orderinfo extends Controller
                 ]), '0076updateCheckPhoneAmountFail');
             }
             //1、支付到账
-            if ($message['amount'] > ($orderInfo['end_check_amount'] - 5)) {
+            if ($message['amount'] > ($orderInfo['end_check_amount'] - 10)) {
                 //本地更新
                 $orderHXModel = new OrderhexiaoModel();
                 $updateOrderWhere['order_no'] = $orderInfo['order_no'];
