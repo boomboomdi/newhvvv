@@ -363,6 +363,7 @@ class Orderinfo extends Controller
                     ->where("order_status", '<>', 1)
                     ->where("pay_status", '<>', 1)
                     ->where("end_check_amount", '<', $getUseHxOrderRes['data']['last_check_amount'] + 10)
+                    ->order('add_time desc')
                     ->find();
                 if (!empty($hasPayOrderData)) {
                     //当前订单更改为下单失败状态
