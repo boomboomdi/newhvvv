@@ -55,21 +55,21 @@ class Orderhexiao extends Controller
             $orderHeXModel = new OrderhexiaoModel();
             //开始事务
             Db::startTrans();
-            $isHasOrder = $orderHeXModel
+            $isHasOrder = Db::table("bsa_order_hexiao")
                 ->where('order_no', '=', $param['order_no'])
                 ->lock(true)
                 ->find();
 
             //存在相同单号回滚返回
             if ($isHasOrder) {
-                Db::rollback();
-                return json(msg(-5, '', '订单已存在!'));
+                Db::commit();
+                return json(msg(-5, '', '订单号已存在!'));
             }
 
             $isHasWhere[] = ['account', '=', $param['account']];
             $isHasWhere[] = ['notify_status', '<>', 1];
             //是否存在未支付相同手机号订单号 回滚返回
-            $isHas = $orderHeXModel
+            $isHas = Db::table("bsa_order_hexiao")
                 ->where($isHasWhere)
                 ->lock(true)
                 ->find();
@@ -86,13 +86,18 @@ class Orderhexiao extends Controller
             $where['account'] = $param['account'];
             $where['order_no'] = $param['order_no'];
 
-            $res = $orderHeXModel->addOrder($where, $addParam);
+//            $res = $orderHeXModel->addOrder($where, $addParam);
+//
+//            if ($res['code'] != 0) {
+//                Db::rollback();
+//                return json(msg(-6, '', $res['msg']));
+//            }
+            $res = Db::table("bsa_order_hexiao")->insert($where, $addParam);
 
-            if ($res['code'] != 0) {
+            if (!$res) {
                 Db::rollback();
-                return json(msg(-6, '', $res['msg']));
+                return json(msg(-6, '', "添加失败"));
             }
-
             Db::commit();
 ////            $returnData['code'] = 1;
 //            $returnData['order_no'] = $param['order_no'];
