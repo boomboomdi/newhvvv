@@ -65,21 +65,27 @@ class Orderhexiao extends Controller
 
             //存在相同单号回滚返回
             if ($isHasOrder) {
-//                Db::rollback();
+                Db::rollback();
                 return json(msg(-5, '', '订单号已存在!'));
             }
 
             $isHasWhere[] = ['account', '=', $param['account']];
-            $isHasWhere[] = ['notify_status', '<>', 1];
+//            $isHasWhere[] = ['notify_status', '<>', 1];
             //是否存在未支付相同手机号订单号 回滚返回
             $isHas = Db::table("bsa_order_hexiao")
                 ->where($isHasWhere)
                 ->lock(true)
-                ->find();
-            if ($isHas) {
-                Db::rollback();
-                return json(msg(-4, '', '该账号有未回调订单!'));
+                ->select();
+
+            if (!empty($isHas)) {
+                foreach ($isHas as $k => $v) {
+                    if ($v['notify_status'] <> 1) {
+                        Db::rollback();
+                        return json(msg(-4, '', '该账号有未回调订单!'));
+                    }
+                }
             }
+//            Db::commit();
 
             $addParam = $param;
             unset($addParam['sign']);
