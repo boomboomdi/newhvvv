@@ -62,7 +62,7 @@ class Orderhexiao extends Controller
 
             //存在相同单号回滚返回
             if ($isHasOrder) {
-                Db::commit();
+                Db::rollback();
                 return json(msg(-5, '', '订单号已存在!'));
             }
 
@@ -85,14 +85,15 @@ class Orderhexiao extends Controller
             $addParam['status'] = 0;
             $where['account'] = $param['account'];
             $where['order_no'] = $param['order_no'];
-            Db::commit();
+//            Db::commit();
             $res = $orderHeXModel->addOrder($where, $addParam);
 //
             if ($res['code'] != 0) {
                 Db::rollback();
                 return json(msg(-6, '', $res['msg']));
             }
-            $res = Db::table("bsa_order_hexiao")->insert($addParam);
+            Db::commit();
+//            $res = Db::table("bsa_order_hexiao")->insert($addParam);
 
 //            if (!$res) {
 //                return json(msg(-6, '', "添加失败"));
