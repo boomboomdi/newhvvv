@@ -60,7 +60,7 @@ class Orderhexiao extends Controller
             Db::startTrans();
             $isHasOrder = Db::table("bsa_order_hexiao")
                 ->where('order_no', '=', $param['order_no'])
-                ->lock('lock in share mode')
+                ->lock(true)
                 ->find();
 
             //存在相同单号回滚返回
@@ -74,6 +74,7 @@ class Orderhexiao extends Controller
             //是否存在未支付相同手机号订单号 回滚返回
             $isHas = Db::table("bsa_order_hexiao")
                 ->where($isHasWhere)
+                ->lock(true)
                 ->find();
             if ($isHas) {
                 Db::rollback();
