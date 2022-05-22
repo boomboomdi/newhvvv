@@ -75,7 +75,6 @@ class Orderinfo extends Controller
                 return apiJsonReturn(-6, "无可匹配订单！");
             }
             $orderLimitTime = SystemConfigModel::getOrderLockTime();
-            $orderHxLockTime = SystemConfigModel::getOrderHxLockTime();
             $db::startTrans();
             $hxOrderData = $db::table("bsa_order_hexiao")
                 ->field("bsa_order_hexiao.*")
@@ -106,6 +105,7 @@ class Orderinfo extends Controller
             $apiUrl = $request->domain() . "/api/orderinfo/getorderinfo";
             $url = $url . "?order_id=" . $message['order_no'] . "&amount=" . $message['amount'] . "&apiUrl=" . $apiUrl;
 
+            $orderHxLockTime = SystemConfigModel::getOrderHxLockTime();
             $hxWhere['id'] = $hxOrderData['id'];
             $hxWhere['order_no'] = $hxOrderData['order_no'];
             $updateMatch['check_status'] = 0;
@@ -369,8 +369,8 @@ class Orderinfo extends Controller
                     //当前订单更改为下单失败状态
                     $updateOrderStatus['order_status'] = 3;
                     $updateOrderStatus['last_use_time'] = time();
-                    $updateOrderStatus['check_result'] = "发现调单此单失败" . json_encode($hasPayOrderData['order_no']);
-                    $updateOrderStatus['order_desc'] = "发现有调单|此单下单失败！";
+                    $updateOrderStatus['check_result'] = "发现掉单此单失败" . json_encode($hasPayOrderData['order_no']);
+                    $updateOrderStatus['order_desc'] = "发现掉单|此单下单失败！";
                     $updateMatchRes = $orderModel->where('order_no', $orderInfo['order_no'])->update($updateOrderStatus);
                     if (!$updateMatchRes) {
                         logs(json_encode([

@@ -574,7 +574,6 @@ class OrderhexiaoModel extends Model
             $updateMatch['use_time'] = time();   //使用时间
             $updateMatch['use_times'] = $hxOrderInfo['use_times'] + 1;   //使用次数+1
             $updateMatch['last_use_time'] = time();
-            $updateMatch['order_limit_time'] = time() + 3600;  //匹配成功后锁定3600s 后没支付可以重新解锁匹配
             $updateMatch['order_status'] = 1;
             $updateMatch['order_desc'] = "匹配成功！当前余额:" . $checkRes['data'];
 

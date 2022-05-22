@@ -51,7 +51,8 @@ class Orderceshi extends Controller
         $redis = new Redis();
 //        $redis->set('test',"1111111111111");
         $res = $redis->setnx('test1', "bbb", 10);
-        var_dump($res);exit;
+        var_dump($res);
+        exit;
         echo $redis->get('test1');  //2结果：1111111111111
 //        var_dump($res);  //结果：
     }
@@ -61,7 +62,8 @@ class Orderceshi extends Controller
 
         $redis = new Redis();
         $res = $redis->get('test1');  //2结果：1111111111111
-        var_dump($res);exit;  //结果：
+        var_dump($res);
+        exit;  //结果：
         $account = "first";
         $setRes = $redis->set($account, $account, 180);
         $setRes = $redis->setnx($account, $account, 180);
@@ -75,6 +77,9 @@ class Orderceshi extends Controller
     public function deleteCeShi1()
     {
 
+        $orderHxLockTime = SystemConfigModel::getOrderHxLockTime();
+        var_dump($orderHxLockTime);
+        exit;
         $redis = new Redis();
         $account = "first";
         $redis->delete($account);
