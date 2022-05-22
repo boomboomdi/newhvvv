@@ -25,7 +25,7 @@ class Orderceshi extends Controller
         $account = "123123123";
         $redis->set($account, $account);
         $isHas = $redis->get($account);
-//        var_dump($isHas);
+        var_dump($isHas);
 //        exit;
     }
 
