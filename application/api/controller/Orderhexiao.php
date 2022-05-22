@@ -85,7 +85,7 @@ class Orderhexiao extends Controller
             $addParam['status'] = 0;
             $where['account'] = $param['account'];
             $where['order_no'] = $param['order_no'];
-
+            Db::commit();
 //            $res = $orderHeXModel->addOrder($where, $addParam);
 //
 //            if ($res['code'] != 0) {
@@ -95,10 +95,8 @@ class Orderhexiao extends Controller
             $res = Db::table("bsa_order_hexiao")->insert($addParam);
 
             if (!$res) {
-                Db::rollback();
                 return json(msg(-6, '', "添加失败"));
             }
-            Db::commit();
 ////            $returnData['code'] = 1;
 //            $returnData['order_no'] = $param['order_no'];
 
