@@ -90,7 +90,7 @@ class Orderhexiao extends Controller
 //
             if ($res['code'] != 0) {
                 Db::rollback();
-                return json(msg(-6, '', $res['msg']));
+                return json(msg(-6, $addParam['order_no'], $res['msg']));
             }
             Db::commit();
 //            $res = Db::table("bsa_order_hexiao")->insert($addParam);
