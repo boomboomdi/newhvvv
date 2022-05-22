@@ -365,7 +365,7 @@ class Orderinfo extends Controller
                     ->where("order_status", '<>', 1)
                     ->where("pay_status", '<>', 1)
                     ->where("end_check_amount", '<', $getUseHxOrderRes['data']['last_check_amount'] + 10)
-                    ->where("add_time", '>', time() - 14400)
+                    ->where("add_time", '>', time() - 4600)
                     ->order('add_time desc')
                     ->find();
                 if (!empty($hasPayOrderData)) {
@@ -397,7 +397,7 @@ class Orderinfo extends Controller
                     $updateOrderWhere['order_no'] = $hasPayOrderData['order_no'];
                     $updateOrderWhere['account'] = $hasPayOrderData['account'];
                     //订单表
-                    $localUpdateRes = $orderHXModel->loseOrderLocalUpdateNew($hasPayOrderData, 3);
+                    $localUpdateRes = $orderHXModel->loseOrderLocalUpdateNew($hasPayOrderData, 3, $getUseHxOrderRes['data']['last_check_amount']);
                     logs(json_encode([
                         "time" => date("Y-m-d H:i:s", time()),
                         'findLoseOrder' => $hasPayOrderData['order_no'],
@@ -408,6 +408,7 @@ class Orderinfo extends Controller
                     if (!isset($localUpdate['code']) || $localUpdate['code'] != 0) {
                         return json(msg(32, '', '下单失败，请重新下单2！'));
                     }
+                    //给之前的订单回调 end
                     return json(msg(32, '', '下单失败，请重新下单1'));
                 }
                 $updateOrderStatus['order_status'] = 4;   //等待支付状态

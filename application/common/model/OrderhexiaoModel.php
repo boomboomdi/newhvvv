@@ -262,7 +262,7 @@ class OrderhexiaoModel extends Model
      * @param $orderStatus
      * @return array
      */
-    public function loseOrderLocalUpdateNew($orderDataNo, $orderStatus = 1)
+    public function loseOrderLocalUpdateNew($orderDataNo, $orderStatus = 1, $checkAmount = "")
     {
 
         $db = new Db();
@@ -271,8 +271,8 @@ class OrderhexiaoModel extends Model
             if ($orderStatus != 3) {
                 return modelReMsg(-1, "", "update fail rollback");
             }
-            $updateHXData['check_result'] = "发现调单：" . $orderDataNo['order_no'];
-            $updateOrderData['check_result'] = "发现调单：" . $orderDataNo['order_no'];
+            $updateHXData['check_result'] = "发现掉单：" . $orderDataNo['order_no'] . "-" . $checkAmount;
+            $updateOrderData['check_result'] = "发现掉单：" . $orderDataNo['order_no'] . "-" . $checkAmount;
             //更新核销表  start
             $orderHxWhere['order_no'] = $orderDataNo['order_pay'];
             $orderHxWhere['account'] = $orderDataNo['account'];
