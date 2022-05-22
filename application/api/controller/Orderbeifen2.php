@@ -547,7 +547,7 @@ class Orderinfo extends Controller
                 ]), '0076updateCheckPhoneAmountFail');
             }
             //1、支付到账
-            if ($message['amount'] > ($orderInfo['end_check_amount'] - 5)) {
+            if ($message['amount'] > ($orderInfo['end_check_amount'] - 10)) {
                 //本地更新
                 $orderHXModel = new OrderhexiaoModel();
                 $updateOrderWhere['order_no'] = $orderInfo['order_no'];
