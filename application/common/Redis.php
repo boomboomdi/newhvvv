@@ -14,7 +14,8 @@ class Redis
     {
         $host = trim(isset($options["host"]) ? $options["host"] : '127.0.0.1');
         $port = trim(isset($options["port"]) ? $options["port"] : 6379);
-        $auth = trim(isset($options["auth"]) ? $options["auth"] : 'zhangsan');
+//        $auth = trim(isset($options["auth"]) ? $options["auth"] : "password");
+        $auth = ' ';
         $index = trim(isset($options["index"]) ? $options["index"] : 0);
         if (!is_integer($index) && $index > 16) {
             $index = 0;
