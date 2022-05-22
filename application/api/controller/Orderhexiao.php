@@ -57,12 +57,12 @@ class Orderhexiao extends Controller
             Db::startTrans();
             $isHasOrder = Db::table("bsa_order_hexiao")
                 ->where('order_no', '=', $param['order_no'])
-                ->lock(true)
+                ->lock('lock in share mode')
                 ->find();
 
             //存在相同单号回滚返回
             if ($isHasOrder) {
-                Db::rollback();
+//                Db::rollback();
                 return json(msg(-5, '', '订单号已存在!'));
             }
 
@@ -71,7 +71,6 @@ class Orderhexiao extends Controller
             //是否存在未支付相同手机号订单号 回滚返回
             $isHas = Db::table("bsa_order_hexiao")
                 ->where($isHasWhere)
-                ->lock(true)
                 ->find();
             if ($isHas) {
                 Db::rollback();
@@ -86,18 +85,20 @@ class Orderhexiao extends Controller
             $where['account'] = $param['account'];
             $where['order_no'] = $param['order_no'];
 //            Db::commit();
-            $res = $orderHeXModel->addOrder($where, $addParam);
-//
-            if ($res['code'] != 0) {
+//            $res = $orderHeXModel->addOrder($where, $addParam);
+////
+//            if ($res['code'] != 0) {
+//                Db::rollback();
+//                return json(msg(-6, $addParam['account'], $res['msg']));
+//            }
+            $insertRes = Db::table("bsa_order_hexiao")->insert($addParam);
+
+            if (!$insertRes) {
                 Db::rollback();
-                return json(msg(-6, $addParam['order_no'], $res['msg']));
+                return json(msg(-6, '', "添加失败"));
             }
             Db::commit();
-//            $res = Db::table("bsa_order_hexiao")->insert($addParam);
-
-//            if (!$res) {
-//                return json(msg(-6, '', "添加失败"));
-//            }
+//
 ////            $returnData['code'] = 1;
 //            $returnData['order_no'] = $param['order_no'];
 
@@ -105,10 +106,10 @@ class Orderhexiao extends Controller
 
         } catch (\Exception $exception) {
             logs(json_encode(['param' => $param, 'file' => $exception->getFile(), 'line' => $exception->getLine(), 'errorMessage' => $exception->getMessage()]), 'uploadOrder_exception');
-            return json(msg('-11', '', '下单异常:uploadOrder_exception!' . $exception->getMessage()));
+            return json(msg(-11, '', '下单异常:uploadOrder_exception!' . $exception->getMessage()));
         } catch (\Error $error) {
             logs(json_encode(['param' => $param, 'file' => $error->getFile(), 'line' => $error->getLine(), 'errorMessage' => $error->getMessage()]), 'uploadOrder_error');
-            return json(msg('-22', '', '下单异常:uploadOrder_exception!' . $error->getMessage()));
+            return json(msg(-22, '', '下单异常:uploadOrder_exception!' . $error->getMessage()));
         }
     }
 
