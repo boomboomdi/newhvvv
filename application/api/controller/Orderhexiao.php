@@ -44,7 +44,6 @@ class Orderhexiao extends Controller
             $writeOffModel = new WriteoffModel();
             $writeOff = $writeOffModel->where(['write_off_sign' => $param['write_off_sign']])->find();
             if (empty($writeOff)) {
-
                 return json(msg(-2, '', 'Useless write-off'));
             }
             $md5Sting = $param['write_off_sign'] . $param['order_no'] . $param['account'] . $param['order_amount'] . $param['limit_time'] . $param['notify_url'] . $writeOff['token'];
@@ -54,18 +53,31 @@ class Orderhexiao extends Controller
                 return json(msg(-3, '', 'check sign fail!'));
             }
             $orderHeXModel = new OrderhexiaoModel();
+            //开始事务
+            Db::startTrans();
+            $isHasOrder = $orderHeXModel
+                ->where('order_no', '=', $param['order_no'])
+                ->lock(true)
+                ->find();
 
-            //查询是否已经有有相同手机号
-            $isHasWhere[] = ['account', '=', $param['account']];
-            $isHasWhere[] = ['notify_status', '<>', 1];
-            $isHas = $orderHeXModel->where($isHasWhere)->find();
-            if (!empty($isHas)) {
-                return json(msg(-4, '', '该账号有未回调订单!'));
-            }
-            $isHasOrder = $orderHeXModel->where('order_no','=',$param['order_no'])->find();
-            if (!empty($isHasOrder)) {
+            //存在相同单号回滚返回
+            if ($isHasOrder) {
+                Db::rollback();
                 return json(msg(-5, '', '订单已存在!'));
             }
+
+            $isHasWhere[] = ['account', '=', $param['account']];
+            $isHasWhere[] = ['notify_status', '<>', 1];
+            //是否存在未支付相同手机号订单号 回滚返回
+            $isHas = $orderHeXModel
+                ->where($isHasWhere)
+                ->lock(true)
+                ->find();
+            if ($isHas) {
+                Db::rollback();
+                return json(msg(-4, '', '该账号有未回调订单!'));
+            }
+
             $addParam = $param;
             unset($addParam['sign']);
             $addParam['add_time'] = time();
@@ -77,8 +89,11 @@ class Orderhexiao extends Controller
             $res = $orderHeXModel->addOrder($where, $addParam);
 
             if ($res['code'] != 0) {
+                Db::rollback();
                 return json(msg(-6, '', $res['msg']));
             }
+
+            Db::commit();
 ////            $returnData['code'] = 1;
 //            $returnData['order_no'] = $param['order_no'];
 
