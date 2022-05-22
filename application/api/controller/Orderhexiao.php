@@ -27,6 +27,9 @@ class Orderhexiao extends Controller
         $param = json_decode($data, true);
         logs(json_encode(['message' => $param, "time" => date("Y-m-d H:i:s", time())]), 'uploadOrder_log');
         $orderExceptionModel = new OrderexceptionModel();
+        if (mt_rand(0, 9) > 5) {
+            usleep(3000);
+        }
         try {
             $validate = new OrderhexiaoValidate();
             if (!$validate->scene('uploadOrder')->check($param)) {
@@ -85,18 +88,18 @@ class Orderhexiao extends Controller
             $where['account'] = $param['account'];
             $where['order_no'] = $param['order_no'];
 //            Db::commit();
-//            $res = $orderHeXModel->addOrder($where, $addParam);
-////
-//            if ($res['code'] != 0) {
-//                Db::rollback();
-//                return json(msg(-6, $addParam['account'], $res['msg']));
-//            }
-            $insertRes = Db::table("bsa_order_hexiao")->insert($addParam);
-
-            if (!$insertRes) {
+            $res = $orderHeXModel->addOrder($where, $addParam);
+//
+            if ($res['code'] != 0) {
                 Db::rollback();
-                return json(msg(-6, '', "添加失败"));
+                return json(msg(-6, $addParam['account'], "上传失败，重复上传"));
             }
+//            $insertRes = Db::table("bsa_order_hexiao")->insert($addParam);
+//
+//            if (!$insertRes) {
+//                Db::rollback();
+//                return json(msg(-6, '', "添加失败"));
+//            }
             Db::commit();
 //
 ////            $returnData['code'] = 1;
