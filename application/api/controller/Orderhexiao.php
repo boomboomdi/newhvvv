@@ -74,7 +74,7 @@ class Orderhexiao extends Controller
             }
 
             $isHasWhere[] = ['account', '=', $param['account']];
-//            $isHasWhere[] = ['notify_status', '<>', 1];
+            $isHasWhere[] = ['notify_status', '<>', 1];
             //是否存在未支付相同手机号订单号 回滚返回
             $isHas = Db::table("bsa_order_hexiao")
                 ->where($isHasWhere)
@@ -137,7 +137,7 @@ class Orderhexiao extends Controller
                 return json(msg(-1, '', '错误的核销商'));
             }
             if (md5($param['write_off_sign'] . $param['order_no'] . $param['account'] . $writeOff['token']) != $param['sign']) {
-                return json(msg(-1, '', 'fuck you!'));
+                return json(msg(-1, '', '签名有误！'));
             }
             $orderHXModel = new OrderhexiaoModel();
             $where['account'] = $param['account'];
