@@ -315,6 +315,8 @@ class Orderinfo extends Controller
                     ->where("order_status", "=", 0)
                     ->lock(true)
                     ->find();
+
+                $orderHxLockTime = SystemConfigModel::getOrderHxLockTime();
                 if (!$orderInfo || $orderInfo['order_status'] > 0) {
                     logs(json_encode([
                         'action' => 'lockFail',
@@ -365,7 +367,7 @@ class Orderinfo extends Controller
                     ->where("order_status", '<>', 1)
                     ->where("pay_status", '<>', 1)
                     ->where("end_check_amount", '<', $getUseHxOrderRes['data']['last_check_amount'] + 10)
-                    ->where("add_time", '>', time() - 4600)
+                    ->where("add_time", '>', time() - ($orderHxLockTime + 3600))
                     ->order('add_time desc')
                     ->find();
                 if (!empty($hasPayOrderData)) {
