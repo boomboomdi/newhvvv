@@ -74,7 +74,7 @@ class Orderhexiao extends Controller
             }
 
             $isHasWhere[] = ['account', '=', $param['account']];
-            $isHasWhere[] = ['notify_status', '<>', 1];
+//            $isHasWhere[] = ['notify_status', '<>', 1];
             //是否存在未支付相同手机号订单号 回滚返回
             $isHas = Db::table("bsa_order_hexiao")
                 ->where($isHasWhere)
