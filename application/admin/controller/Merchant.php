@@ -29,6 +29,12 @@ class Merchant extends Base
             if (!empty($merchantName)) {
                 $where[] = ['merchant_name', 'like', $merchantName . '%'];
             }
+            if (!empty(input('param.addTime'))) {
+                $where[] = ['add_time', '>', strtotime(input('param.add_time'))];
+            }
+             if (!empty(input('param.endTime'))) {
+                $where[] = ['add_time', '>', strtotime(input('param.add_time'))];
+            }
             $studio = session("admin_role_id");
             if ($studio == 9) {
                 $where[] = ['merchant_sign', '=', session("admin_user_name")];//默认情况下 登录名就是 工作室标识
