@@ -29,12 +29,7 @@ class Merchant extends Base
             if (!empty($merchantName)) {
                 $where[] = ['merchant_name', 'like', $merchantName . '%'];
             }
-            if (!empty(input('param.addTime'))) {
-                $where[] = ['add_time', '>', strtotime(input('param.add_time'))];
-            }
-             if (!empty(input('param.endTime'))) {
-                $where[] = ['add_time', '>', strtotime(input('param.add_time'))];
-            }
+
             $studio = session("admin_role_id");
             if ($studio == 9) {
                 $where[] = ['merchant_sign', '=', session("admin_user_name")];//默认情况下 登录名就是 工作室标识
@@ -43,28 +38,43 @@ class Merchant extends Base
             $list = $admin->getMerchants($limit, $where);
             $data = empty($list['data']) ? array() : $list['data'];
             foreach ($data as $key => $vo) {
+
                 $data[$key]['add_time'] = date('Y-m-d H:i:s', $data[$key]['add_time']);
                 $data[$key]['update_time'] = date('Y-m-d H:i:s', $data[$key]['update_time']);
                 //查询商户订单量 总
-                $order_total_amount = (new \app\admin\model\OrderModel())->getAllOrderTotalAmountByMerchantSign($vo['merchant_sign']);
-                $data[$key]['order_total_amount'] = (new \app\admin\model\OrderModel())->getAllOrderTotalAmountByMerchantSign($vo['merchant_sign'])['data'];
+                $order_total_amount = (new \app\admin\model\OrderModel())
+                    ->getAllOrderTotalAmountByMerchantSign($vo['merchant_sign'], strtotime(input('param.startTime')), strtotime(input('param.endTime')));
+                $data[$key]['order_total_amount'] = (new \app\admin\model\OrderModel())
+                    ->getAllOrderTotalAmountByMerchantSign($vo['merchant_sign'], strtotime(input('param.startTime')), strtotime(input('param.endTime')))['data'];
 
+//                var_dump($data[$key]['order_total_amount']);exit;
                 $orderCountWhere[] = ['merchant_sign', "=", $vo['merchant_sign']];
+                if (!empty(input('param.startTime'))) {
+                    $orderCountWhere[] = ['add_time', '>', strtotime(input('param.startTime'))];
+                }
+                if (!empty(input('param.endTime'))) {
+                    $orderCountWhere[] = ['add_time', '<', strtotime(input('param.endTime'))];
+                }
                 //查询商户订单量
-                $data[$key]['order_total'] = Db::table("bsa_order")->where($orderCountWhere)->count();
+                $data[$key]['order_total'] = Db::table("bsa_order")
+                    ->where($orderCountWhere)
+                    ->count();
 //                $data[$key]['order_total'] = (new \app\admin\model\OrderModel())->getAllOrderNumberByMerchantSign($vo['merchant_sign'])['data'];
                 //成功数量 支付成功量
 
                 $successCountWhere[] = ['order_status', "in", [1, 5]];
-                $data[$key]['success_order_total'] = Db::table("bsa_order")->where($successCountWhere)->count();
+                $data[$key]['success_order_total'] = Db::table("bsa_order")
+                    ->where($successCountWhere)->count();
                 //成功率
                 $data[$key]['success_order_rate'] = makeSuccessRate((int)$data[$key]['success_order_total'], (int)$data[$key]['order_total']);
 //                logs(json_encode(['order_total' => $data[$key]['order_total'], 'success_total' => $data[$key]['success_order_total'], "last_sql" => Db::table('bsa_order')->getLastSql()]), 'merchantIndex_log_3');
 
                 $startTime = time() - 300;
-                $data[$key]['order_total5'] = (new \app\admin\model\OrderModel())->getAllOrderNumberByMerchantSign($data[$key]['merchant_sign'], $startTime)['data'];
+                $data[$key]['order_total5'] = (new \app\admin\model\OrderModel())
+                    ->getAllOrderNumberByMerchantSign($data[$key]['merchant_sign'], $startTime)['data'];
                 //查询商户订单量 支付成功量 30分钟
-                $data[$key]['success_order_total5'] = (new \app\admin\model\OrderModel())->getAllOrderSuccessNumberByMerchantSign($data[$key]['merchant_sign'], $startTime)['data'];
+                $data[$key]['success_order_total5'] = (new \app\admin\model\OrderModel())
+                    ->getAllOrderSuccessNumberByMerchantSign($data[$key]['merchant_sign'], $startTime)['data'];
                 $data[$key]['success_order_rate5'] = makeSuccessRate((int)$data[$key]['success_order_total'], (int)$data[$key]['order_total5']);
 
             }
