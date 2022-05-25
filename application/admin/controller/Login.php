@@ -11,6 +11,7 @@ namespace app\admin\controller;
 use app\admin\model\Admin;
 use app\admin\model\LoginLog;
 use think\Controller;
+use think\facade\Config;
 
 class Login extends Controller
 {
@@ -27,7 +28,12 @@ class Login extends Controller
         if(isset($param['node']) && $param['node'] =='aisle'){
             $nodeTitle = "通道";
         }
+        $appName = "张三话费";
+        if (!empty(Config::get('app.app_name'))) {
+            $appName = Config::get('app.app_name');
+        }
         $this->assign([
+            'app_name' => $appName,
             'node_title' => $nodeTitle
         ]);
         return $this->fetch();

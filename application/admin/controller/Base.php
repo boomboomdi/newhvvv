@@ -6,6 +6,7 @@
  * Date: 2019/2/28
  * Time: 8:24 PM
  */
+
 namespace app\admin\controller;
 
 ////define('DIRECTORY_SEPARATOR', "/");
@@ -13,13 +14,14 @@ namespace app\admin\controller;
 //defined('APP_PATH') or define('APP_PATH', dirname($_SERVER['SCRIPT_FILENAME']) . DS);
 //defined('ROOT_PATH') or define('ROOT_PATH', dirname(realpath(APP_PATH)) . DS);
 use think\Controller;
+use think\facade\Config;
 use tool\Auth;
 
 class Base extends Controller
 {
     public function initialize()
     {
-        if(empty(session('admin_user_name'))){
+        if (empty(session('admin_user_name'))) {
 
             $this->redirect(url('login/index'));
         }
@@ -43,8 +45,12 @@ class Base extends Controller
                 }
             }
         }
-
+        $appName = "张三话费";
+        if (!empty(Config::get('app.app_name'))) {
+            $appName = Config::get('app.app_name');
+        }
         $this->assign([
+            'app_name' => $appName,
             'admin_name' => session('admin_user_name'),
             'admin_id' => session('admin_user_id'),
             'node_title' => session('node_title')

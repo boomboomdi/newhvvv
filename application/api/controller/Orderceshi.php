@@ -13,9 +13,15 @@ use app\common\model\OrderhexiaoModel;
 use app\common\Redis;
 use think\Request;
 use think\Validate;
+use think\facade\Config;
 
 class Orderceshi extends Controller
 {
+
+    public function getAppName()
+    {
+        dump(Config::get('app.'));
+    }
 
     public function getOrderHxLockTime()
     {
