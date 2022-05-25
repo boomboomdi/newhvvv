@@ -384,7 +384,7 @@ function curlPostJson($url = '', $postData = '', $options = array())
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 20); //设置cURL允许执行的最长秒数
+    curl_setopt($ch, CURLOPT_TIMEOUT, 30); //设置cURL允许执行的最长秒数
     if (!empty($options)) {
         curl_setopt_array($ch, $options);
     }
