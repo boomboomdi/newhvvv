@@ -34,7 +34,7 @@ class Timenotifyorder extends Command
                 ->where('pay_status', '=', 1)
                 ->where('notify_status', '<>', 1)
                 ->where('do_notify', '=', 0)
-                ->where('notify_times', '<', 3)
+                ->where('notify_times', '<', 10)
                 ->select();
             $totalNum = count($orderData);
             if ($totalNum > 0) {
