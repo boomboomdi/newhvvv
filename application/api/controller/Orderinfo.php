@@ -97,11 +97,11 @@ class Orderinfo extends Controller
 //            var_dump($hxOrderData);exit;
 //            $url = "http://175.178.241.238/pay/#/huafei";
             $url = "http://175.178.241.238/pay/#/kindsRoll";
-//            if ($message['payment'] == "alipay") {
-//                //支付宝 http://175.178.241.238/pay/#/huafeiZfb?order_id=1652284620.115997636502970&amount=30
-////                $url = "http://175.178.241.238/pay/#/huafeiZfb";
-//                $url = "http://175.178.241.238/pay/#/huafeiNewZfb";
-//            }
+            if ($message['payment'] == "onlyalipay") {
+                //支付宝 http://175.178.241.238/pay/#/huafeiZfb?order_id=1652284620.115997636502970&amount=30
+//                $url = "http://175.178.241.238/pay/#/huafeiZfb";
+                $url = "http://175.178.241.238/pay/#/huafeiNewZfb";
+            }
             $apiUrl = $request->domain() . "/api/orderinfo/getorderinfo";
             $url = $url . "?order_id=" . $message['order_no'] . "&amount=" . $message['amount'] . "&apiUrl=" . $apiUrl;
 
