@@ -148,7 +148,11 @@ class Orderinfo extends Controller
             $insertOrderData['write_off_sign'] = $hxOrderData['write_off_sign'];   //匹配核销单核销商标识
             $insertOrderData['payable_amount'] = $message['amount'];  //应付金额
             $insertOrderData['order_limit_time'] = (time() + $orderLimitTime);  //订单表 $orderLimitTime
-            $insertOrderData['next_check_time'] = (time() + 90);   //下次查询余额时间（第二次）
+            $insertOrderData['operator'] = $hxOrderData['operator']; //移动联通电信
+            $insertOrderData['next_check_time'] = (time() + 90);   //下次查询余额时间（第二次） 移动联通
+            if ($insertOrderData['operator'] == '移动') {
+                $insertOrderData['next_check_time'] = (time() + 600);
+            }
             $insertOrderData['payment'] = $message['payment']; //alipay
             $insertOrderData['add_time'] = time();  //入库时间
             $insertOrderData['notify_url'] = $message['notify_url']; //下单回调地址 notify url
@@ -203,7 +207,6 @@ class Orderinfo extends Controller
             return json(msg(-1, '', "order_no error"));
         }
         try {
-
             $orderShowTime = SystemConfigModel::getOrderShowTime();
             $db = new Db();
 //            $orderModel = new OrderModel();
@@ -317,7 +320,7 @@ class Orderinfo extends Controller
                     ->find();
 
                 $orderHxLockTime = SystemConfigModel::getOrderHxLockTime();
-                if (!$orderInfo || $orderInfo['order_status'] > 0) {
+                if (!$orderInfo) {
                     logs(json_encode([
                         'action' => 'lockFail',
                         'message' => $message,
@@ -419,6 +422,9 @@ class Orderinfo extends Controller
                 $updateOrderStatus['last_check_amount'] = $getUseHxOrderRes['data']['last_check_amount'];  //第一次查询余额
                 $updateOrderStatus['end_check_amount'] = $getUseHxOrderRes['data']['last_check_amount'] + $orderInfo['amount'];  //应到余额
                 $updateOrderStatus['order_desc'] = "下单成功,等待支付！";
+                if ($orderInfo['operator'] == '移动') {
+                    $updateOrderStatus['next_check_time'] = $updateOrderStatus['next_check_time'] + 90;
+                }
 //                $url = "http://175.178.241.238/pay/#/huafei";
                 $url = "http://175.178.241.238/pay/#/kindsRoll";
 //                if (isset($orderInfo['payment']) && $orderInfo['payment'] == "alipay") {
@@ -523,17 +529,17 @@ class Orderinfo extends Controller
             $db = new Db();
             $checkResult = "第" . ($orderInfo['check_times'] + 1) . "次查询结果" . $message['amount'] . "(" . date("Y-m-d H:i:s") . ")";
 
-            $nextCheckTime = time() + 300;  //设置第三次往后的查询时间
+            $nextCheckTime = $orderInfo['next_check_time'] + 300;  //设置第三次往后的查询时间
             $autoCheckOrderTime = SystemConfigModel::getAutoCheckOrderTime();
             if (is_int($autoCheckOrderTime)) {
-                $nextCheckTime = time() + $autoCheckOrderTime;
+                $nextCheckTime = $orderInfo['next_check_time'] + $autoCheckOrderTime;
             }
             if ($message['check_status'] != 1) {
                 $updateCheckTimesRes = $db::table("bsa_order")->where($orderWhere)
                     ->update([
                         "check_status" => 0,  //查询结束
 //                        "check_times" => $orderInfo['check_times'] + 1,
-                        "next_check_time" => time() + 3,
+                        "next_check_time" => $orderInfo['next_check_time'] + 20,
                         "order_desc" => $checkResult,
                         "check_result" => $checkResult,
                     ]);

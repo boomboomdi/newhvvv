@@ -61,6 +61,7 @@ class Order extends Base
                 }
                 $data[$key]['check_amount'] = $data[$key]['start_check_amount'] . "-" . $data[$key]['end_check_amount'] . "-" . $data[$key]['last_check_amount'];
                 $data[$key]['order_limit_time'] = date('Y-m-d H:i:s', $data[$key]['order_limit_time']);
+                $data[$key]['next_check_time'] = date('Y-m-d H:i:s', $data[$key]['next_check_time']);
                 $data[$key]['notify_time'] = date('Y-m-d H:i:s', $data[$key]['notify_time']);
                 $data[$key]['add_time'] = date('Y-m-d H:i:s', $vo['add_time']);
                 $data[$key]['click_time'] = date('Y-m-d H:i:s', $vo['click_time']);

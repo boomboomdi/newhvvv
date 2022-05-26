@@ -30,11 +30,11 @@ class SystemConfigModel extends Model
             if (isset($config['configContent']) && !empty($config['configContent'])) {
                 return (int)$config['configContent'];
             }
-            return 900;
+            return 1800;
         } catch (\Exception $exception) {
-            return 900;
+            return 1800;
         } catch (\Error $error) {
-            return 900;
+            return 1800;
         }
     }
 
@@ -73,7 +73,6 @@ class SystemConfigModel extends Model
             $config = Db::table('bsa_system_config')
                 ->where($where)
                 ->find();
-//            var_dump($config);exit;
             if (isset($config['configContent']) && !empty($config['configContent'])) {
                 return (int)$config['configContent'];
             }
