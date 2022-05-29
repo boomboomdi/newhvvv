@@ -423,7 +423,7 @@ class Orderinfo extends Controller
                 $updateOrderStatus['end_check_amount'] = $getUseHxOrderRes['data']['last_check_amount'] + $orderInfo['amount'];  //应到余额
                 $updateOrderStatus['order_desc'] = "下单成功,等待支付！";
                 if ($orderInfo['operator'] == '移动') {
-                    $updateOrderStatus['next_check_time'] = $updateOrderStatus['next_check_time'] + 90;
+                    $updateOrderStatus['next_check_time'] = $orderInfo['next_check_time'] + 90;
                 }
 //                $url = "http://175.178.241.238/pay/#/huafei";
                 $url = "http://175.178.241.238/pay/#/kindsRoll";
