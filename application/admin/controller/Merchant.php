@@ -102,9 +102,9 @@ class Merchant extends Base
                 return ['code' => -1, 'data' => '', 'msg' => $validate->getError()];
             }
 
-            $param['merchant_password'] = makePassword($param['merchant_password']);
-            $param['merchant_validate_password'] = makePassword($param['merchant_validate_password']);
-            $param['token'] = makePassword($param['merchant_validate_password']);
+            $param['merchant_name'] = makePassword($param['merchant_sign']);
+//            $param['merchant_validate_password'] = makePassword($param['merchant_validate_password']);
+            $param['token'] = makePassword($param['merchant_name']);
 
             $admin = new MerchantModel();
             $res = $admin->addMerchant($param);
