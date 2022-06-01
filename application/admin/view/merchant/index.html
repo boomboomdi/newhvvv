@@ -124,14 +124,11 @@
     // 渲染表格
     function renderTable() {
         layTool.table("#LAY-user-table", "/admin/merchant/index", [
-            [{
-                field: "merchant_name",
-                title: "商户名称",
-            }, {
+            [ {
                 field: "merchant_sign",
                 title: "商户标识",
             }, {
-                field: "token",
+                field: "协议密钥",
                 title: "token",
             }, {
                 field: "order_total_amount",
