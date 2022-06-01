@@ -19,50 +19,37 @@
                     <form class="layui-form" action="" lay-filter="component-form-element">
                         <input type="hidden" name="merchant_id" value="{$merchant['merchant_id']}"/>
                         <div class="layui-row layui-col-space10 layui-form-item">
-                            <div class="layui-col-lg6">
-                                <label class="layui-form-label">商户名称：</label>
-                                <div class="layui-input-block">
-                                    <input type="text" name="merchant_name" lay-verify="required" placeholder="" autocomplete="off" class="layui-input" value="{$merchant['merchant_name']}">
-                                </div>
-                            </div>
+<!--                            <div class="layui-col-lg6">-->
+<!--                                <label class="layui-form-label">商户名称：</label>-->
+<!--                                <div class="layui-input-block">-->
+<!--                                    <input type="text" name="merchant_name" lay-verify="required" placeholder="" autocomplete="off" class="layui-input" value="{$merchant['merchant_name']}">-->
+<!--                                </div>-->
+<!--                            </div>-->
                             <div class="layui-col-lg6">
                                 <label class="layui-form-label">商户标识：</label>
                                 <div class="layui-input-block">
                                     <input type="text" name="merchant_sign" lay-verify="required" placeholder="" autocomplete="off" class="layui-input" value="{$merchant['merchant_sign']}">
                                 </div>
                             </div>
+<!--                            <div class="layui-col-lg6">-->
+<!--                                <label class="layui-form-label">登录名称：</label>-->
+<!--                                <div class="layui-input-block">-->
+<!--                                    <input type="text" name="merchant_username" lay-verify="required" placeholder="" autocomplete="off" class="layui-input" value="{$merchant['merchant_username']}">-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            <div class="layui-col-lg6">-->
+<!--                                <label class="layui-form-label">登录密码：</label>-->
+<!--                                <div class="layui-input-block">-->
+<!--                                    <input type="text" name="merchant_password" placeholder="输入则为重置" autocomplete="off" class="layui-input">-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            <div class="layui-col-lg6">-->
+<!--                                <label class="layui-form-label">回调地址：</label>-->
+<!--                                <div class="layui-input-block">-->
+<!--                                    <input type="text" name="notify_url" placeholder="" autocomplete="off" class="layui-input" value="{$merchant['notify_url']}">-->
+<!--                                </div>-->
+<!--                            </div>-->
                             <div class="layui-col-lg6">
-                                <label class="layui-form-label">登录名称：</label>
-                                <div class="layui-input-block">
-                                    <input type="text" name="merchant_username" lay-verify="required" placeholder="" autocomplete="off" class="layui-input" value="{$merchant['merchant_username']}">
-                                </div>
-                            </div>
-                            <div class="layui-col-lg6">
-                                <label class="layui-form-label">登录密码：</label>
-                                <div class="layui-input-block">
-                                    <input type="text" name="merchant_password" placeholder="输入则为重置" autocomplete="off" class="layui-input">
-                                </div>
-                            </div>
-                            <div class="layui-col-lg6">
-                                <label class="layui-form-label">回调地址：</label>
-                                <div class="layui-input-block">
-                                    <input type="text" name="notify_url" placeholder="" autocomplete="off" class="layui-input" value="{$merchant['notify_url']}">
-                                </div>
-                            </div>
-                            <div class="layui-col-lg6">
-                                <!--                                <label class="layui-form-label">选择框</label>-->
-                                <!--                                <div class="layui-input-block">-->
-                                <!--                                    <select name="role_id" lay-verify="required">-->
-                                <!--                                        <option value=""></option>-->
-                                <!--                                        {if !empty($roles)}-->
-                                <!--                                        {foreach name="roles" item="vo"}-->
-                                <!--                                        {if $vo['role_id'] neq 1}-->
-                                <!--                                        <option value="{$vo['role_id']}" {if $merchant['role_id'] eq $vo['role_id']} selected {/if}>{$vo['role_name']}</option>-->
-                                <!--                                        {/if}-->
-                                <!--                                        {/foreach}-->
-                                <!--                                        {/if}-->
-                                <!--                                    </select>-->
-                                <!--                                </div>-->
                                 <div class="layui-col-lg6">
                                     <label class="layui-form-label">是否启用：</label>
                                     <div class="layui-input-block">
