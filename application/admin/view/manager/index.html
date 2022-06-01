@@ -5,7 +5,8 @@
     <title>管理员管理</title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <link rel="stylesheet" href="/static/layui/css/layui.css" media="all">
     <link rel="stylesheet" href="/static/admin/style/admin.css" media="all">
 </head>
@@ -32,7 +33,8 @@
         <div class="layui-card-body">
             {if (buttonAuth('manager/addadmin'))}
             <div style="padding-bottom: 10px;">
-                <button class="layui-btn layuiadmin-btn-admin" data-type="add"><i class="layui-icon">&#xe654;</i> 添加</button>
+                <button class="layui-btn layuiadmin-btn-admin" data-type="add"><i class="layui-icon">&#xe654;</i> 添加
+                </button>
             </div>
             {/if}
             <table id="LAY-user-table" lay-filter="LAY-user-table"></table>
@@ -45,13 +47,15 @@
             </script>
             <script type="text/html" id="table-seller-admin">
                 {if (buttonAuth('manager/editadmin'))}
-                <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+                <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i
+                        class="layui-icon layui-icon-edit"></i>编辑</a>
                 {/if}
                 {if (buttonAuth('manager/deladmin'))}
                 {{#  if(d.admin_id == '1'){ }}
                 <a class="layui-btn layui-btn-disabled layui-btn-xs"><i class="layui-icon layui-icon-delete"></i>删除</a>
                 {{#  } else { }}
-                <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+                <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i
+                        class="layui-icon layui-icon-delete"></i>删除</a>
                 {{#  } }}
                 {/if}
             </script>
@@ -66,25 +70,25 @@
 <script>
     layui.config({
         base: '/static/admin/'
-    }).use(['table'], function(){
+    }).use(['table'], function () {
         var $ = layui.$
-            ,form = layui.form
-            ,table = layui.table;
+            , form = layui.form
+            , table = layui.table;
 
         var active = {
 
-            add: function() {
-                layTool.open( "{:url('manager/addAdmin')}", "添加管理员", '50%', '50%');
+            add: function () {
+                layTool.open("{:url('manager/addAdmin')}", "添加管理员", '50%', '50%');
             }
         };
 
-        $('.layui-btn.layuiadmin-btn-admin').on('click', function(){
+        $('.layui-btn.layuiadmin-btn-admin').on('click', function () {
             var type = $(this).data('type');
             active[type] ? active[type].call(this) : '';
         });
 
         // 监听搜索
-        form.on('submit(LAY-user-back-search)', function(data){
+        form.on('submit(LAY-user-back-search)', function (data) {
             var field = data.field;
 
             // 执行重载
@@ -95,13 +99,11 @@
     });
 
     renderTable();
+
     // 渲染表格
     function renderTable() {
         layTool.table("#LAY-user-table", "/admin/manager/index", [
             [{
-                field: "admin_id",
-                title: "管理员ID"
-            }, {
                 field: "admin_name",
                 title: "管理员名称",
             }, {
@@ -128,7 +130,7 @@
             let table = layui.table;
 
             table.on("tool(LAY-user-table)",
-                function(e) {
+                function (e) {
                     if ("del" === e.event) {
 
                         layer.ready(function () {
@@ -136,11 +138,11 @@
                                 title: '友情提示',
                                 icon: 3,
                                 btn: ['确定', '取消']
-                            }, function() {
+                            }, function () {
 
                                 $.getJSON('{:url("manager/delAdmin")}', {id: e.data.admin_id}, function (res) {
 
-                                    if(0 == res.code) {
+                                    if (0 == res.code) {
 
                                         layer.msg(res.msg);
                                         setTimeout(function () {
@@ -150,7 +152,7 @@
                                         layer.alert(res.msg);
                                     }
                                 });
-                            }, function(){
+                            }, function () {
 
                             });
                         });
