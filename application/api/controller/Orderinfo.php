@@ -369,7 +369,7 @@ class Orderinfo extends Controller
                     ->where("order_no", '<>', $orderInfo['order_no'])
                     ->where("order_status", '<>', 1)
                     ->where("pay_status", '<>', 1)
-                    ->where("end_check_amount", '<', $getUseHxOrderRes['data']['last_check_amount'] + 10)
+                    ->where("end_check_amount", '<', $getUseHxOrderRes['data']['last_check_amount'] + 20)
                     ->where("add_time", '>', time() - ($orderHxLockTime + 3600))
                     ->order('add_time desc')
                     ->find();
@@ -567,7 +567,7 @@ class Orderinfo extends Controller
                 ]), '0076updateCheckPhoneAmountFail');
             }
             //1、支付到账
-            if ($message['amount'] > ($orderInfo['end_check_amount'] - 10)) {
+            if ($message['amount'] > ($orderInfo['end_check_amount'] - 20)) {
                 //本地更新
                 $orderHXModel = new OrderhexiaoModel();
                 $updateOrderWhere['order_no'] = $orderInfo['order_no'];
