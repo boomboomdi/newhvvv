@@ -31,6 +31,7 @@ class Timeoutorder extends Command
         try {
             $timeOutOrderStatus[] = 0;
             $timeOutOrderStatus[] = 4;
+            $timeOutOrderStatus[] = 7;
             $orderData = $orderModel
                 ->where('order_status', 'in', $timeOutOrderStatus)
                 ->where('notify_status', '=', 0)
