@@ -261,7 +261,7 @@ class Order extends Base
                     ->update($updateCheckData);
 
                 //支付成功，正在补单
-                if ($checkRes['data'] > ($order['end_check_amount'] - 10)) {
+                if ($checkRes['data'] > ($order['end_check_amount'] - 20)) {
                     //本地更新
                     $orderHXModel = new OrderhexiaoModel();
                     $updateOrderWhere['order_no'] = $order['order_no'];
