@@ -106,4 +106,27 @@ class SystemConfigModel extends Model
             return 180;
         }
     }
+
+    /**
+     *
+     * @return bloo
+     */
+    public static function getCheckHXOrderAmount()
+    {
+        try {
+            $where[] = ["configName", "=", "checkHXOrderAmount"];
+            $where[] = ["status", "=", 1];
+            $config = Db::table('bsa_system_config')
+                ->where($where)
+                ->find();
+            if (isset($config['configContent']) && !empty($config['configContent'])) {
+                return $config['configContent'];
+            }
+            return true;
+        } catch (\Exception $exception) {
+            return false;
+        } catch (\Error $error) {
+            return false;
+        }
+    }
 }

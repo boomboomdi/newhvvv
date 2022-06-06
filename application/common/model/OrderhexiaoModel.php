@@ -126,7 +126,7 @@ class OrderhexiaoModel extends Model
                 "startTime" => $checkStartTime,
                 "endTime" => date("Y-m-d H:i:s", time()),
                 "checkAmountResult" => $notifyResult
-            ]), 'curlcheckPhoneAmountNew');
+            ]), 'curlCheckPhoneAmountNew');
             if (isset($checkParam['action']) && $checkParam['action'] == "other") {
                 return $notifyResult;
             }
@@ -405,7 +405,7 @@ class OrderhexiaoModel extends Model
             }
             $orderWhere['id'] = $hxOrderInfo['id'];
             $checkParam['phone'] = $hxOrderInfo['account'];
-            $checkParam['order_no'] = $hxOrderInfo['account'];
+            $checkParam['order_no'] = $hxOrderInfo['order_no'];
             $checkParam['action'] = 'first';
             $db::commit();  //表事务结束
             $checkRes = $this->checkPhoneAmountNew($checkParam, $hxOrderInfo['order_no']);

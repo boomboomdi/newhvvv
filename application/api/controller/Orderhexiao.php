@@ -7,6 +7,7 @@ use app\admin\model\WriteoffModel;
 use app\common\model\OrderhexiaoModel;
 use app\common\model\OrderexceptionModel;
 
+use app\common\model\SystemConfigModel;
 use app\common\Redis;
 use think\Db;
 use think\facade\Log;
@@ -96,6 +97,22 @@ class Orderhexiao extends Controller
             $addParam['status'] = 0;
             $where['account'] = $param['account'];
             $where['order_no'] = $param['order_no'];
+
+            $checkHXOrderAmount = SystemConfigModel::getCheckHXOrderAmount();
+            if ($checkHXOrderAmount) {
+                $checkParam['phone'] = $param['account'];
+                $checkParam['order_no'] = $param['order_no'];
+                $checkParam['action'] = 'first';
+                $checkRes = $orderHeXModel->checkPhoneAmountNew($checkParam, $param['order_no']);
+                if (!isset($checkRes['code']) || $checkRes['code'] != 0) {
+                    //停用该核销单
+                    $addParam['order_desc'] = "订单不可充值，立即回调";   //订单备注
+                    $addParam['check_result'] = "订单不可充值，立即回调";   //查询结果
+                    $addParam['status'] = 2;   //禁用
+                    $addParam['pay_status'] = 2;   //禁用
+                    $addParam['limit_time'] = time();
+                }
+            }
 //            Db::commit();
             $res = $orderHeXModel->addOrder($where, $addParam);
 //
