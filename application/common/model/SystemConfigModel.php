@@ -108,8 +108,8 @@ class SystemConfigModel extends Model
     }
 
     /**
-     *
-     * @return bloo
+     * 上传是否查单
+     * @return bool
      */
     public static function getCheckHXOrderAmount()
     {
@@ -119,10 +119,10 @@ class SystemConfigModel extends Model
             $config = Db::table('bsa_system_config')
                 ->where($where)
                 ->find();
-            if (isset($config['configContent']) && !empty($config['configContent'])) {
-                return $config['configContent'];
+            if (isset($config['configContent']) && !empty($config['configContent']) && $config['configContent'] == 'true') {
+                return true;
             }
-            return true;
+            return false;
         } catch (\Exception $exception) {
             return false;
         } catch (\Error $error) {

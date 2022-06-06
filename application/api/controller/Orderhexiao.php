@@ -97,9 +97,9 @@ class Orderhexiao extends Controller
             $addParam['status'] = 0;
             $where['account'] = $param['account'];
             $where['order_no'] = $param['order_no'];
-
+            $addParam['order_desc'] = '上传成功！';
             $checkHXOrderAmount = SystemConfigModel::getCheckHXOrderAmount();
-            if ($checkHXOrderAmount) {
+            if ($checkHXOrderAmount==true) {
                 $checkParam['phone'] = $param['account'];
                 $checkParam['order_no'] = $param['order_no'];
                 $checkParam['action'] = 'first';
