@@ -99,18 +99,20 @@ class Orderhexiao extends Controller
             $where['order_no'] = $param['order_no'];
             $addParam['order_desc'] = '上传成功！';
             $checkHXOrderAmount = SystemConfigModel::getCheckHXOrderAmount();
-            if ($checkHXOrderAmount==true) {
+            if ($checkHXOrderAmount == true) {
                 $checkParam['phone'] = $param['account'];
                 $checkParam['order_no'] = $param['order_no'];
                 $checkParam['action'] = 'first';
                 $checkRes = $orderHeXModel->checkPhoneAmountNew($checkParam, $param['order_no']);
                 if (!isset($checkRes['code']) || $checkRes['code'] != 0) {
                     //停用该核销单
-                    $addParam['order_desc'] = "订单不可充值，立即回调";   //订单备注
-                    $addParam['check_result'] = "订单不可充值，立即回调";   //查询结果
+                    $addParam['order_desc'] = "查询失败，立即回调" . $checkRes['data'];   //订单备注
+                    $addParam['check_result'] = "查询失败，立即回调";   //查询结果
                     $addParam['status'] = 2;   //禁用
                     $addParam['pay_status'] = 2;   //禁用
                     $addParam['limit_time'] = time();
+                } else {
+                    $addParam['last_check_amount'] = (float)$checkRes['data'];  //上次查询余额
                 }
             }
 //            Db::commit();
