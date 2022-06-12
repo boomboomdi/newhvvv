@@ -205,6 +205,10 @@ class Writeoff extends Base
             $update['status'] = 2;
             $update['order_status'] = 2;
             $update['order_desc'] = "止付" . date("Y-m-d H:i:s");
+            logs(json_encode(['param' => $param,
+                "time" => date("Y-m-d H:i:s", time()),
+                "where" => $where,
+            ]), 'stopOrderHx');
 
             $updateData = Db::table("bsa_order_hexiao")->where($where)->update($update);
 //            var_dump();
@@ -221,7 +225,7 @@ class Writeoff extends Base
             $addLog['content'] = serialize($where) . "共计" . $stopOrderAccount . "单";
             $addLog['desc'] = "止付核销商:" . input('post.write_off_sign') .
                 ",(" . input('post.operator') . "),截至:" . input('post.endTime') . "止,共计" . $stopOrderAccount . "单)";
-            Db::table("bsa_order_exception")->insert($addLog);
+            Db::table("bsa_order_exception")->create($addLog);
 
             return json(['code' => 0, 'msg' => $addLog['action_result']]);
         }
