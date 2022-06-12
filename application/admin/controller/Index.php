@@ -76,7 +76,7 @@ class Index extends Base
             ->count();
         //支付数量
         $payTOrderNum = $db::table("bsa_order_hexiao")
-            ->where('order_status', '=', 1)
+//            ->where('order_status', '=', 1)
             ->where('pay_status', '=', 1)
             ->count();
         $successTOrderRate = makeSuccessRate((int)$payTOrderNum, (int)$tOrderNum);
