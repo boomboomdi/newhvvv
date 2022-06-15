@@ -137,7 +137,7 @@ class Order extends Base
                     "time" => date("Y-m-d H:i:s", time())
                 ]), 'ADontDELETEnotify_log');
 
-                $localUpdate = $orderHXModel->orderLocalUpdate($orderData, 2);
+                $localUpdate = $orderHXModel->orderLocalUpdate($orderData, 3);
                 if (!isset($localUpdate['code']) || $localUpdate['code'] != 0) {
                     logs(json_encode(["time" => date("Y-m-d H:i:s", time()),
                         'order_no' => $orderData['order_no'],

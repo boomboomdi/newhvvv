@@ -173,8 +173,12 @@ class OrderhexiaoModel extends Model
         $db::startTrans();
         try {
             if ($orderStatus == 2) {
-                $updateHXData['check_result'] = "查单回调" . session('admin_user_name');
-                $updateOrderData['check_result'] = "查单回调" . session('admin_user_name');
+                $updateHXData['check_result'] = "查单到账" . session('admin_user_name');
+//                $updateOrderData['check_result'] = "查单回调" . session('admin_user_name');
+            }
+            if ($orderStatus == 3) {
+                $updateHXData['check_result'] = "手动回调" . session('admin_user_name');
+                $updateOrderData['check_result'] = "手动回调" . session('admin_user_name');
             }
             //更新核销表  start
             $orderHxWhere['order_no'] = $orderDataNo['order_pay'];
