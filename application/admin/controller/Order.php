@@ -245,7 +245,7 @@ class Order extends Base
                     'orderWhere' => $getResParam,
                     'checkRes' => $checkRes,
                     'getLastSql' => Db::table("bsa_order_hexiao")->getLastSql(),
-                ]), 'adminCheckOrderFail');
+                ]), 'adminCheckOrderLog');
                 if ($checkRes['code'] != 0) {
                     return json(modelReMsg(-7, '', '查询超时,请稍等后在查!'));
                 }
