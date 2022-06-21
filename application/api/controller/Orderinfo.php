@@ -518,13 +518,15 @@ class Orderinfo extends Controller
             $orderWhere['account'] = $message['phone'];   //订单匹配手机号
             $orderInfo = $orderModel->where($orderWhere)->find();
 
-            logs(json_encode([
-                "time" => date("Y-m-d H:i:s", time()),
-                'param' => $message
-            ]), 'MatchOrderFailCheckPhoneAmountNotify0076');
+
             if (empty($orderInfo)) {
                 return json(msg(-2, '', '无此订单！'));
             }
+            logs(json_encode([
+                "time" => date("Y-m-d H:i:s", time()),
+                "orderInfo" => $orderInfo,
+                'param' => $message
+            ]), 'MatchOrderFailCheckPhoneAmountNotify0076');
             if ($orderInfo['order_status'] == 1) {
                 return json(msg(-3, '', '订单已支付！'));
             }
