@@ -174,7 +174,7 @@ class OrderhexiaoModel extends Model
         try {
             if ($orderStatus == 2) {
                 $updateHXData['check_result'] = "查单到账" . session('admin_user_name');
-//                $updateOrderData['check_result'] = "查单回调" . session('admin_user_name');
+                $updateOrderData['order_desc'] = "查单到账" . session('admin_user_name')."|".date("Y-m-d H:i:s", time());
             }
             if ($orderStatus == 3) {
                 $updateHXData['check_result'] = "手动回调" . session('admin_user_name');
