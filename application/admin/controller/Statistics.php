@@ -15,6 +15,7 @@ use app\admin\model\Orderhexiaomodel;
 //use app\admin\validate\WriteoffValidate;
 //use app\common\model\OrderModel;
 use app\admin\model\WriteoffModel;
+use GatewayWorker\Lib\Db;
 use tool\Log;
 
 //统计
@@ -106,6 +107,10 @@ class Statistics extends Base
                         ->where('pay_status', "=", 1)
                         ->where("order_amount", "=", $vo['order_amount'])
                         ->find()['totalPayOrderAmount'];
+//                    logs(json_encode([
+//                        'order_amount' => $vo['order_amount'],
+//                        "sql" => \think\Db::table('bas_order_hexiao')->getLastSql()
+//                    ]), 'StatisticsLog');
                     $totalPayOrderAmount += $data[$key]['totalPayOrderAmount'];
 
                     //剩余可用单量

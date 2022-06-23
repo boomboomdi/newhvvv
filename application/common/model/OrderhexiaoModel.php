@@ -174,19 +174,25 @@ class OrderhexiaoModel extends Model
         try {
             if ($orderStatus == 2) {
                 $updateHXData['check_result'] = "查单到账" . session('admin_user_name');
-                $updateOrderData['order_desc'] = "查单到账" . session('admin_user_name')."|".date("Y-m-d H:i:s", time());
+                $updateOrderData['order_desc'] = "查单到账" . session('admin_user_name') . "|" . date("Y-m-d H:i:s", time());
             }
             if ($orderStatus == 3) {
                 $updateHXData['check_result'] = "手动回调" . session('admin_user_name');
                 $updateOrderData['check_result'] = "手动回调" . session('admin_user_name');
             }
             //更新核销表  start
-            $orderHxWhere['order_no'] = $orderDataNo['order_pay'];
-            $orderHxWhere['account'] = $orderDataNo['account'];
-            $orderHxWhere['pay_status'] = 0;
+
+            $orderHxWhere['order_no'] = ['=', $orderDataNo['order_pay']];
+            $orderHxWhere['account'] = ['=', $orderDataNo['account']];
+            $orderHxWhere['pay_status'] = ['<>', 1];
+//            $orderHxWhere['order_no'] = $orderDataNo['order_pay'];
+//            $orderHxWhere['account'] = $orderDataNo['account'];
+//            $orderHxWhere['pay_status'] = 0;
 //            $orderWhere['account'] = $orderHxData['account'];
             $payTime = time();
-            $lockHxOrderRes = $db::table("bsa_order_hexiao")->where($orderHxWhere)->lock(true)->find();
+            $lockHxOrderRes = $db::table("bsa_order_hexiao")
+                ->where($orderHxWhere)
+                ->lock(true)->find();
             if (!$lockHxOrderRes) {
                 $db::rollback();
                 logs(json_encode(['file' => $orderDataNo,
