@@ -200,6 +200,10 @@ class Order extends Base
                 if (!empty($hasPayOrder)) {
                     return json(modelReMsg(-6, '', '此单已被匹配支付，不可查单回调!'));
                 }
+
+                if(empty($order['start_check_amount'])){
+                    return json(modelReMsg(-4, '', '不可查询的订单!'));
+                }
                 //已存在重新匹配的
                 $hasOrder = Db::table("bsa_order")
                     ->where("order_pay", $order['order_pay'])
@@ -261,7 +265,7 @@ class Order extends Base
                     ->update($updateCheckData);
 
                 //支付成功，正在补单
-                if ($checkRes['data'] > ($order['end_check_amount'] - 20)) {
+                if ($checkRes['data'] > ($order['start_check_amount'] - 20)) {
                     //本地更新
                     $orderHXModel = new OrderhexiaoModel();
                     $updateOrderWhere['order_no'] = $order['order_no'];
