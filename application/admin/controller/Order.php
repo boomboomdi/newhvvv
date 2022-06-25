@@ -201,7 +201,7 @@ class Order extends Base
                     return json(modelReMsg(-6, '', '此单已被匹配支付，不可查单回调!'));
                 }
 
-                if(empty($order['start_check_amount'])||empty($order['end_check_amount'])){
+                if (empty($order['start_check_amount']) || empty($order['end_check_amount']) || !is_float($order['end_check_amount'])) {
                     return json(modelReMsg(-4, '', '不可查询的订单!'));
                 }
                 //已存在重新匹配的
