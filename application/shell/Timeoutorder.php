@@ -29,7 +29,7 @@ class Timeoutorder extends Command
 
         $orderModel = new OrderModel();
         try {
-            $timeOutOrderStatus[] = 0;
+//            $timeOutOrderStatus[] = 0;
             $timeOutOrderStatus[] = 4;
             $timeOutOrderStatus[] = 7;
             $orderData = $orderModel
