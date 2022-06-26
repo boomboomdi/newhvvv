@@ -49,7 +49,7 @@ class Orderhexiao extends Controller
             $writeOffModel = new WriteoffModel();
             $writeOff = $writeOffModel->where(['write_off_sign' => $param['write_off_sign']])->find();
             if (empty($writeOff)) {
-                return json(msg(-2, '', 'Useless write-off'));
+                return json(msg(-2, '', '核销标识有误！'));
             }
             $md5Sting = $param['write_off_sign'] . $param['order_no'] . $param['account'] . $param['order_amount'] . $param['limit_time'] . $param['notify_url'] . $writeOff['token'];
             $doMd5 = md5($md5Sting);
