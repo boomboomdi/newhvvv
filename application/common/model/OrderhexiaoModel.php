@@ -549,7 +549,7 @@ class OrderhexiaoModel extends Model
             $db::commit();  //表事务结束
             $checkRes = $this->checkPhoneAmountNew($checkParam, $hxOrderInfo['order_no']);
 
-            if ($checkRes['code'] != 0) {
+            if (!isset($checkRes['code']) || $checkRes['code'] != 0) {
                 //停用该核销单
                 $updateHxWhereForStop['id'] = $hxOrderInfo['id'];
                 $updateHxDataForStop['status'] = 2;
