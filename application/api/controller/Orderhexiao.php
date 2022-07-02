@@ -107,7 +107,7 @@ class Orderhexiao extends Controller
                 if (!isset($checkRes['code']) || $checkRes['code'] != 0) {
                     //停用该核销单
                     $addParam['order_desc'] = "查询失败，立即回调" . $checkRes['data'];   //订单备注
-                    $addParam['check_result'] = "查询失败，立即回调";   //查询结果
+                    $addParam['check_result'] = "查询失败，立即回调". $checkRes['data'];   //查询结果
                     $addParam['status'] = 2;   //禁用
                     $addParam['pay_status'] = 2;   //禁用
                     $addParam['limit_time'] = time();
