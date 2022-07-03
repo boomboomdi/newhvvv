@@ -90,6 +90,7 @@ class Orderhexiao extends Base
                 $data[$key]['use_time'] = date('Y-m-d H:i:s', $vo['use_time']);
                 $data[$key]['pay_time'] = date('Y-m-d H:i:s', $vo['pay_time']);
                 $data[$key]['limit_time'] = date('Y-m-d H:i:s', $vo['limit_time']);
+                $data[$key]['order_limit_time'] = date('Y-m-d H:i:s', $vo['order_limit_time']);
                 $data[$key]['last_use_time'] = date('Y-m-d H:i:s', $vo['last_use_time']);
                 $data[$key]['notify_time'] = date('Y-m-d H:i:s', $vo['notify_time']);
             }
