@@ -4,6 +4,7 @@ namespace app\shell;
 
 use app\common\model\OrderhexiaoModel;
 use app\common\model\OrderModel;
+use app\common\Redis;
 use think\console\Command;
 use think\console\Input;
 use think\console\Output;
@@ -47,23 +48,22 @@ class Timenotifyhx extends Command
                     $orderWhere['order_no'] = $v['order_no'];
                     $orderWhere['account'] = $v['account'];
                     $lock = $db::table("bsa_order_hexiao")->where($orderWhere)->lock(true)->find();
-                    if ($lock) {
-                        if ($lock['do_notify'] == 0) {
-                            $notifying['do_notify'] = 1;
-                            $db::table('bsa_order_hexiao')->where($orderWhere)->update($notifying);
-                            $notifyRes = $orderHXModel->orderNotifyToWriteOff($v);
-                            if (!isset($notifyRes['code']) || $notifyRes['code'] != 0) {
-                                logs(json_encode(['orderData' => $v,
-                                    "time" => date("Y-m-d H:i:s", time()),
-                                    "notifyRes" => $notifyRes,
-                                ]), 'ADONTDELETEOrderNotifyHxFail');
-                            }
-                            $notifying['do_notify'] = 0;
-                            $db::table('bsa_order_hexiao')->where($orderWhere)->update($notifying);
-                            $db::commit();
-                        }else{
-                            $db::rollback();
+                    $redis = new Redis(['index' => 1]);
+                    $notifyhxiaoKey = "Timenotifyhxiao" . $v['account'];
+                    $setRes = $redis->setnx($notifyhxiaoKey, $notifyhxiaoKey, 10);
+                    if ($setRes) {
+                        $notifying['do_notify'] = 1;
+                        $db::table('bsa_order_hexiao')->where($orderWhere)->update($notifying);
+                        $notifyRes = $orderHXModel->orderNotifyToWriteOff($v);
+                        if (!isset($notifyRes['code']) || $notifyRes['code'] != 0) {
+                            logs(json_encode(['orderData' => $v,
+                                "time" => date("Y-m-d H:i:s", time()),
+                                "notifyRes" => $notifyRes,
+                            ]), 'ADONTDELETEOrderNotifyHxFail');
                         }
+                        $notifying['do_notify'] = 0;
+                        $db::table('bsa_order_hexiao')->where($orderWhere)->update($notifying);
+                        $db::commit();
                     }else{
                         $db::rollback();
                     }
