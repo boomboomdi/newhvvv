@@ -47,7 +47,7 @@ class Timenotifyhx extends Command
                     $db::startTrans();
                     $orderWhere['order_no'] = $v['order_no'];
                     $orderWhere['account'] = $v['account'];
-                    $lock = $db::table("bsa_order_hexiao")->where($orderWhere)->lock(true)->find();
+                    $db::table("bsa_order_hexiao")->where($orderWhere)->lock(true)->find();
                     $redis = new Redis(['index' => 1]);
                     $notifyhxiaoKey = "Timenotifyhxiao" . $v['account'];
                     $setRes = $redis->setnx($notifyhxiaoKey, $notifyhxiaoKey, 10);
