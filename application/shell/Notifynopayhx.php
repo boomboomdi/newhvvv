@@ -8,6 +8,7 @@ use think\console\Command;
 use think\console\Input;
 use think\console\Output;
 
+use app\common\Redis;
 use app\common\model\SystemConfigModel;
 use app\common\model\NotifylogModel;
 use think\Db;
@@ -37,18 +38,23 @@ class Notifynopayhx extends Command
                 ->select();
             $db = new Db();
             $totalNum = count($orderHXData);
+            $redis = new Redis(['index' => 1]);
             if ($totalNum > 0) {
                 foreach ($orderHXData as $k => $v) {
-                    if ($v['status'] != 2) {
-                        $notifying['status'] = 2;
+                    $notifyhxiaoKey = "Timenotifyhxiao" . $v['account'];
+                    $setRes = $redis->setnx($notifyhxiaoKey, $notifyhxiaoKey, 10);
+                    if($setRes){
+                        if ($v['status'] != 2) {
+                            $notifying['status'] = 2;
+                        }
+                        $orderWhere['order_no'] = $v['order_no'];
+                        $orderWhere['account'] = $v['account'];
+                        $notifying['do_notify'] = 1;
+                        $db::table('bsa_order_hexiao')->where($orderWhere)->update($notifying);
+                        $orderHXModel->orderNotifyToWriteOff($v);
+                        $notifying['do_notify'] = 0;
+                        $db::table('bsa_order_hexiao')->where($orderWhere)->update($notifying);
                     }
-                    $orderWhere['order_no'] = $v['order_no'];
-                    $orderWhere['account'] = $v['account'];
-                    $notifying['do_notify'] = 1;
-                    $db::table('bsa_order_hexiao')->where($orderWhere)->update($notifying);
-                    $orderHXModel->orderNotifyToWriteOff($v);
-                    $notifying['do_notify'] = 0;
-                    $db::table('bsa_order_hexiao')->where($orderWhere)->update($notifying);
                 }
             }
             $output->writeln("Notifynopayhx:订单总数" . $totalNum);
