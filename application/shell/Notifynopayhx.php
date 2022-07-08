@@ -41,7 +41,7 @@ class Notifynopayhx extends Command
             $redis = new Redis(['index' => 1]);
             if ($totalNum > 0) {
                 foreach ($orderHXData as $k => $v) {
-                    $notifyhxiaoKey = "Timenotifyhxiao" . $v['account'];
+                    $notifyhxiaoKey = "Timenotifyhxiao" . $v['order_no'];
                     $setRes = $redis->setnx($notifyhxiaoKey, $notifyhxiaoKey, 10);
                     if($setRes){
                         if ($v['status'] != 2) {

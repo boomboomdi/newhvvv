@@ -49,7 +49,7 @@ class Timenotifyhx extends Command
                     $orderWhere['account'] = $v['account'];
                     $db::table("bsa_order_hexiao")->where($orderWhere)->lock(true)->find();
                     $redis = new Redis(['index' => 1]);
-                    $notifyhxiaoKey = "Timenotifyhxiao" . $v['account'];
+                    $notifyhxiaoKey = "Timenotifyhxiao" . $v['order_no'];
                     $setRes = $redis->setnx($notifyhxiaoKey, $notifyhxiaoKey, 10);
                     if ($setRes) {
                         $notifying['do_notify'] = 1;
