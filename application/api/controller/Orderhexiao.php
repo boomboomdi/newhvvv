@@ -54,7 +54,7 @@ class Orderhexiao extends Controller
             $md5Sting = $param['write_off_sign'] . $param['order_no'] . $param['account'] . $param['order_amount'] . $param['limit_time'] . $param['notify_url'] . $writeOff['token'];
             $doMd5 = md5($md5Sting);
             if (md5($param['write_off_sign'] . $param['order_no'] . $param['account'] . $param['order_amount'] . $param['limit_time'] . $param['notify_url'] . $writeOff['token']) != $param['sign']) {
-                logs(json_encode(['param' => $param, 'md5Sting' => $md5Sting, 'md5' => $doMd5]), 'uploadOrder_md5');
+                logs(json_encode(['param' => $param, 'writeOffMd5Sting' => $md5Sting, 'ourMd5string' => $doMd5]), 'uploadOrder_md5');
                 return json(msg(-3, '', 'check sign fail!'));
             }
             $orderHeXModel = new OrderhexiaoModel();

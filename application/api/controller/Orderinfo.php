@@ -249,7 +249,6 @@ class Orderinfo extends Controller
         $data = @file_get_contents('php://input');
         $message = json_decode($data, true);
 
-        $orderLockTime = SystemConfigModel::getOrderLockTime();
         $orderShowTime = SystemConfigModel::getOrderShowTime();
         logs(json_encode([
             'action' => 'getOrderInfo',
