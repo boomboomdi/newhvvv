@@ -113,6 +113,7 @@ class Orderhexiao extends Controller
                     $addParam['limit_time'] = time();
                 } else {
                     $addParam['last_check_amount'] = (float)$checkRes['data'];  //上次查询余额
+                    $addParam['check_result'] = "查询成功". $checkRes['data'];   //查询结果
                 }
             }
 //            Db::commit();
