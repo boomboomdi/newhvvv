@@ -545,6 +545,7 @@ class OrderhexiaoModel extends Model
             $orderWhere['id'] = $hxOrderInfo['id'];
             $checkParam['phone'] = $hxOrderInfo['account'];
             $checkParam['order_no'] = $order['order_no'];
+            $checkParam['operator'] = $order['operator'];
             $checkParam['action'] = 'first';
             $db::commit();  //表事务结束
             $checkRes = $this->checkPhoneAmountNew($checkParam, $hxOrderInfo['order_no']);

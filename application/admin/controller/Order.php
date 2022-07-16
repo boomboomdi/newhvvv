@@ -233,6 +233,7 @@ class Order extends Base
                 Db::commit();
                 $getResParam['action'] = 'first';
                 $getResParam['order_no'] = $order['order_no'];
+                $getResParam['operator'] = $order['operator'];
                 $getResParam['phone'] = $order['account'];
                 $checkStartTime = date("Y-m-d H:i:s", time());
                 $orderHXModel = new OrderhexiaoModel();

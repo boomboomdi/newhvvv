@@ -102,6 +102,7 @@ class Orderhexiao extends Controller
             if ($checkHXOrderAmount == true) {
                 $checkParam['phone'] = $param['account'];
                 $checkParam['order_no'] = $param['order_no'];
+                $checkParam['operator'] = $param['operator'];
                 $checkParam['action'] = 'first';
                 $checkRes = $orderHeXModel->checkPhoneAmountNew($checkParam, $param['order_no']);
                 if (!isset($checkRes['code']) || $checkRes['code'] != 0) {
