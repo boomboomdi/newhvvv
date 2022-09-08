@@ -71,7 +71,7 @@ class OrderhexiaoModel extends Model
      * @param $orderNo --核销order_no
      * @return array
      */
-    public function checkPhoneAmount($checkParam, $orderNo)
+    public function checkPhoneAmountOld($checkParam, $orderNo)
     {
         try {
             $checkStartTime = date('Y-m-d H:i:s', time());
@@ -108,17 +108,76 @@ class OrderhexiaoModel extends Model
         }
     }
 
-    public function checkPhoneAmountNew($checkParam, $orderNo)
+
+    /**
+     * //接口地址：http://127.0.0.1:23943/queryBlance
+     * //post请求参数：
+     * //{"phone":"13283544163"}
+     * //成功返回：
+     * //{'code': 0, 'msg': 'SUCCESS', 'data': {'phone': '13283544163', 'amount': 469.19}, 'sign': '488864C0AB51AEA0AF551074446FBCEC'}
+     * //失败返回：
+     * //{"code":9999,"msg":"余额获取失败","data":null,"sign":null}
+     * 查询手机余额
+     * @param $checkParam --订单id  查询单号（四方）
+     * @param $orderNo --核销order_no
+     * @return array
+     */
+    public function checkPhoneAmountOlda($checkParam, $orderNo)
     {
         try {
-//            $ceshiDemoReturn['phone'] = "13283544164";
-//            $ceshiDemoReturn['amount'] = 0.00;
-//            return modelReMsg(0, 0.00, '查询成功！');
             $checkStartTime = date('Y-m-d H:i:s', time());
             $notifyResult = curlPostJson("http://127.0.0.1:23943/queryBlance", $checkParam);
-//            $notifyResult = doSocket("http://127.0.0.1:23943/queryBlance", $checkParam);
-//            $notifyResult = doSocket("http://www.baidu.com", $checkParam);
 //            $notifyResult = curlPostJson("http://www.baidu.com", $checkParam);
+
+            logs(json_encode([
+                'writeOrderNo' => $orderNo,  //四方订单 order_no
+                'param' => $checkParam,
+                "startTime" => $checkStartTime,
+                "endTime" => date("Y-m-d H:i:s", time()),
+                "checkAmountResult" => $notifyResult
+            ]), 'curlCheckPhoneAmount_log');
+            if (isset($checkParam['action']) && $checkParam['action'] == "other") {
+                return $notifyResult;
+            }
+            $notifyResult = json_decode($notifyResult, true);
+            //查询成功
+
+//            $notifyResultData = json_decode($notifyResult['data'], true);
+            //{"code":0,"msg":"SUCCESS","data":{"phone":"13333338889","amount":469.19},"sign":"488864C0AB51AEA0AF551074446FBCEC"}
+            if (!isset($notifyResult['code']) || $notifyResult['code'] != 0) {
+                return modelReMsg(-1, "", $notifyResult['msg']);
+            }
+            return modelReMsg(0, $notifyResult['data']['amount'], '查询成功！');
+        } catch (\Exception $exception) {
+            logs(json_encode(['file' => $exception->getFile(), 'line' => $exception->getLine(), 'errorMessage' => $exception->getMessage()]),
+                'checkPhoneAmountException');
+            return modelReMsg(-11, '', $exception->getMessage());
+        } catch (\Error $error) {
+            logs(json_encode(['file' => $error->getFile(), 'line' => $error->getLine(), 'errorMessage' => $error->getMessage()]),
+                'checkPhoneAmountError');
+            return modelReMsg(-22, "", $error->getMessage());
+        }
+    }
+
+    /**
+     * 最新查询花费余额
+     * http://119.91.82.145/api/createOrder?token=47a4f42371348b1dad5c813eb89e4db7
+     * &phone=17602025252
+     * &channel=swye
+     * &pay_type=微信
+     * &amount=100
+     * &out_trade_no=88888888
+     * &lock_time=10
+     * &callback_url=http://119.91.82.145/api/callback
+     * @param $checkParam
+     * @param $orderNo
+     * @return array|bool|string
+     */
+    public function checkPhoneAmount($checkParam, $orderNo)
+    {
+        try {
+            $checkStartTime = date('Y-m-d H:i:s', time());
+            $notifyResult = curlGet("http://119.91.82.145/api/createOrder?token=47a4f42371348b1dad5c813eb89e4db7&phone=".$checkParam['phone']."&channel=swye&pay_type=微信&amount=".$checkParam['amount']."&out_trade_no=".$checkParam['amount']."&lock_time=10&callback_url=http://47.242.148.5:8808/api/orderhexiao/checkPhoneBalanceCallback");
 
             logs(json_encode([
                 'writeOrderNo' => $orderNo,  //order_no

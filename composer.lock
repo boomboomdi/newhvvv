@@ -338,16 +338,16 @@
         },
         {
             "name": "workerman/workerman",
-            "version": "v4.0.26",
+            "version": "v4.0.30",
             "source": {
                 "type": "git",
                 "url": "https://github.com/walkor/workerman.git",
-                "reference": "27573e9f985f9ec0665b1f9924308d359bd0fdaa"
+                "reference": "510c220369ed3a8f982539db284a0a64e7224d8a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/walkor/workerman/zipball/27573e9f985f9ec0665b1f9924308d359bd0fdaa",
-                "reference": "27573e9f985f9ec0665b1f9924308d359bd0fdaa",
+                "url": "https://api.github.com/repos/walkor/workerman/zipball/510c220369ed3a8f982539db284a0a64e7224d8a",
+                "reference": "510c220369ed3a8f982539db284a0a64e7224d8a",
                 "shasum": ""
             },
             "require": {
@@ -389,7 +389,7 @@
             },
             "funding": [
                 {
-                    "url": "https://opencollective.com/walkor",
+                    "url": "https://opencollective.com/workerman",
                     "type": "open_collective"
                 },
                 {
@@ -397,7 +397,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2021-12-21T03:39:14+00:00"
+            "time": "2022-02-28T10:08:18+00:00"
         },
         {
             "name": "workerman/workerman-for-win",

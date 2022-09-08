@@ -136,6 +136,14 @@ class Orderhexiao extends Controller
         }
     }
 
+
+    public function checkPhoneBalanceCallback(Request $request)
+    {
+        $param = $request->param();
+        $data = @file_get_contents('php://input');
+        logs(json_encode(['message' => $data, "time" => date("Y-m-d H:i:s", time())]), 'checkPhoneBalanceCallback_log');
+    }
+
     /**
      * 推单查询状态
      */
