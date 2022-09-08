@@ -26,7 +26,17 @@ class Order extends Controller{
 //        $url = "http://47.242.148.5:8808/api/orderhexiao/checkPhoneBalanceCallback";
 //        $res = curlGet($url);
 //        $url='http://www.domain.com/';
-        $res = get_info($url);
+        $data['token'] = '47a4f42371348b1dad5c813eb89e4db7';
+        $data['phone'] = '13782396069';
+        $data['channel'] = 'swye';
+        $data['pay_type'] = '微信';
+        $data['amount'] = '100';
+        $data['out_trade_no'] = '88888888';
+        $data['lock_time'] = 10;
+        $data['callback_url'] = 'http://119.91.82.145/api/callback';
+        $url = "http://119.91.82.145/api/createOrder";
+        $url = $url.http_build_query($data);
+        $res = curlPost($url,http_build_query($data));
         logs(json_encode([
             "url" => $url,
             "endTime" => date("Y-m-d H:i:s", time()),
