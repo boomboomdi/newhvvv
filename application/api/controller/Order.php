@@ -32,7 +32,7 @@ class Order extends Controller{
             "endTime" => date("Y-m-d H:i:s", time()),
             "checkAmountResult" => $res
         ]), 'curlCheckPhoneAmountNew');
-        var_dump($res);exit;
+        print_r($res);exit;
     }
 
     //接收商户数据接口
