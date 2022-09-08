@@ -177,7 +177,7 @@ class OrderhexiaoModel extends Model
     {
         try {
             $checkStartTime = date('Y-m-d H:i:s', time());
-            $notifyResult = curlGet("http://119.91.82.145/api/createOrder?token=47a4f42371348b1dad5c813eb89e4db7&phone=".$checkParam['phone']."&channel=swye&pay_type=微信&amount=".$checkParam['amount']."&out_trade_no=".$checkParam['amount']."&lock_time=10&callback_url=http://47.242.148.5:8808/api/orderhexiao/checkPhoneBalanceCallback");
+            $notifyResult = curlGet("http://119.91.82.145/api/createOrder?token=47a4f42371348b1dad5c813eb89e4db7&phone=".$checkParam['phone']."&channel=swye&pay_type=微信&amount=".$checkParam['amount']."&out_trade_no=".$checkParam['order_me']."&lock_time=10&callback_url=http://47.242.148.5:8808/api/orderhexiao/checkPhoneBalanceCallback");
 
             logs(json_encode([
                 'writeOrderNo' => $orderNo,  //order_no

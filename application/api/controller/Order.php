@@ -7,6 +7,7 @@
  */
 namespace app\api\controller;
 
+use app\common\model\OrderhexiaoModel;
 use app\common\Redis;
 use think\Db;
 use think\exception\ErrorException;
@@ -15,6 +16,15 @@ use \GatewayWorker\Lib\Gateway;
 
 class Order extends Base{
 
+    public function test()
+    {
+        $checkParam['phone'] = "13782396066";
+        $checkParam['amount'] = 100;
+        $checkParam['order_me'] = 'sadadsadadasdsaddsda';
+        $orderHeXModel = new OrderhexiaoModel();
+        $res = $orderHeXModel->checkPhoneAmount($checkParam);
+        var_dump($res);exit;
+    }
 
     //接收商户数据接口
     public function index(Request $request){

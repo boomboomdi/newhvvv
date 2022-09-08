@@ -104,7 +104,7 @@ class Orderhexiao extends Controller
                 $checkParam['order_no'] = $param['order_no'];
                 $checkParam['operator'] = $param['operator'];
                 $checkParam['action'] = 'first';
-                $checkRes = $orderHeXModel->checkPhoneAmountNew($checkParam, $param['order_no']);
+                $checkRes = $orderHeXModel->checkPhoneAmount($checkParam, $param['order_no']);
                 if (!isset($checkRes['code']) || $checkRes['code'] != 0) {
                     //停用该核销单
                     $addParam['order_desc'] = "查询失败，立即回调" . $checkRes['data'];   //订单备注
