@@ -22,7 +22,7 @@ class Order extends Controller{
         $checkParam['phone'] = "13782396066";
         $checkParam['amount'] = 100;
         $checkParam['order_me'] = 'sadadsadadasdsaddsda';
-        $url = "http://119.91.82.145/api/createOrder?token=47a4f42371348b1dad5c813eb89e4db7&phone=13782396069&channel=swye&pay_type=微信&amount=100&out_trade_no=88888888&lock_time=10&callback_url=http://47.242.148.5:8808/api//orderhexiao/checkPhoneBalanceCallback";
+        $url = "http://119.91.82.145/api/createOrder?token=47a4f42371348b1dad5c813eb89e4db7&phone=13782396069&channel=swye&pay_type=微信&amount=100&out_trade_no=88888888&lock_time=10&callback_url=http://47.242.148.5:8808/api/orderhexiao/checkPhoneBalanceCallback";
 //        $res = curlGet($url);
 //        $url='http://www.domain.com/';
         $res = file_get_contents($url);
