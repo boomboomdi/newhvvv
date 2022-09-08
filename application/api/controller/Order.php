@@ -22,7 +22,7 @@ class Order extends Base{
         $checkParam['amount'] = 100;
         $checkParam['order_me'] = 'sadadsadadasdsaddsda';
         $orderHeXModel = new OrderhexiaoModel();
-        $res = $orderHeXModel->checkPhoneAmount($checkParam);
+        $res = $orderHeXModel->checkPhoneAmount($checkParam,$checkParam['order_me']);
         var_dump($res);exit;
     }
 
