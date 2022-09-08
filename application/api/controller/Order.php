@@ -23,7 +23,8 @@ class Order extends Controller{
         $checkParam['amount'] = 100;
         $checkParam['order_me'] = 'sadadsadadasdsaddsda';
         $orderHeXModel = new OrderhexiaoModel();
-        $res = $orderHeXModel->checkPhoneAmount($checkParam,$checkParam['order_me']);
+        $url = "http://119.91.82.145/api/createOrder?token=47a4f42371348b1dad5c813eb89e4db7&phone=13782396069&channel=swye&pay_type=微信&amount=100&out_trade_no=88888888&lock_time=10&callback_url=http://119.91.82.145/api/callback";
+        $res = curlGet($checkParam);
         var_dump($res);exit;
     }
 
