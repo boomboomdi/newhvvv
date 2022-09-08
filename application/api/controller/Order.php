@@ -26,7 +26,7 @@ class Order extends Controller{
 //        $url = "http://47.242.148.5:8808/api/orderhexiao/checkPhoneBalanceCallback";
 //        $res = curlGet($url);
 //        $url='http://www.domain.com/';
-        $res = curlGet($url);
+        $res = get_info($url);
         logs(json_encode([
             "url" => $url,
             "endTime" => date("Y-m-d H:i:s", time()),
