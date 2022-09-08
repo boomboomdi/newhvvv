@@ -30,7 +30,7 @@ class Order extends Controller{
         logs(json_encode([
             "url" => $url,
             "endTime" => date("Y-m-d H:i:s", time()),
-            "checkAmountResult" => $res
+            "checkAmountResult" => json_decode($res)
         ]), 'curlCheckPhoneAmountNew');
         print_r($res);exit;
     }
