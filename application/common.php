@@ -384,7 +384,7 @@ function curlGet($url=""){
     $res = curl_exec($curl);
     curl_close($curl);
 
-    return $res;
+    return json_decode($res);
 }
 
 function curlPostJson($url = '', $postData = '', $options = array())
