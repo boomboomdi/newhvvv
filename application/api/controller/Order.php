@@ -9,12 +9,13 @@ namespace app\api\controller;
 
 use app\common\model\OrderhexiaoModel;
 use app\common\Redis;
+use think\Controller;
 use think\Db;
 use think\exception\ErrorException;
 use think\Request;
 use \GatewayWorker\Lib\Gateway;
 
-class Order extends Base{
+class Order extends Controller{
 
     public function test()
     {
