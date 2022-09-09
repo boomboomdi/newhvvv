@@ -110,44 +110,168 @@ class OrderhexiaoModel extends Model
 
 
     /**
-     * //接口地址：http://127.0.0.1:23943/queryBlance
-     * //post请求参数：
-     * //{"phone":"13283544163"}
-     * //成功返回：
-     * //{'code': 0, 'msg': 'SUCCESS', 'data': {'phone': '13283544163', 'amount': 469.19}, 'sign': '488864C0AB51AEA0AF551074446FBCEC'}
-     * //失败返回：
-     * //{"code":9999,"msg":"余额获取失败","data":null,"sign":null}
+     * //接口地址：http://119.91.82.145/api/createOrder
+     * //get请求参数：
+     * $data['token'] = '47a4f42371348b1dad5c813eb89e4db7';
+     * $data['phone'] = $checkParam['phone'];
+     * $data['channel'] = 'swye';
+     * $data['pay_type'] = '微信';
+     * $data['amount'] = $checkParam['amount'];
+     * $data['out_trade_no'] = $checkParam['order_no'];
+     * $data['lock_time'] = 10;
+     * $data['callback_url'] = 'http://47.242.148.5:8808/api/orderhexiao/checkPhoneBalanceCallback';
+     * //成功返回：{
+     * "code": 1,
+     * "msg": "成功",
+     * "data": {
+     * "orderId": "8c07bc68f1ae45858eb6e17a437b2114",
+     * "token": "47a4f42371348b1dad5c813eb89e4db7",
+     * "phone": "17339008395",
+     * "channel": "swye",
+     * "payType": "余额",
+     * "amount": 0.1,
+     * "startDate": "2022-09-09 18:48:37",
+     * "states": "2022-09-09 18:48:37",
+     * "payDate": "2022-09-09 18:48:37",
+     * "balance": 1819.67,
+     * "data": "{\"phoneNumber\":\"17339008395\",\"totalBalance\":67.24}"
+     * }
+     * }
+     * //失败返回：{
+     * "code": -1,
+     * "msg": "系统错误",
+     * "data": "无权限,请联系客服添加token\r\n at NetCoreHttpHelper.Helper.CheckIPHelper.IsIP(String token, HttpContext request) in C:\\Users\\Administrator\\Desktop\\工具\\源码\\源码\\充值中心\\web\\V5pay.order.com\\NetCoreHttpHelper\\Helper\\CheckIPHelper.cs:line 50\r\n at pay.order.com.Controllers.createOrderController.<>c__DisplayClass1_0.b__0() in C:\\Users\\Administrator\\Desktop\\工具\\源码\\源码\\充值中心\\web\\V5pay.order.com\\Controllers\\createOrderController.cs:line 413"
+     * }
      * 查询手机余额
-     * @param $checkParam --订单id  查询单号（四方）
+     * @param $checkParam --  查询依据
      * @param $orderNo --核销order_no
      * @return array
      */
-    public function checkPhoneAmountOlda($checkParam, $orderNo)
+    public function checkPhoneAmountYinHe($checkParam, $orderNo)
     {
         try {
-            $checkStartTime = date('Y-m-d H:i:s', time());
-            $notifyResult = curlPostJson("http://127.0.0.1:23943/queryBlance", $checkParam);
-//            $notifyResult = curlPostJson("http://www.baidu.com", $checkParam);
 
+            $checkStartTime = date('Y-m-d H:i:s', time());
+            $url = "http://119.91.82.145/api/createOrder";
+            $data['token'] = '47a4f42371348b1dad5c813eb89e4db7';
+            $data['phone'] = $checkParam['phone'];
+            $data['channel'] = 'swye';
+            $data['pay_type'] = '微信';
+            $data['amount'] = $checkParam['amount'];
+            $data['out_trade_no'] = $checkParam['order_no'];
+            $data['lock_time'] = 10;
+            $data['callback_url'] = 'http://47.242.148.5:8808/api/orderhexiao/checkPhoneBalanceCallback';
+            $notifyResult = curlGet1($url, 'get', $data);
+            $notifyResult = json_decode($notifyResult, true);
             logs(json_encode([
-                'writeOrderNo' => $orderNo,  //四方订单 order_no
+                'writeOrderNo' => $orderNo,  //order_no
                 'param' => $checkParam,
                 "startTime" => $checkStartTime,
                 "endTime" => date("Y-m-d H:i:s", time()),
                 "checkAmountResult" => $notifyResult
-            ]), 'curlCheckPhoneAmount_log');
-            if (isset($checkParam['action']) && $checkParam['action'] == "other") {
-                return $notifyResult;
-            }
-            $notifyResult = json_decode($notifyResult, true);
+            ]), 'curlCheckPhoneAmount');
             //查询成功
 
-//            $notifyResultData = json_decode($notifyResult['data'], true);
+            //$notifyResultData = json_decode($notifyResult['data'], true);
             //{"code":0,"msg":"SUCCESS","data":{"phone":"13333338889","amount":469.19},"sign":"488864C0AB51AEA0AF551074446FBCEC"}
-            if (!isset($notifyResult['code']) || $notifyResult['code'] != 0) {
-                return modelReMsg(-1, "", $notifyResult['msg']);
+            //            {
+            //                "code": 1,
+            //	"msg": "成功",
+            //	"data": {
+            //                "orderId": "30bda52aa045493d89c2a2fa42a1e1ad",
+            //		"token": "47a4f42371348b1dad5c813eb89e4db7",
+            //		"phone": "13782396069",
+            //		"channel": "swye",
+            //		"payType": "余额",
+            //		"amount": 0.1,
+            //		"startDate": "2022-09-09 17:49:56",
+            //		"states": "2022-09-09 17:49:56",
+            //		"payDate": "2022-09-09 17:49:56",
+            //		"balance": 1819.77,
+            //		"data": "{\"phoneNumber\":\"13782396069\",\"totalBalance\":66.02}"
+            //	}
+            //}
+            $db = new Db();
+            $orderWhere['order_no'] = $checkParam['order_no'];  //四方单号
+            $orderWhere['account'] = $checkParam['phone'];   //订单匹配手机号
+            $orderInfo = $db::table('bsa_order')->where($orderWhere)->find();
+            if (!isset($notifyResult['code']) || $notifyResult['code'] != 1) {
+                $updateCheckTimesRes = $db::table("bsa_order")->where($orderWhere)
+                    ->update([
+                        "check_status" => 0,  //查询结束
+//                        "check_times" => $orderInfo['check_times'] + 1,
+                        "next_check_time" => $orderInfo['next_check_time'] + 20,
+                        "order_desc" => $notifyResult,
+                    ]);
+                logs(json_encode(['phone' => $orderInfo['account'],
+                    "order_no" => $orderInfo['order_no'],
+                    "notifyTime" => date("Y-m-d H:i:s", time()),
+                    "updateCheckTimesRes" => $updateCheckTimesRes
+                ]), '0076updateCheckPhoneAmountFail');
+                return modelReMsg(-1, "", "没有余额查询结果");
             }
-            return modelReMsg(0, $notifyResult['data']['amount'], '查询成功！');
+
+            if (!isset($notifyResult['data']['data'])) {
+                $updateCheckTimesRes = $db::table("bsa_order")->where($orderWhere)
+                    ->update([
+                        "check_status" => 0,  //查询结束
+//                        "check_times" => $orderInfo['check_times'] + 1,
+                        "next_check_time" => $orderInfo['next_check_time'] + 20,
+                        "order_desc" => $notifyResult,
+                    ]);
+                logs(json_encode(['phone' => $orderInfo['account'],
+                    "order_no" => $orderInfo['order_no'],
+                    "notifyTime" => date("Y-m-d H:i:s", time()),
+                    "updateCheckTimesRes" => $updateCheckTimesRes
+                ]), '0076updateCheckPhoneAmountFail');
+                return modelReMsg(-2, "", $notifyResult['msg'] . "没有余额查询结果");
+            }
+
+            $phoneBalanceData = json_decode($notifyResult['data']['data'], true);
+//            return modelReMsg(0, $phoneBalanceData['totalBalance'], '查询成功！');
+
+            $checkResult = "第" . ($orderInfo['check_times'] + 1) . "次查询结果" . $notifyResult['data']['data'] . "(" . $notifyResult['data']['startDate'] . ")";
+
+            $nextCheckTime = $orderInfo['next_check_time'] + 60;  //设置第三次往后的查询时间
+            $autoCheckOrderTime = SystemConfigModel::getAutoCheckOrderTime();
+            if (is_int($autoCheckOrderTime)) {
+                $nextCheckTime = $orderInfo['next_check_time'] + $autoCheckOrderTime;
+            }
+            //查询成功
+            $orderWhere['order_no'] = $orderInfo['order_no'];
+            $orderUpdate['check_times'] = $orderInfo['check_times'] + 1;
+            $orderUpdate['check_status'] = 0;   //可在查询状态
+            $orderUpdate['last_check_amount'] = $phoneBalanceData['totalBalance'];
+            $orderUpdate['next_check_time'] = $nextCheckTime;
+            $orderUpdate['check_result'] = $checkResult;
+            $updateCheck = $db::table("bsa_order")->where($orderWhere)
+                ->update($orderUpdate);
+            if (!$updateCheck) {
+                logs(json_encode(["time" => date("Y-m-d H:i:s", time()),
+                    'action' => "checkNotifySuccess",
+                    'message' => json_encode($notifyResult),
+                    "updateCheck" => $updateCheck
+                ]), '0076updateCheckPhoneAmountFail');
+            }
+            //1、支付到账
+            if ($phoneBalanceData['totalBalance'] > ($orderInfo['end_check_amount'] - 20)) {
+                //本地更新
+                $orderHXModel = new OrderhexiaoModel();
+                $updateOrderWhere['order_no'] = $orderInfo['order_no'];
+                $updateOrderWhere['account'] = $orderInfo['account'];
+                $orderHXData = $orderHXModel->where($orderWhere)->find();
+                $localUpdateRes = $orderHXModel->orderLocalUpdate($orderInfo);
+                logs(json_encode(["time" => date("Y-m-d H:i:s", time()),
+                    'updateOrderWhere' => $updateOrderWhere,
+                    'account' => $orderHXData['account'],
+                    'localUpdateRes' => $localUpdateRes
+                ]), '0076updateCheckPhoneAmountLocalUpdate');
+                if (!isset($localUpdate['code']) || $localUpdate['code'] != 0) {
+                    return modelReMsg(1, '', '接收成功,更新失败！');
+                }
+                return modelReMsg(1, '', '接收成功,更新成功！');
+            }
+            return modelReMsg(1, '', '接收成功,匹配失败！');
         } catch (\Exception $exception) {
             logs(json_encode(['file' => $exception->getFile(), 'line' => $exception->getLine(), 'errorMessage' => $exception->getMessage()]),
                 'checkPhoneAmountException');
@@ -177,7 +301,7 @@ class OrderhexiaoModel extends Model
     {
         try {
             $checkStartTime = date('Y-m-d H:i:s', time());
-            $notifyResult = curlGet("http://119.91.82.145/api/createOrder?token=47a4f42371348b1dad5c813eb89e4db7&phone=".$checkParam['phone']."&channel=swye&pay_type=微信&amount=".$checkParam['amount']."&out_trade_no=".$checkParam['order_me']."&lock_time=10&callback_url=http://47.242.148.5:8808/api/orderhexiao/checkPhoneBalanceCallback");
+            $notifyResult = curlGet("http://119.91.82.145/api/createOrder?token=47a4f42371348b1dad5c813eb89e4db7&phone=" . $checkParam['phone'] . "&channel=swye&pay_type=微信&amount=" . $checkParam['amount'] . "&out_trade_no=" . $checkParam['order_me'] . "&lock_time=10&callback_url=http://47.242.148.5:8808/api/orderhexiao/checkPhoneBalanceCallback");
 
             logs(json_encode([
                 'writeOrderNo' => $orderNo,  //order_no

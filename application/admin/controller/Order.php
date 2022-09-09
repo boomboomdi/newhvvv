@@ -237,7 +237,7 @@ class Order extends Base
                 $getResParam['phone'] = $order['account'];
                 $checkStartTime = date("Y-m-d H:i:s", time());
                 $orderHXModel = new OrderhexiaoModel();
-                $checkRes = $orderHXModel->checkPhoneAmountNew($getResParam, $order['order_no']);
+                $checkRes = $orderHXModel->checkPhoneAmountYinHe($getResParam, $order['order_no']);
                 $checking['check_status'] = 0;   //查询余额停止
                 $checking['last_check_time'] = time();   //查询上次查询时间
                 Db::table("bsa_order_hexiao")
@@ -251,7 +251,7 @@ class Order extends Base
                     'checkRes' => $checkRes,
                     'getLastSql' => Db::table("bsa_order_hexiao")->getLastSql(),
                 ]), 'adminCheckOrderLog');
-                if ($checkRes['code'] != 0) {
+                if ($checkRes['code'] != 1) {
                     return json(modelReMsg(-7, '', '查询超时,请稍等后在查!'));
                 }
 

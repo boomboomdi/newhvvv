@@ -12,7 +12,7 @@ use app\common\model\SystemConfigModel;
 use app\common\model\NotifylogModel;
 use think\Db;
 
-class Timecheckorder extends Command
+class TimecheckordeOld extends Command
 {
     protected function configure()
     {
@@ -65,7 +65,7 @@ class Timecheckorder extends Command
                             $getResParam['operator'] = $v['operator'];
                             $checkStartTime = date("Y-m-d H:i:s", time());
                             $getPhoneAmountRes = $orderHXModel->checkPhoneAmountYinHe($getResParam, $v['order_pay']);
-                            if (!isset($getPhoneAmountRes['code'])||$getPhoneAmountRes['code'] != 1) {
+                            if ($getPhoneAmountRes != "success") {
                                 $updateCheckWhere['order_no'] = $v['order_no'];
                                 $updateCheckData['check_status'] = 0;
                                 $db::table("bsa_order")->where($updateCheckWhere)

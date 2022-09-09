@@ -561,4 +561,16 @@ class Redis
         call_user_func_array([$this->redisObj[$this->sn], $method], $args);
     }
 
+    public function psubscribe($patterns = array(), $callback)
+    {
+        $this->handler->psubscribe($patterns, $callback);
+    }
+
+    public function setOption()
+    {
+        $this->handler->setOption(\Redis::OPT_READ_TIMEOUT, -1);
+    }
+
+
+
 }
