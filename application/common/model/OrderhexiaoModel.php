@@ -150,7 +150,6 @@ class OrderhexiaoModel extends Model
     public function checkPhoneAmountYinHe($checkParam, $orderNo)
     {
         try {
-
             $checkStartTime = date('Y-m-d H:i:s', time());
             $url = "http://119.91.82.145/api/createOrder";
             $data['token'] = '47a4f42371348b1dad5c813eb89e4db7';

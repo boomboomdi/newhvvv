@@ -337,6 +337,11 @@ function curlGet1($url, $type, $data = false, &$err_msg = null, $timeout = 20, $
     }
 
     $ch = curl_init();
+
+    $headers = [
+        "Content-Type: application/json;charset=UTF-8",
+    ];
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
     curl_setopt_array($ch, $option);
     $response = curl_exec($ch);
     $curl_no = curl_errno($ch);
