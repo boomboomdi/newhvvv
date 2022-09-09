@@ -279,6 +279,7 @@ function msg($code, $data, $msg)
     curl_setopt($oCurl, CURLOPT_URL, $url);
     curl_setopt($oCurl, CURLOPT_RETURNTRANSFER, 1 );
     $sContent = curl_exec($oCurl);
+    var_dump($sContent);exit;
     $aStatus = curl_getinfo($oCurl);
     curl_close($oCurl);
     if(intval($aStatus["http_code"])==200){
