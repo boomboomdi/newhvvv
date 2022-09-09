@@ -44,7 +44,8 @@ class Ceshi extends Controller
             $addData['limit_time'] = time() + 21600;
             $addData['notify_url'] = $request->domain() . "/api/ceshi/ordernotify";  //回调地址
             $addData['notify_url'] = $request->domain() . "/api/ceshi/ordernotify";  //回调地址
-            $addData['sign'] = md5($addData['write_off_sign'] . $addData['order_no'] . $addData['account'] . "jfkdakjfhamdfka29u9");
+            $addData['sign'] = md5($param['write_off_sign'] . $param['order_no'] . $param['account'] . $param['order_amount'] . $param['limit_time'] . $param['notify_url'] . "jfkdakjfhamdfka29u9");
+//            $addData['sign'] = md5($addData['write_off_sign'] . $addData['order_no'] . $addData['account'] . "jfkdakjfhamdfka29u9");
 //            $addOrderRes = curlPostJson($request->domain() . "/api/orderhexiao/uploadorder", $addData);
             $addOrderRes = curlGet1($request->domain() . "/api/orderhexiao/uploadorder", 'post',json_encode($addData));
             var_dump($addOrderRes);
