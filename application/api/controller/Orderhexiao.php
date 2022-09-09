@@ -29,7 +29,6 @@ class Orderhexiao extends Controller
         $data = @file_get_contents("php://input");
         logs(json_encode(['message' => $data, "time" => date("Y-m-d H:i:s", time())]), 'uploadOrder_log');
         $param = json_decode($data, true);
-        logs(json_encode(['message' => $param, "time" => date("Y-m-d H:i:s", time())]), 'uploadOrder_log');
 //        $orderExceptionModel = new OrderexceptionModel();
 //        if (mt_rand(0, 9) > 5) {
 //            usleep(3000);
