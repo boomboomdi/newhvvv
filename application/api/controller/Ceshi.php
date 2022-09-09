@@ -37,7 +37,7 @@ class Ceshi extends Controller
             //ceshi
             //jfkdakjfhamdfka29u9
             $addData['write_off_sign'] = 'ceshi';
-           $token = 'jfkdakjfhamdfka29u9';
+            $token = 'jfkdakjfhamdfka29u9';
             $addData['order_no'] = guid12();
             $addData['order_amount'] = 100;
             $addData['operator'] = '移动';
@@ -47,12 +47,12 @@ class Ceshi extends Controller
             $addData['sign'] = md5($addData['write_off_sign'] . $addData['order_no'] . $addData['account'] . $addData['order_amount'] . $addData['limit_time'] . $addData['notify_url'] . $token);
 //            $addData['sign'] = md5($addData['write_off_sign'] . $addData['order_no'] . $addData['account'] . "jfkdakjfhamdfka29u9");
 //            $addOrderRes = curlPostJson($request->domain() . "/api/orderhexiao/uploadorder", $addData);
-            $addOrderRes = curlGet1($request->domain() . "/api/orderhexiao/uploadorder", 'post',json_encode($addData));
+            $addOrderRes = curlGet1($request->domain() . "/api/orderhexiao/uploadorder", 'post', json_encode($addData));
             var_dump($addData);
 //            var_dump($request->domain() . "/api/orderhexiao/uploadorder");
             echo "</pre>";
 //            exit;
-              var_dump($addOrderRes);
+            var_dump($addOrderRes);
 //            var_dump($request->domain() . "/api/orderhexiao/uploadorder");
             exit;
             $res = json_decode($addOrderRes);
@@ -74,11 +74,39 @@ class Ceshi extends Controller
     {
         $data = @file_get_contents("php://input");
         $param = json_decode($data, true);
-        if (isset($param['account']) && !empty($param['account'])) {
-            $createOrderData['account'] = $param['account'];
-        } else {
-            $createOrderData['account'] = randomMobile();
-        }
+        $addData['merchant_sign'] = "ceshi";
+        $token = '123';
+        $addData['amount'] = 100;
+        $addData['notify_url'] = "order_no";
+        $addData['payment'] = "order_no";
+        $addData['time'] = "order_no";
+        $addData['sign'] = "order_no";   //md5(merchant_sign+ order_no+amount+ time+token)
+
     }
 
+    /**
+     * 测试下单
+     * @return void
+     */
+    public function createOrderNotify(Request $request)
+    {
+        $data = @file_get_contents("php://input");
+        logs(json_encode(['message' => $data, "time" => date("Y-m-d H:i:s", time())]), 'uploadOrder_log');
+        $param = json_decode($data, true);
+        $addData['merchant_sign'] = "ceshi";
+        $addData['order_no'] = guidForSelf();
+        $token = '123';
+        $addData['amount'] = 100;
+        $addData['notify_url'] = $request->domain() . "/api/ceshi/createOrderNotify";
+        $addData['payment'] = "微信";
+        $addData['time'] = time();
+        $addData['sign'] = md5($addData['merchant_sign']+$addData['order_no']+$addData['amount']+$addData['time']+$token);   //md5(merchant_sign+ order_no+amount+ time+token)
+        $addOrderRes = curlGet1($request->domain() . "/api/orderhexiao/uploadorder", 'post', json_encode($addData));
+        var_dump($addData);
+//            var_dump($request->domain() . "/api/orderhexiao/uploadorder");
+        echo "</pre>";
+//            exit;
+        var_dump($addOrderRes);
+
+    }
 }
