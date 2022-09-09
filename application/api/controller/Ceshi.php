@@ -32,7 +32,7 @@ class Ceshi extends Controller
 //        }
 
         for ($i = 0; $i < 5; $i++) {
-            $addData['account'] = randomMobile();
+            $addData['account'] = randomMobile(1);
             //ceshi
             //jfkdakjfhamdfka29u9
             $addData['write_off_sign'] = 'ceshi';
@@ -41,9 +41,9 @@ class Ceshi extends Controller
             $addData['operator'] = '移动';
             $addData['order_type'] = 'HUAFEI';
             $addData['limit_time'] = time() + 21600;
-            $addData['notify_url'] = "http://" . $request->ip() . "/api/ceshi/ordernotify";  //回调地址
+            $addData['notify_url'] = "http://" . $request->ip() . ":8808/api/ceshi/ordernotify";  //回调地址
             $addData['sign'] = md5($addData['write_off_sign'] . $addData['order_no'] . $addData['account'] . "jfkdakjfhamdfka29u9");
-            $addOrderRes = curlPost("http://" . $request->ip() . "/api/orderhexiao/uploadorder", $addData);
+            $addOrderRes = curlPost("http://" . $request->ip() . ":8808/api/orderhexiao/uploadorder", $addData);
             $res = json_decode($addOrderRes);
             if (!isset($res['code']) || $res['code'] != 1) {
                 echo "第".($i+1)."上传失败：".json_encode($addOrderRes);
