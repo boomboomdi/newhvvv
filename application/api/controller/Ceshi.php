@@ -47,7 +47,11 @@ class Ceshi extends Controller
 //            $addData['sign'] = md5($addData['write_off_sign'] . $addData['order_no'] . $addData['account'] . "jfkdakjfhamdfka29u9");
 //            $addOrderRes = curlPostJson($request->domain() . "/api/orderhexiao/uploadorder", $addData);
             $addOrderRes = curlGet1($request->domain() . "/api/orderhexiao/uploadorder", 'post',json_encode($addData));
-            var_dump($addOrderRes);
+            var_dump($addData);
+//            var_dump($request->domain() . "/api/orderhexiao/uploadorder");
+            echo "</pre>";
+//            exit;
+              var_dump($addOrderRes);
 //            var_dump($request->domain() . "/api/orderhexiao/uploadorder");
             exit;
             $res = json_decode($addOrderRes);
