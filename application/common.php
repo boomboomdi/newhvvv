@@ -270,6 +270,16 @@ function msg($code, $data, $msg)
     return compact('code', 'data', 'msg');
 }
 
+/**
+ * curl
+ * @param $url
+ * @param $type
+ * @param $data
+ * @param $err_msg
+ * @param $timeout
+ * @param $cert_info
+ * @return bool|string
+ */
 function curlGet1($url, $type, $data = false, &$err_msg = null, $timeout = 20, $cert_info = array())
 {
     $type = strtoupper($type);

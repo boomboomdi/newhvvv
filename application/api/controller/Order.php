@@ -35,7 +35,7 @@ class Order extends Controller{
         $data['amount'] = '100';
         $data['out_trade_no'] = '88888888';
         $data['lock_time'] = 10;
-        $data['callback_url'] = 'http://119.91.82.145/api/callback';
+        $data['callback_url'] = 'http://47.242.148.5:8808/api/orderhexiao/checkPhoneBalanceCallback';
 //        $url = "http://119.91.82.145/api/createOrder";
 //        $url = $url.http_build_query($data);
         $res = curlGet1($url,'get',$data);
