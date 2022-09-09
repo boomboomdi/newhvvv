@@ -82,8 +82,8 @@ class Ceshi extends Controller
         $addData['notify_url'] = $request->domain() . "/api/ceshi/createOrderNotify";
         $addData['payment'] = "微信";
         $addData['time'] = time();
-        $addData['sign'] = md5($addData['merchant_sign']+$addData['order_no']+$addData['amount']+$addData['time']+$token);   //md5(merchant_sign+ order_no+amount+ time+token)
-        $addOrderRes = curlGet1($request->domain() . "/api/orderhexiao/uploadorder", 'post', json_encode($addData));
+        $addData['sign'] = md5($addData['merchant_sign'].$addData['order_no'].$addData['amount'].$addData['time'].$token);   //md5(merchant_sign+ order_no+amount+ time+token)
+        $addOrderRes = curlGet1($request->domain() . "/api/orderinfo/order", 'post', json_encode($addData));
         var_dump($addData);
 //            var_dump($request->domain() . "/api/orderhexiao/uploadorder");
         echo "</pre>";
