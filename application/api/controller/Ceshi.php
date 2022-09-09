@@ -73,24 +73,6 @@ class Ceshi extends Controller
     public function createOrder(Request $request)
     {
         $data = @file_get_contents("php://input");
-        $param = json_decode($data, true);
-        $addData['merchant_sign'] = "ceshi";
-        $token = '123';
-        $addData['amount'] = 100;
-        $addData['notify_url'] = "order_no";
-        $addData['payment'] = "order_no";
-        $addData['time'] = "order_no";
-        $addData['sign'] = "order_no";   //md5(merchant_sign+ order_no+amount+ time+token)
-
-    }
-
-    /**
-     * 测试下单
-     * @return void
-     */
-    public function createOrderNotify(Request $request)
-    {
-        $data = @file_get_contents("php://input");
         logs(json_encode(['message' => $data, "time" => date("Y-m-d H:i:s", time())]), 'uploadOrder_log');
         $param = json_decode($data, true);
         $addData['merchant_sign'] = "ceshi";
@@ -107,6 +89,33 @@ class Ceshi extends Controller
         echo "</pre>";
 //            exit;
         var_dump($addOrderRes);
+
+    }
+
+    /**
+     * 测试下单
+     * @return void
+     */
+    public function createOrderNotify(Request $request)
+    {
+        $data = @file_get_contents("php://input");
+        logs(json_encode(['message' => $data, "time" => date("Y-m-d H:i:s", time())]), 'uploadOrder_log');
+        $param = json_decode($data, true);
+        return "success";
+//        $addData['merchant_sign'] = "ceshi";
+//        $addData['order_no'] = guidForSelf();
+//        $token = '123';
+//        $addData['amount'] = 100;
+//        $addData['notify_url'] = $request->domain() . "/api/ceshi/createOrderNotify";
+//        $addData['payment'] = "微信";
+//        $addData['time'] = time();
+//        $addData['sign'] = md5($addData['merchant_sign']+$addData['order_no']+$addData['amount']+$addData['time']+$token);   //md5(merchant_sign+ order_no+amount+ time+token)
+//        $addOrderRes = curlGet1($request->domain() . "/api/orderhexiao/uploadorder", 'post', json_encode($addData));
+//        var_dump($addData);
+////            var_dump($request->domain() . "/api/orderhexiao/uploadorder");
+//        echo "</pre>";
+////            exit;
+//        var_dump($addOrderRes);
 
     }
 }
