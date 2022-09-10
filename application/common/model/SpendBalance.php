@@ -50,6 +50,7 @@ class SpendBalance extends Model
             $res = curlGet1($url, 'get', $data);
             logs(json_encode([
                 "url" => $url,
+                "data" => $data,
                 "time" => date("Y-m-d H:i:s", time()),
                 "checkAmountResult" => json_decode($res)
             ]), 'yinHeBalance');
