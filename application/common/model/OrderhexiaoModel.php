@@ -829,11 +829,6 @@ class OrderhexiaoModel extends Model
                 ->where("account", "=", $order['account'])
                 ->lock(true)
                 ->find();
-//            logs(json_encode(['action' => 'getUseHxOrder',
-//                'orderNo' => $order['order_no'],
-//                'hxOrderInfo' => $hxOrderInfo,
-//                'lastSql' => $db::table("bsa_order_hexiao")->getLastSql(),
-//            ]), 'getUseHxOrder_log');
 
             if (!$hxOrderInfo || $hxOrderInfo['order_me'] == null) {
                 $db::rollback();
