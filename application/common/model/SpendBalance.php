@@ -89,6 +89,8 @@ class SpendBalance extends Model
             ]), 'yinHeBalancerInsert');
             print_r($addParam);
             $checklogModel = new ChecklogModel();
+            $type = is_array($addParam);
+            var_dump($type);exit;
             $insert = $checklogModel->addlog($addParam);
             if (!$insert) {
                 return model(-12, $returnBalanceData, $addParam);
