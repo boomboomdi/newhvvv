@@ -283,6 +283,20 @@ function msg($code, $data, $msg)
 //    return array_unique($tmp);
     return $tel_arr[array_rand($tel_arr)].mt_rand(1000,9999).mt_rand(1000,9999);
 }
+
+function json_to_array($str) {
+    if (is_string($str))
+        $str = json_decode($str);
+    $arr=array();
+    foreach($str as $k=>$v) {
+        if(is_object($v) || is_array($v))
+            $arr[$k]=json_to_array($v);
+        else
+            $arr[$k]=$v;
+    }
+    return $arr;
+}
+
 /**
  * curl
  * @param $url
