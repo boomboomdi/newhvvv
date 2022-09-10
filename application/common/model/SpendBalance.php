@@ -84,13 +84,13 @@ class SpendBalance extends Model
             $addParam['account'] = $account;
             $addParam['amount'] = $amount;
             $addParam['check_time'] = time();
-//            $addParam['check_result'] = $checkRes;
+            $addParam['check_result'] = $checkRes;
             logs(json_encode(['param' => $addParam,
             ]), 'yinHeBalancerInsert');
             print_r($addParam);
             $checklogModel = new ChecklogModel();
-            $type = is_array($addParam);
-            var_dump($type);exit;
+//            $type = is_array($addParam);
+//            var_dump($type);exit;
             $insert = $checklogModel->addlog($addParam);
             if (!$insert) {
                 return model(-12, $returnBalanceData, $addParam);
