@@ -85,7 +85,7 @@ class SpendBalance extends Model
             $addParam['check_result'] = $checkRes;
             logs(json_encode(['param' => $addParam,
             ]), 'yinHeBalancerInsert');
-            var_dump($addParam);
+            print_r($addParam);
             $insert = $db::table("bsa_check_log")->insert($addParam);
             if (!$insert) {
                 return model(-12, $returnBalanceData, $addParam);
