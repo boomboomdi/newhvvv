@@ -115,7 +115,7 @@ class SpendBalance extends Model
                 'line' => $exception->getLine(),
                 'errorMessage' => $exception->getMessage(),
             ]), 'yinHeBalancerException');
-            return json(-11, '', "接口异常!-11");
+            return model(-11, '', "接口异常!-11");
         }
 
 
