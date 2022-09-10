@@ -88,12 +88,13 @@ class SpendBalance extends Model
             print_r($addParam);
             $checklogModel = new ChecklogModel();
 //            $type = is_array($addParam);
-            var_dump(json_encode($checkRes));exit;
+//            var_dump(json_encode($checkRes));exit;
             $insert = $checklogModel->addlog([
                 'check_sign' => $addParam['check_sign'],
                 'status' => $addParam['status'],
                 'order_no' => $addParam['order_no'],
                 'account' => $addParam['account'],
+                'amount' => $addParam['amount'],
                 'check_time' => $addParam['check_time'],
                 'check_result' => "接口返回|" . json_encode($checkRes)
             ]);
