@@ -59,8 +59,6 @@ class SpendBalance extends Model
             ]), 'yinHeBalance');
             $db = new Db();
             $res = json_to_array($checkRes);
-            $addParam = [];
-            $addParam['check_result'] = json_encode($checkRes);
             $returnCode = -2;
             $addParam = [];
             $addParam['check_sign'] = '银河';
@@ -97,7 +95,7 @@ class SpendBalance extends Model
                 'order_no' => $addParam['order_no'],
                 'account' => $addParam['account'],
                 'check_time' => $addParam['check_time'],
-                'check_result' => $addParam['check_result']
+                'check_result' => "接口返回|".$addParam['check_result']
             ]);
             if (!$insert) {
                 return modelReMsg(-12, $returnBalanceData, $addParam);
