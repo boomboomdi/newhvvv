@@ -131,7 +131,9 @@ class Ceshi extends Controller
         $amount = 100;
         $out_trade_no = 100;
         $res = $spendBalance->yinHeBalance($account, $amount, $orderNo, '88888888', $pay_type);
-        var_dump(json_decode($res, true));
+        $data = json_decode($res, true);
+
+        var_dump($data['data']);
         exit;
     }
 }
