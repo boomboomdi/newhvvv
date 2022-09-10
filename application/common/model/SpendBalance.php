@@ -68,7 +68,7 @@ class SpendBalance extends Model
                 $returnCode = -1;
                 $addParam['check_desc'] = '查询失败';
             }
-
+            $addParam['check_result'] = $checkRes;
             $returnBalanceData = [];
             if (isset($res['code']) && $res['code'] == 1) {
                 $returnCode = 1;
@@ -76,6 +76,7 @@ class SpendBalance extends Model
                 $addParam['check_desc'] = '查询成功';
                 $balanceDataOne = $res['data'];
                 $balanceData = json_decode($balanceDataOne['data'], true);
+                $addParam['balance'] = $balanceData['totalBalance'];
                 $returnBalanceData['account'] = $balanceData['phoneNumber'];
                 $returnBalanceData['balance'] = $balanceData['totalBalance'];
             }
@@ -83,9 +84,9 @@ class SpendBalance extends Model
             $addParam['account'] = $account;
             $addParam['amount'] = $amount;
             $addParam['check_time'] = time();
-            logs(json_encode(['param' => $addParam,
-            ]), 'yinHeBalancerInsert');
-            print_r($addParam);
+//            logs(json_encode(['param' => $addParam,
+//            ]), 'yinHeBalancerInsert');
+//            print_r($addParam);
             $checklogModel = new ChecklogModel();
 //            $type = is_array($addParam);
 //            var_dump(json_encode($checkRes));exit;
