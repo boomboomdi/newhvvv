@@ -59,7 +59,7 @@ class SpendBalance extends Model
             ]), 'yinHeBalance');
             $db = new Db();
             $res = json_to_array($checkRes);
-
+            $addParam = [];
             $addParam['check_result'] = json_encode($checkRes);
             $returnCode = -2;
             $addParam = [];
