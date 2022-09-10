@@ -134,7 +134,7 @@ class Ceshi extends Controller
 
         $data = json_to_array($res);
         if(!isset($data['code'])||$data['code']!=1){
-            return($data['data']);
+            return  $data['data'];
         }
 
         return $data;
