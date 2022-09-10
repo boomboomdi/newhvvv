@@ -86,9 +86,9 @@ class Ceshi extends Controller
         $addOrderRes = curlGet1($request->domain() . "/api/orderinfo/order", 'post', json_encode($addData));
         var_dump($addData);
 //            var_dump($request->domain() . "/api/orderhexiao/uploadorder");
-        echo "</pre>";
+        echo "</pre>/n";
 //            exit;
-        var_dump($addOrderRes);
+        print_r($addOrderRes);
 
     }
 
