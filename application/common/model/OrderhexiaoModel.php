@@ -803,6 +803,135 @@ class OrderhexiaoModel extends Model
 
     }
 
+
+    /**
+     *
+     * 获取可用付款抖音话单支付链接
+     * @param $where
+     * @return array
+     */
+    public function getUseHxHuaFeiOrder($order, $getTimes = 1)
+    {
+        $db = new Db();
+        $db::startTrans();
+        try {
+            if (empty($order['order_me'])) {
+                return modelReMsg(-1, '', '错误订单！-0');
+            }
+            $bsaWriteOff = $db::table("bsa_write_off")->where('status', '=', 1)->column('write_off_sign');
+            if (empty($bsaWriteOff)) {
+                $db::rollback();
+                return modelReMsg(-2, '', '无可匹配订单！-2');
+            }
+
+            $hxOrderInfo = $db::table("bsa_order_hexiao")
+                ->where("order_me", "=", $order['order_me'])
+                ->where("account", "=", $order['account'])
+                ->lock(true)
+                ->find();
+//            logs(json_encode(['action' => 'getUseHxOrder',
+//                'orderNo' => $order['order_no'],
+//                'hxOrderInfo' => $hxOrderInfo,
+//                'lastSql' => $db::table("bsa_order_hexiao")->getLastSql(),
+//            ]), 'getUseHxOrder_log');
+
+            if (!$hxOrderInfo || $hxOrderInfo['order_me'] == null) {
+                $db::rollback();
+                return modelReMsg(-3, '', '无可用下单！-3');
+            }
+
+            $orderWhere['id'] = $hxOrderInfo['id'];
+            $orderWhere['account'] = $hxOrderInfo['account'];
+            $checking['order_status'] = 1;  //使用中
+            $checking['check_status'] = 1;   //查询余额中
+            $checking['last_check_time'] = time();   //查询上次查询时间
+            $checkRes = $db::table("bsa_order_hexiao")->where($orderWhere)->update($checking);
+            if (!$checkRes) {
+                $db::rollback();
+                return modelReMsg(-4, '', '无可用下单！-1');
+            }
+            $orderWhere['id'] = $hxOrderInfo['id'];
+            $checkParam['phone'] = $hxOrderInfo['account'];
+            $checkParam['order_no'] = $order['order_no'];
+            $checkParam['operator'] = $order['operator'];
+            $checkParam['action'] = 'first';
+            $db::commit();  //表事务结束
+            $spendBalance = new SpendBalance();
+
+//            public function yinHeBalance($account, $amount = 100, $orderNo = "YINHE8888888888", $outTradeNo = '88888888', $payType = '微信')
+            $checkRes = $spendBalance->yinHeBalance($checkParam['phone'], $order['amount'], $hxOrderInfo['order_no'], "", '微信');
+
+            if (!isset($checkRes['code']) || $checkRes['code'] != 1) {
+                //停用该核销单
+                $updateHxWhereForStop['id'] = $hxOrderInfo['id'];
+                $updateHxDataForStop['status'] = 2;
+                $updateHxDataForStop['limit_time'] = time();
+                $updateHxDataForStop['last_use_time'] = time();
+                $updateHxDataForStop['order_status'] = 2;
+                $updateHxDataForStop['check_status'] = 0;
+                $updateHxDataForStop['check_result'] = "查询失败，立即回调" . $checkRes['msg'];
+                $updateHxDataForStop['order_desc'] = "查询失败，立即回调|" . json_encode($checkRes);
+                $updateHxDataForStopRes = $db::table("bsa_order_hexiao")->where($updateHxWhereForStop)->update($updateHxDataForStop);
+                logs(json_encode([
+                    'action' => 'updateHxWhereForStop',
+                    'orderWhere' => $updateHxWhereForStop,
+                    'updateHxDataForStop' => $updateHxDataForStop,
+                    'checkPhoneAmountNewRes' => $checkRes,
+                    'updateHxDataForStopRes' => $updateHxDataForStopRes,
+                    'getLastSql' => $db::table("bsa_order_hexiao")->getLastSql(),
+                ]), 'ADONTMatchHxDataCheckResFAIL');
+//                if (!$updateHxDataForStopRes) {
+//                    $db::rollback();
+//                }
+                return modelReMsg(-5, "查询失败，立即回调" . $checkRes['msg'], '查询余额失败-5！');
+            }
+            //查询成功更新余额order_hexiao $order order_hexiao
+            $orderWhere['id'] = $hxOrderInfo['id'];
+            $orderWhere['order_me'] = $hxOrderInfo['order_me'];
+            $orderWhere['account'] = $order['account'];
+            $updateMatch['last_check_amount'] = (float)$checkRes['data']['balance'];
+            $updateMatch['check_status'] = 0;
+            $updateMatch['status'] = 1;   //使用中
+            $updateMatch['last_check_time'] = time();  //上次查询余额时间
+            $updateMatch['use_time'] = time();   //使用时间
+            $updateMatch['use_times'] = $hxOrderInfo['use_times'] + 1;   //使用次数+1
+            $updateMatch['last_use_time'] = time();
+            $updateMatch['order_status'] = 1;
+            $updateMatch['order_desc'] = "匹配成功！当前余额:" . (float)$checkRes['data']['balance'];
+
+            $updateMatchSuccessRes = $db::table("bsa_order_hexiao")->where($orderWhere)->update($updateMatch);
+            logs(json_encode([
+                'action' => 'getUseHxOrderUpdateMatch',
+                'orderWhere' => $orderWhere,
+                'updateMatch' => $updateMatch,
+                'updateMatchSuccessRes' => $updateMatchSuccessRes,
+            ]), 'AAAMatchSuccessRes');
+            if (!$updateMatchSuccessRes) {
+                return modelReMsg(-6, '', '下单频繁，请稍后再下-6！');
+            }
+            $hxOrderInfo = $db::table("bsa_order_hexiao")->where($orderWhere)->find();
+            return modelReMsg(0, $hxOrderInfo, "匹配成功！");
+
+        } catch (\Exception $exception) {
+
+            $db::rollback();
+            logs(json_encode(['orderNo' => $order['order_no'],
+                'file' => $exception->getFile(),
+                'line' => $exception->getLine(),
+                'errorMessage' => $exception->getMessage()]), 'getUseHxOrderException');
+            return modelReMsg(-11, '', $exception->getMessage());
+        } catch (\Error $error) {
+
+            $db::rollback();
+            logs(json_encode(['orderNo' => $order['order_no'],
+                'file' => $error->getFile(),
+                'line' => $error->getLine(),
+                'errorMessage' => $error->getMessage()]), 'getUseHxOrderError');
+            return modelReMsg(-11, '', $error->getMessage());
+        }
+
+    }
+
     /**
      * {
      * "write_off_sign":"lisi", //string

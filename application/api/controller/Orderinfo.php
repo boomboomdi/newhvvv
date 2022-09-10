@@ -339,7 +339,8 @@ class Orderinfo extends Controller
                 $db::commit();
                 //2、请求核销单
                 $orderHXModel = new OrderhexiaoModel();
-                $getUseHxOrderRes = $orderHXModel->getUseHxOrderNew($orderInfo);
+//                $getUseHxOrderRes = $orderHXModel->getUseHxOrderNew($orderInfo);
+                $getUseHxOrderRes = $orderHXModel->getUseHxHuaFeiOrder($orderInfo);
 
                 if (!isset($getUseHxOrderRes['code']) || $getUseHxOrderRes['code'] != 0) {
                     if (is_array($getUseHxOrderRes['data'])) {
