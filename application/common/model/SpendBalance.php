@@ -77,7 +77,7 @@ class SpendBalance extends Model
             $param['order_no'] = $orderNo;
             $param['account'] = $account;
             $param['amount'] = $amount;
-            $param['time'] = time();
+            $param['check_time'] = time();
             $param['check_result'] = $res;
             $db::table("bsa_check_log")->insert($param);
             return model($returnCode, $returnBalanceData, $param['check_desc']);
