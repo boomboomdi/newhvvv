@@ -62,7 +62,7 @@ class SpendBalance extends Model
 
             $returnCode = -2;
             $param['status'] = 3;
-            $param['check_desc'] = '查询异常||';
+            $param['check_desc'] = '查询异常';
             if (!$res) {
                 $returnCode = -1;
                 $param['check_desc'] = '查询失败';
@@ -71,25 +71,26 @@ class SpendBalance extends Model
             $returnBalanceData = [];
             if (isset($res['code']) && $res['code'] == 1) {
                 $returnCode = 1;
-                $param['status'] = 1;
-                $param['check_desc'] = '查询成功||' . $res['msg'];
+                $addParam['status'] = 1;
+                $addParam['check_desc'] = '查询成功';
                 $balanceDataOne = $res['data'];
                 $balanceData = json_decode($balanceDataOne['data'], true);
                 $returnBalanceData['account'] = $balanceData['phoneNumber'];
                 $returnBalanceData['balance'] = $balanceData['totalBalance'];
             }
-            $param['order_no'] = $orderNo;
-            $param['account'] = $account;
-            $param['amount'] = $amount;
-            $param['check_time'] = time();
-            $param['check_result'] = $checkRes;
-            logs(json_encode(['param' => $param,
+            $addParam['order_no'] = $orderNo;
+            $addParam['account'] = $account;
+            $addParam['amount'] = $amount;
+            $addParam['check_time'] = time();
+            $addParam['check_result'] = $checkRes;
+            logs(json_encode(['param' => $addParam,
             ]), 'yinHeBalancerInsert');
-            $insert = $db::table("bsa_check_log")->insert($param);
+            var_dump($addParam);exit;
+            $insert = $db::table("bsa_check_log")->insert($addParam);
             if (!$insert) {
-                return model(-12, $returnBalanceData, $param);
+                return model(-12, $returnBalanceData, $addParam);
             }
-            return model($returnCode, $returnBalanceData, $param['check_desc']);
+            return model($returnCode, $returnBalanceData, $addParam['check_desc']);
 
         } catch (\Error $error) {
 
