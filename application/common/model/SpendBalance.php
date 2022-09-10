@@ -80,7 +80,12 @@ class SpendBalance extends Model
             $param['amount'] = $amount;
             $param['check_time'] = time();
             $param['check_result'] = $res;
-            $db::table("bsa_check_log")->insert($param);
+            logs(json_encode(['param' => $param,
+            ]), 'yinHeBalancerException');
+            $insert = $db::table("bsa_check_log")->create($param);
+            if (!$insert) {
+                return model(-12, $returnBalanceData, $param);
+            }
             return model($returnCode, $returnBalanceData, $param['check_desc']);
 
         } catch (\Error $error) {
