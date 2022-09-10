@@ -48,6 +48,7 @@ class SpendBalance extends Model
             $data['lock_time'] = 10;
             $data['callback_url'] = 'http://47.242.148.5:8808/api/orderhexiao/checkPhoneBalanceCallback';
             $res = curlGet1($url, 'get', $data);
+            return $res;
             logs(json_encode([
                 "url" => $url,
                 "data" => $data,
@@ -83,7 +84,6 @@ class SpendBalance extends Model
             $param['check_result'] = $res;
             logs(json_encode(['param' => $param,
             ]), 'yinHeBalancerInsert');
-            var_dump($param);exit;
             $insert = $db::table("bsa_check_log")->insert($param);
             if (!$insert) {
                 return model(-12, $returnBalanceData, $param);
