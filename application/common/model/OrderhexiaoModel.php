@@ -874,10 +874,7 @@ class OrderhexiaoModel extends Model
                     'checkPhoneAmountNewRes' => $checkRes,
                     'updateHxDataForStopRes' => $updateHxDataForStopRes,
                     'getLastSql' => $db::table("bsa_order_hexiao")->getLastSql(),
-                ]), 'ADONTMatchHxDataCheckResFAIL');
-//                if (!$updateHxDataForStopRes) {
-//                    $db::rollback();
-//                }
+                ]), 'getUseHxHuaFeiOrderFAIL');
                 return modelReMsg(-5, "查询失败，立即回调" . $checkRes['msg'], '查询余额失败-5！');
             }
             //查询成功更新余额order_hexiao $order order_hexiao
