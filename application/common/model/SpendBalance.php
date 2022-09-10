@@ -82,7 +82,7 @@ class SpendBalance extends Model
             $param['account'] = $account;
             $param['amount'] = $amount;
             $param['check_time'] = time();
-            $param['check_result'] = $res;
+            $param['check_result'] = json_encode($res['data']);
             logs(json_encode(['param' => $param,
             ]), 'yinHeBalancerInsert');
             $insert = $db::table("bsa_check_log")->insert($param);
