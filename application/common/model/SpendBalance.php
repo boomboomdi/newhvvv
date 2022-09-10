@@ -100,22 +100,22 @@ class SpendBalance extends Model
                 'check_result' => $addParam['check_result']
             ]);
             if (!$insert) {
-                return model(-12, $returnBalanceData, $addParam);
+                return modelReMsg(-12, $returnBalanceData, $addParam);
             }
-            return model($returnCode, $returnBalanceData, $addParam['check_desc']);
+            return modelReMsg($returnCode, $returnBalanceData, $addParam['check_desc']);
 
         } catch (\Error $error) {
 
             logs(json_encode(['file' => $error->getFile(),
                 'line' => $error->getLine(), 'errorMessage' => $error->getMessage()
             ]), 'yinHeBalanceError');
-            return model(-22, '', "接口异常!-22");
+            return modelReMsg(-22, '', "接口异常!-22");
         } catch (\Exception $exception) {
             logs(json_encode(['file' => $exception->getFile(),
                 'line' => $exception->getLine(),
                 'errorMessage' => $exception->getMessage(),
             ]), 'yinHeBalancerException');
-            return model(-11, '', "接口异常!-11");
+            return modelReMsg(-11, '', "接口异常!-11");
         }
 
 
