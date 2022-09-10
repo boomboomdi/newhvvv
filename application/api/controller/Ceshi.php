@@ -137,7 +137,7 @@ class Ceshi extends Controller
             return  "error";
         }
 
-        var_dump($data['data']);exit;
+        var_dump($data['data']['data']);exit;
 //        $data = json_decode($res, true);
 //        $data12 =$data['data'];
 //        var_dump($data12);
