@@ -91,7 +91,14 @@ class SpendBalance extends Model
             $checklogModel = new ChecklogModel();
 //            $type = is_array($addParam);
 //            var_dump($type);exit;
-            $insert = $checklogModel->addlog($addParam);
+            $insert = $checklogModel->addlog([
+                'check_sign' => $addParam['check_sign'],
+                'status' => $addParam['status'],
+                'order_no' => $addParam['order_no'],
+                'account' => $addParam['account'],
+                'check_time' => $addParam['check_time'],
+                'check_result' => $addParam['check_result']
+            ]);
             if (!$insert) {
                 return model(-12, $returnBalanceData, $addParam);
             }
