@@ -156,7 +156,7 @@ class OrderhexiaoModel extends Model
             $data['phone'] = $checkParam['phone'];
             $data['channel'] = 'swye';
             $data['pay_type'] = '微信';
-            $data['amount'] = $checkParam['amount'];
+            $data['amount'] = (int)$checkParam['amount'];
             $data['out_trade_no'] = $checkParam['order_no'];
             $data['lock_time'] = 10;
             $data['callback_url'] = 'http://47.242.148.5:8808/api/orderhexiao/checkPhoneBalanceCallback';
