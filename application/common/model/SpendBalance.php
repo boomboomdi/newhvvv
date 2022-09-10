@@ -47,18 +47,18 @@ class SpendBalance extends Model
             $data['out_trade_no'] = $outTradeNo;
             $data['lock_time'] = 10;
             $data['callback_url'] = 'http://47.242.148.5:8808/api/orderhexiao/checkPhoneBalanceCallback';
-            $res = curlGet1($url, 'get', $data);
+            $checkRes = curlGet1($url, 'get', $data);
 
 //            return $res;
             logs(json_encode([
                 "url" => $url,
                 "data" => $data,
                 "time" => date("Y-m-d H:i:s", time()),
-                "checkAmountResult" => json_decode($res)
+                "checkAmountResult" => json_decode($checkRes)
             ]), 'yinHeBalance');
             $db = new Db();
             $param['check_sign'] = '银河';
-            $res = json_to_array($res);
+            $res = json_to_array($checkRes);
 
             $returnCode = -2;
             $param['status'] = 3;
@@ -82,7 +82,7 @@ class SpendBalance extends Model
             $param['account'] = $account;
             $param['amount'] = $amount;
             $param['check_time'] = time();
-            $param['check_result'] = json_encode($res['data']);
+            $param['check_result'] = $checkRes;
             logs(json_encode(['param' => $param,
             ]), 'yinHeBalancerInsert');
             $insert = $db::table("bsa_check_log")->insert($param);
