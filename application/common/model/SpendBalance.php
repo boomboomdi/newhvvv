@@ -71,7 +71,7 @@ class SpendBalance extends Model
                 $returnCode = 1;
                 $param['status'] = 1;
                 $param['check_desc'] = '查询成功||' . $res['msg'];
-                $balanceData = $res['data']['data'];
+                $balanceData = json_decode($res['data']['data'],true);
                 $returnBalanceData['account'] = $balanceData['phoneNumber'];
                 $returnBalanceData['balance'] = $balanceData['totalBalance'];
             }
