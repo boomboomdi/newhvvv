@@ -57,15 +57,16 @@ class SpendBalance extends Model
                 "checkAmountResult" => json_decode($checkRes)
             ]), 'yinHeBalance');
             $db = new Db();
-            $param['check_sign'] = '银河';
             $res = json_to_array($checkRes);
 
             $returnCode = -2;
-            $param['status'] = 3;
-            $param['check_desc'] = '查询异常';
+            $addParam = [];
+            $addParam['check_sign'] = '银河';
+            $addParam['status'] = 3;
+            $addParam['check_desc'] = '查询异常';
             if (!$res) {
                 $returnCode = -1;
-                $param['check_desc'] = '查询失败';
+                $addParam['check_desc'] = '查询失败';
             }
 
             $returnBalanceData = [];
