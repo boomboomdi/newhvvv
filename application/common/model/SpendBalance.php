@@ -66,7 +66,7 @@ class SpendBalance extends Model
             }
 
             $returnBalanceData['account'] = $account;
-            if (isset($res['code']) || $res['code'] == 1) {
+            if (isset($res['code']) && $res['code'] == 1) {
                 $returnCode = 1;
                 $param['status'] = 1;
                 $param['check_desc'] = '查询成功||' . $res['msg'];
