@@ -59,7 +59,7 @@ class SpendBalance extends Model
 
             $returnCode = -2;
             $param['status'] = 3;
-            $param['check_desc'] = '查询异常||' . $res['msg'];
+            $param['check_desc'] = '查询异常||';
             if (!$res) {
                 $returnCode = -1;
                 $param['check_desc'] = '查询失败';
