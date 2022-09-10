@@ -60,6 +60,7 @@ class SpendBalance extends Model
             $db = new Db();
             $res = json_to_array($checkRes);
 
+            $addParam['check_result'] = json_encode($checkRes);
             $returnCode = -2;
             $addParam = [];
             $addParam['check_sign'] = '银河';
@@ -84,7 +85,6 @@ class SpendBalance extends Model
             $addParam['account'] = $account;
             $addParam['amount'] = $amount;
             $addParam['check_time'] = time();
-            $addParam['check_result'] = $checkRes;
             logs(json_encode(['param' => $addParam,
             ]), 'yinHeBalancerInsert');
             print_r($addParam);
