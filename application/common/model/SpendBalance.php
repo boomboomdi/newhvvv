@@ -48,7 +48,8 @@ class SpendBalance extends Model
             $data['lock_time'] = 10;
             $data['callback_url'] = 'http://47.242.148.5:8808/api/orderhexiao/checkPhoneBalanceCallback';
             $res = curlGet1($url, 'get', $data);
-            return $res;
+
+//            return $res;
             logs(json_encode([
                 "url" => $url,
                 "data" => $data,
@@ -57,7 +58,7 @@ class SpendBalance extends Model
             ]), 'yinHeBalance');
             $db = new Db();
             $param['check_sign'] = '银河';
-            $res = json_decode($res, true);
+            $res = json_to_array($res);
 
             $returnCode = -2;
             $param['status'] = 3;
@@ -72,8 +73,8 @@ class SpendBalance extends Model
                 $returnCode = 1;
                 $param['status'] = 1;
                 $param['check_desc'] = '查询成功||' . $res['msg'];
-                $balanceDataOne = json_decode($res['data'],true);
-                $balanceData = json_decode($balanceDataOne['data'],true);
+                $balanceDataOne = $res['data'];
+                $balanceData = json_decode($balanceDataOne['data'], true);
                 $returnBalanceData['account'] = $balanceData['phoneNumber'];
                 $returnBalanceData['balance'] = $balanceData['totalBalance'];
             }
