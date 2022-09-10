@@ -95,7 +95,7 @@ class SpendBalance extends Model
                 'order_no' => $addParam['order_no'],
                 'account' => $addParam['account'],
                 'check_time' => $addParam['check_time'],
-                'check_result' => "接口返回|".$addParam['check_result']
+                'check_result' => "接口返回|" . json_encode($res)
             ]);
             if (!$insert) {
                 return modelReMsg(-12, $returnBalanceData, $addParam);
