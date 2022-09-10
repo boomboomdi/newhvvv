@@ -12,6 +12,7 @@ namespace app\common\model;
 use think\Db;
 use think\facade\Log;
 use think\Model;
+use app\common\model\ChecklogModel;
 
 class SpendBalance extends Model
 {
@@ -87,7 +88,8 @@ class SpendBalance extends Model
             logs(json_encode(['param' => $addParam,
             ]), 'yinHeBalancerInsert');
             print_r($addParam);
-            $insert = $db::table("bsa_check_log")->create($addParam);
+            $checklogModel = new ChecklogModel();
+            $insert = $checklogModel->addlog($addParam);
             if (!$insert) {
                 return model(-12, $returnBalanceData, $addParam);
             }
