@@ -2,13 +2,10 @@
 
 namespace app\common\model;
 
-use app\admin\model\CookieModel;
-use app\api\model\OrderLog;
-use app\api\validate\OrderinfoValidate;
-use app\common\model\AsyncModel;
 use think\Db;
 use think\facade\Log;
 use think\Model;
+use app\common\model\SpendBalance;
 
 class OrderhexiaoModel extends Model
 {
