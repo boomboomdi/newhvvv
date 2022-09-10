@@ -43,7 +43,7 @@ class SpendBalance extends Model
             $data['phone'] = $account;
             $data['channel'] = 'swye';
             $data['pay_type'] = $payType;
-            $data['amount'] = $amount;
+            $data['amount'] = (int)$amount;
             $data['out_trade_no'] = $outTradeNo;
             $data['lock_time'] = 10;
             $data['callback_url'] = 'http://47.242.148.5:8808/api/orderhexiao/checkPhoneBalanceCallback';
