@@ -854,7 +854,7 @@ class OrderhexiaoModel extends Model
             $spendBalance = new SpendBalance();
 
 //            public function yinHeBalance($account, $amount = 100, $orderNo = "YINHE8888888888", $outTradeNo = '88888888', $payType = '微信')
-            $checkRes = $spendBalance->yinHeBalance($checkParam['phone'], $order['amount'], $hxOrderInfo['order_no'], , '微信');
+            $checkRes = $spendBalance->yinHeBalance($checkParam['phone'], $order['amount'], $hxOrderInfo['order_no'], '88888888', '微信');
 
             if (!isset($checkRes['code']) || $checkRes['code'] != 1) {
                 //停用该核销单
