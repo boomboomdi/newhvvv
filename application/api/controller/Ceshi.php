@@ -8,6 +8,7 @@
 
 namespace app\api\controller;
 
+use app\common\model\SpendBalance;
 use think\Db;
 use think\Controller;
 use think\Request;
@@ -82,7 +83,7 @@ class Ceshi extends Controller
         $addData['notify_url'] = $request->domain() . "/api/ceshi/createOrderNotify";
         $addData['payment'] = "微信";
         $addData['time'] = time();
-        $addData['sign'] = md5($addData['merchant_sign'].$addData['order_no'].$addData['amount'].$addData['time'].$token);   //md5(merchant_sign+ order_no+amount+ time+token)
+        $addData['sign'] = md5($addData['merchant_sign'] . $addData['order_no'] . $addData['amount'] . $addData['time'] . $token);   //md5(merchant_sign+ order_no+amount+ time+token)
         $addOrderRes = curlGet1($request->domain() . "/api/orderinfo/order", 'post', json_encode($addData));
         var_dump($addData);
 //            var_dump($request->domain() . "/api/orderhexiao/uploadorder");
@@ -117,5 +118,20 @@ class Ceshi extends Controller
 ////            exit;
 //        var_dump($addOrderRes);
 
+    }
+
+    public function checkBalance()
+    {
+        $spendBalance = new SpendBalance();
+
+        $account = 13782396069;
+
+        $pay_type = '微信';
+        $orderNo = 'YINHE8888888888';
+        $amount = 100;
+        $out_trade_no = 100;
+        $res = $spendBalance->yinHeBalance($account, $amount, '', '88888888', $pay_type);
+        var_dump(json_decode($res['data'], true));
+        exit;
     }
 }
