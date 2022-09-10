@@ -55,7 +55,7 @@ class SpendBalance extends Model
             ]), 'yinHeBalance');
             $db = new Db();
             $param['check_sign'] = '银河';
-            $res = json_encode($res, true);
+            $res = json_decode($res, true);
 
             $returnCode = -2;
             $param['status'] = 3;
