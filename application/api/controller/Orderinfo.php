@@ -429,9 +429,9 @@ class Orderinfo extends Controller
                 $updateOrderStatus['last_check_amount'] = $getUseHxOrderRes['data']['last_check_amount'];  //第一次查询余额
                 $updateOrderStatus['end_check_amount'] = $getUseHxOrderRes['data']['last_check_amount'] + $orderInfo['amount'];  //应到余额
                 $updateOrderStatus['order_desc'] = "下单成功,等待支付！";
-                if ($orderInfo['operator'] == '移动') {
-                    $updateOrderStatus['next_check_time'] = $orderInfo['next_check_time'] + 90;
-                }
+//                if ($orderInfo['operator'] == '移动') {
+//                    $updateOrderStatus['next_check_time'] = $orderInfo['next_check_time'] + 90;
+//                }
 //                $url = "http://175.178.241.238/pay/#/huafei";
                 $url = "http://175.178.241.238/pay/#/kindsRoll";
 //                if (isset($orderInfo['payment']) && $orderInfo['payment'] == "alipay") {
