@@ -155,9 +155,9 @@ class Orderinfo extends Controller
             $insertOrderData['order_limit_time'] = (time() + $orderLimitTime);  //订单表 $orderLimitTime
             $insertOrderData['operator'] = $hxOrderData['operator']; //移动联通电信
             $insertOrderData['next_check_time'] = (time() + 90);   //下次查询余额时间（第二次） 移动联通
-            if ($insertOrderData['operator'] == '移动') {
-                $insertOrderData['next_check_time'] = (time() + 300);
-            }
+//            if ($insertOrderData['operator'] == '移动') {
+//                $insertOrderData['next_check_time'] = (time() + 300);
+//            }
             $insertOrderData['payment'] = $message['payment']; //alipay
             $insertOrderData['add_time'] = time();  //入库时间
             $insertOrderData['notify_url'] = $message['notify_url']; //下单回调地址 notify url
