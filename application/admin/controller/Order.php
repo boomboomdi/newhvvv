@@ -11,6 +11,7 @@ namespace app\admin\controller;
 use app\admin\model\OrderModel;
 use app\common\model\OrderdouyinModel;
 use app\common\model\OrderhexiaoModel;
+use app\common\model\SpendBalance;
 use think\Db;
 
 class Order extends Base
@@ -236,8 +237,10 @@ class Order extends Base
                 $getResParam['operator'] = $order['operator'];
                 $getResParam['phone'] = $order['account'];
                 $checkStartTime = date("Y-m-d H:i:s", time());
-                $orderHXModel = new OrderhexiaoModel();
-                $checkRes = $orderHXModel->checkPhoneAmountYinHe($getResParam, $order['order_no']);
+//                $orderHXModel = new OrderhexiaoModel();
+//                $checkRes = $orderHXModel->checkPhoneAmountYinHe($getResParam, $order['order_no']);
+                $speedBalanceModel = new SpendBalance();
+                $checkRes = $speedBalanceModel->yinHeBalance($order['account'],(int)$order['amount'],$order['order_me'],'88888888','微信');
                 $checking['check_status'] = 0;   //查询余额停止
                 $checking['last_check_time'] = time();   //查询上次查询时间
                 Db::table("bsa_order_hexiao")
@@ -251,14 +254,14 @@ class Order extends Base
                     'checkRes' => $checkRes,
                     'getLastSql' => Db::table("bsa_order_hexiao")->getLastSql(),
                 ]), 'adminCheckOrderLog');
-                if ($checkRes['code'] != 1) {
-                    return json(modelReMsg(-7, '', '查询超时,请稍等后在查!'));
+                if (!isset($checkRes['code'])||$checkRes['code'] != 1) {
+                    return json(modelReMsg(-7, '', '查询失败,请稍等后在查!'));
                 }
 
                 //查询成功-更新余额
-                $updateCheckData['last_check_amount'] = $checkRes['data'];
+                $updateCheckData['last_check_amount'] = $checkRes['data']['balance'];
                 $updateCheckData['last_check_time'] = time();
-                $updateCheckData['check_result'] = "手动查寻余额|" . $checkRes['data'] . "|" . $checkStartTime;
+                $updateCheckData['check_result'] = "手动查寻余额|" . $checkRes['data']['balance'] . "|" . $checkStartTime;
                 $updateCheckData['check_status'] = 0;
                 Db::table("bsa_order")
                     ->where('id', '=', $order['id'])
@@ -266,7 +269,7 @@ class Order extends Base
                     ->update($updateCheckData);
 
                 //支付成功，正在补单
-                if ($checkRes['data'] > ($order['end_check_amount'] - 20)) {
+                if ($checkRes['data']['balance'] > ($order['end_check_amount'] - 20)) {
                     //本地更新
                     $orderHXModel = new OrderhexiaoModel();
                     $updateOrderWhere['order_no'] = $order['order_no'];
